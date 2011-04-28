@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE Project SYSTEM "Project-4.6.dtd">
+<!-- eric4 project file for project df -->
+<!-- Saved: 2011-04-28, 19:55:59 -->
+<!-- Copyright (C) 2011 Adrià Cereto-Massagué, adrian.cereto@gmail.com -->
+<Project version="4.6">
+  <Language>ca</Language>
+  <ProgLanguage mixed="0">Python</ProgLanguage>
+  <ProjectType>PySide</ProjectType>
+  <Description></Description>
+  <Version>0.1</Version>
+  <Author>Adrià Cereto-Massagué</Author>
+  <Email>adrian.cereto@gmail.com</Email>
+  <Sources>
+    <Source>__init__.py</Source>
+  </Sources>
+  <Forms>
+  </Forms>
+  <Translations>
+  </Translations>
+  <Resources>
+  </Resources>
+  <Interfaces>
+  </Interfaces>
+  <Others>
+  </Others>
+  <Vcs>
+    <VcsType>None</VcsType>
+  </Vcs>
+  <FiletypeAssociations>
+    <FiletypeAssociation pattern="*.ui" type="FORMS" />
+    <FiletypeAssociation pattern="*.idl" type="INTERFACES" />
+    <FiletypeAssociation pattern="*.qm" type="TRANSLATIONS" />
+    <FiletypeAssociation pattern="*.ptl" type="SOURCES" />
+    <FiletypeAssociation pattern="*.pyw" type="SOURCES" />
+    <FiletypeAssociation pattern="*.ui.h" type="FORMS" />
+    <FiletypeAssociation pattern="*.ts" type="TRANSLATIONS" />
+    <FiletypeAssociation pattern="*.py" type="SOURCES" />
+    <FiletypeAssociation pattern="*.qrc" type="RESOURCES" />
+  </FiletypeAssociations>
+</Project>
