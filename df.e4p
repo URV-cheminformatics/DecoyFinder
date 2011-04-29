@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE Project SYSTEM "Project-4.6.dtd">
 <!-- eric4 project file for project df -->
-<!-- Saved: 2011-04-29, 02:29:05 -->
+<!-- Saved: 2011-04-29, 16:29:59 -->
 <!-- Copyright (C) 2011 Adrià Cereto-Massagué, adrian.cereto@gmail.com -->
 <Project version="4.6">
   <Language>ca</Language>
@@ -12,10 +12,13 @@
   <Author>Adrià Cereto-Massagué</Author>
   <Email>adrian.cereto@gmail.com</Email>
   <Sources>
-    <Source>__init__.py</Source>
     <Source>find_decoys.py</Source>
+    <Source>Ui_MainWindow.py</Source>
+    <Source>MainWindow.py</Source>
+    <Source>decoy_finder.py</Source>
   </Sources>
   <Forms>
+    <Form>MainWindow.ui</Form>
   </Forms>
   <Translations>
   </Translations>
