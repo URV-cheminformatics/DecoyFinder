@@ -185,9 +185,6 @@
             <property name="singleStep">
              <double>0.100000000000000</double>
             </property>
-            <property name="value">
-             <double>0.900000000000000</double>
-            </property>
            </widget>
           </item>
           <item row="1" column="0">
@@ -216,9 +213,6 @@
             <property name="singleStep">
              <double>0.100000000000000</double>
             </property>
-            <property name="value">
-             <double>1.000000000000000</double>
-            </property>
            </widget>
           </item>
           <item row="4" column="0">
@@ -242,9 +236,6 @@
             </property>
             <property name="maximum">
              <number>999</number>
-            </property>
-            <property name="value">
-             <number>40</number>
             </property>
            </widget>
           </item>
@@ -273,7 +264,7 @@
     <item>
      <widget class="QProgressBar" name="progressBar">
       <property name="value">
-       <number>100</number>
+       <number>0</number>
       </property>
       <property name="alignment">
        <set>Qt::AlignCenter</set>
@@ -291,7 +282,7 @@
      <x>0</x>
      <y>0</y>
      <width>598</width>
-     <height>25</height>
+     <height>23</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuHelp">
@@ -334,12 +325,44 @@
    <slot>clear()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>96</x>
-     <y>379</y>
+     <x>85</x>
+     <y>386</y>
     </hint>
     <hint type="destinationlabel">
      <x>467</x>
      <y>221</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>clearButton</sender>
+   <signal>clicked()</signal>
+   <receiver>progressBar</receiver>
+   <slot>reset()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>39</x>
+     <y>383</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>29</x>
+     <y>430</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>clearButton</sender>
+   <signal>clicked()</signal>
+   <receiver>statusbar</receiver>
+   <slot>clear()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>50</x>
+     <y>390</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>49</x>
+     <y>457</y>
     </hint>
    </hints>
   </connection>

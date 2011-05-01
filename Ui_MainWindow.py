@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file '/home/ssorgatem/uni/PEI/decoys/MainWindow.ui'
 #
-# Created: Fri Apr 29 22:21:05 2011
+# Created: Sun May  1 09:37:30 2011
 #      by: pyside-uic 0.2.8 running on PySide 1.0.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -98,7 +98,6 @@ class Ui_MainWindow(object):
         self.tanimotoBox = QtGui.QDoubleSpinBox(self.tabWidgetPage2)
         self.tanimotoBox.setMaximum(1.0)
         self.tanimotoBox.setSingleStep(0.1)
-        self.tanimotoBox.setProperty("value", 0.9)
         self.tanimotoBox.setObjectName("tanimotoBox")
         self.formLayout.setWidget(0, QtGui.QFormLayout.FieldRole, self.tanimotoBox)
         self.hBALabel_2 = QtGui.QLabel(self.tabWidgetPage2)
@@ -112,7 +111,6 @@ class Ui_MainWindow(object):
         self.formLayout.setWidget(3, QtGui.QFormLayout.LabelRole, self.clogPLabel)
         self.clogpBox = QtGui.QDoubleSpinBox(self.tabWidgetPage2)
         self.clogpBox.setSingleStep(0.1)
-        self.clogpBox.setProperty("value", 1.0)
         self.clogpBox.setObjectName("clogpBox")
         self.formLayout.setWidget(3, QtGui.QFormLayout.FieldRole, self.clogpBox)
         self.molecularWeightLabel = QtGui.QLabel(self.tabWidgetPage2)
@@ -123,7 +121,6 @@ class Ui_MainWindow(object):
         self.formLayout.setWidget(5, QtGui.QFormLayout.LabelRole, self.rtotationalBondsLabel)
         self.molwtBox = QtGui.QSpinBox(self.tabWidgetPage2)
         self.molwtBox.setMaximum(999)
-        self.molwtBox.setProperty("value", 40)
         self.molwtBox.setObjectName("molwtBox")
         self.formLayout.setWidget(4, QtGui.QFormLayout.FieldRole, self.molwtBox)
         self.rotbBox = QtGui.QSpinBox(self.tabWidgetPage2)
@@ -142,14 +139,14 @@ class Ui_MainWindow(object):
         self.tabWidget.addTab(self.tabWidgetPage2, "")
         self.verticalLayout_4.addWidget(self.tabWidget)
         self.progressBar = QtGui.QProgressBar(self.centralwidget)
-        self.progressBar.setProperty("value", 100)
+        self.progressBar.setProperty("value", 0)
         self.progressBar.setAlignment(QtCore.Qt.AlignCenter)
         self.progressBar.setOrientation(QtCore.Qt.Horizontal)
         self.progressBar.setObjectName("progressBar")
         self.verticalLayout_4.addWidget(self.progressBar)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtGui.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 598, 25))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 598, 23))
         self.menubar.setObjectName("menubar")
         self.menuHelp = QtGui.QMenu(self.menubar)
         self.menuHelp.setObjectName("menuHelp")
@@ -166,6 +163,8 @@ class Ui_MainWindow(object):
         self.tabWidget.setCurrentIndex(0)
         QtCore.QObject.connect(self.clearButton, QtCore.SIGNAL("clicked()"), self.queryList.clear)
         QtCore.QObject.connect(self.clearButton, QtCore.SIGNAL("clicked()"), self.dbListWidget.clear)
+        QtCore.QObject.connect(self.clearButton, QtCore.SIGNAL("clicked()"), self.progressBar.reset)
+        QtCore.QObject.connect(self.clearButton, QtCore.SIGNAL("clicked()"), self.statusbar.clear)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):

@@ -59,7 +59,7 @@ class ComparableMol():
         self.fp = mol.calcfp("MACCS")
         self.hba = len(HBA.findall(mol))
         self.hbd = len(HBD.findall(mol))
-        self.clogp = mol.calcdesc(['LogP'])['LogP']
+        self.clogp = mol.calcdesc(['logP'])['logP']
         self.mw = mol.molwt
         self.rot = mol.OBMol.NumRotors()
         self.title = mol.title
@@ -110,30 +110,61 @@ def get_fileformat(file):
 def parse_db_files(filelist):
     """
     """
-
+    filecount = 0
     for dbfile in filelist:
-        dbfile = str(dbfile)
-        mols = pybel.readfile('sdf',#get_fileformat(dbfile),
-                              '/home/ssorgatem/uni/PEI/ZINC/10_p0.24.sdf.gz')
+        mols = pybel.readfile(get_fileformat(dbfile), dbfile)
         for mol in mols:
-            yield ComparableMol(mol)
+            yield ComparableMol(mol), filecount, dbfile
+        filecount += 1
+
 
 def parse_query_files(filelist):
     """
     """
     query_dict = {}
     for file in filelist:
-        print file
         file = str(file)
-        print file
-        mols = pybel.readfile('sdf',#get_fileformat(file),
-                              '/home/ssorgatem/uni/PEI/trypsin_ligands.sdf.gz')
-        print list(mols)
+        mols = pybel.readfile(get_fileformat(file),
+                              file)
         for mol in mols:
-            print mol.title
             query_dict[ComparableMol(mol)] = []
     return query_dict
 
+def isdecoy(
+                db_mol
+                ,ligand
+                ,HBA_t = 0 #1
+                ,HBD_t = 0#1
+                ,ClogP_t = 1#1.5
+                ,tanimoto_t = 0.9
+                ,MW_t = 40
+                ,RB_t = 0
+                ):
+    """
+    """
+    tanimoto = db_mol.fp | ligand.fp
+    if  tanimoto < tanimoto_t \
+    and ligand.hba - HBA_t <= db_mol.hba <= ligand.hba + HBA_t\
+    and ligand.hbd - HBD_t <= db_mol.hbd <= ligand.hbd + HBD_t\
+    and ligand.clogp - ClogP_t <= db_mol.clogp <= ligand.clogp + ClogP_t \
+    and ligand.mw - MW_t <= db_mol.mw <= ligand.mw + MW_t \
+    and ligand.rot - RB_t <= db_mol.rot <= ligand.rot + RB_t \
+    :
+        return True
+    else:
+        return False
+
+def save_decoys(ligands_dict, outputdir):
+    """
+    """
+    for ligand in ligands_dict.iterkeys():
+        decoy_list = ligands_dict[ligand]
+        print ligand.title, len(decoy_list), "decoys found"
+        if decoy_list:
+            decoyfile = pybel.Outputfile("sdf", os.path.join(str(outputdir), ligand.title + "_decoys.sdf"), overwrite = True)
+            for decoy in decoy_list:
+                decoyfile.write(decoy.mol)
+            decoyfile.close()
 
 def find_decoys(
                 query_files
@@ -157,38 +188,39 @@ def find_decoys(
 #        testfile = "/home/ssorgatem/uni/PEI/trypsin_ligands.sdf.gz" #STUB!
 #        query_files = [testfile]
 ################################################
-    query_files = ['/home/ssorgatem/uni/PEI/trypsin_ligands.sdf.gz']
-    db_files = ["/home/ssorgatem/uni/PEI/ZINC/10_p0.101.sdf.gz"]
-    print "Parsing db_files"
-    print db_files
+    print "Looking for decoys!"
+
     db_entry_gen = parse_db_files(db_files)
-    print "parsing query files"
+
     ligands_dict = parse_query_files(query_files)
-    print ligands_dict
-    print "Starting comparation"
-    for db_mol in db_entry_gen:
-        print db_mol
+
+    for db_mol, filecount, db_file in db_entry_gen:
+        #print db_mol.title
+        yield filecount, db_file
         for ligand in ligands_dict.iterkeys():
-            print ligand.title
-            tanimoto = db_mol.fp | ligand.fp
-            if  tanimoto < tanimoto_t \
-            and ligand.hba - HBA_t <= db_mol.hba <= ligand.hba + HBA_t\
-            and ligand.hbd - HBD_t <= db_mol.hbd <= ligand.hbd + HBD_t\
-            and ligand.clogp - ClogP_t <= db_mol.clogp <= ligand.clogp + ClogP_t \
-            and ligand.mw - MW_t <= db_mol.mw <= ligand.mw + MW_t \
-            and ligand.rot - RB_t <= db_mol.rot <= ligand.rot + RB_t \
-            :
+            #print ligand.title
+#            tanimoto = db_mol.fp | ligand.fp
+#            if  tanimoto < tanimoto_t \
+#            and ligand.hba - HBA_t <= db_mol.hba <= ligand.hba + HBA_t\
+#            and ligand.hbd - HBD_t <= db_mol.hbd <= ligand.hbd + HBD_t\
+#            and ligand.clogp - ClogP_t <= db_mol.clogp <= ligand.clogp + ClogP_t \
+#            and ligand.mw - MW_t <= db_mol.mw <= ligand.mw + MW_t \
+#            and ligand.rot - RB_t <= db_mol.rot <= ligand.rot + RB_t \
+#            :
+            if isdecoy(db_mol,ligand,HBA_t,HBD_t,ClogP_t,tanimoto_t,MW_t,RB_t ):
                 ligands_dict[ligand].append(db_mol)
                 #print tanimoto, db_mol.title, ligand.title
-    print "Comparation done"
-    for ligand in ligands_dict.iterkeys():
-        decoy_list = ligands_dict[ligand]
-        print ligand.title, len(decoy_list), "decoys found"
-        if decoy_list:
-            decoyfile = pybel.Outputfile("sdf", os.path.join(str(outputdir), ligand.title + "_decoys.sdf"), overwrite = True)
-            for decoy in decoy_list:
-                decoyfile.write(decoy.mol)
-    print "Done."
+
+#    for ligand in ligands_dict.iterkeys():
+#        decoy_list = ligands_dict[ligand]
+#        print ligand.title, len(decoy_list), "decoys found"
+#        if decoy_list:
+#            decoyfile = pybel.Outputfile("sdf", os.path.join(str(outputdir), ligand.title + "_decoys.sdf"), overwrite = True)
+#            for decoy in decoy_list:
+#                decoyfile.write(decoy.mol)
+#            decoyfile.close()
+    save_decoys(ligands_dict, outputdir)
+    print "Done.\n"
 
 if __name__ == '__main__':
     #TODO: OptParse

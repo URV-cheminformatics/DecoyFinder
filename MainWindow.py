@@ -22,54 +22,53 @@ Module implementing MainWindow.
 """
 
 import os, pybel
-import openbabel as ob
 from PySide.QtGui import QMainWindow, QFileDialog, QTableWidgetItem
-from PySide.QtCore import QSettings
+from PySide.QtCore import QSettings, QThread, Signal
 from PySide.QtCore import Slot as pyqtSignature
 
 from find_decoys import get_fileformat, find_decoys, get_zinc_slice
 from Ui_MainWindow import Ui_MainWindow
-def readfile(format, filename):
-    """Iterate over the molecules in a file.
 
-    Required parameters:
-       format - see the informats variable for a list of available
-                input formats
-       filename
 
-    You can access the first molecule in a file using the next() method
-    of the iterator:
-        mol = readfile("smi", "myfile.smi").next()
-
-    You can make a list of the molecules in a file using:
-        mols = list(readfile("smi", "myfile.smi"))
-
-    You can iterate over the molecules in a file as shown in the
-    following code snippet:
-    >>> atomtotal = 0
-    >>> for mol in readfile("sdf", "head.sdf"):
-    ...     atomtotal += len(mol.atoms)
-    ...
-    >>> print atomtotal
-    43
+class DecoyFinderThread(QThread):
     """
-    obconversion = ob.OBConversion()
-    formatok = obconversion.SetInFormat(format)
-    if not formatok:
-        raise ValueError("%s is not a recognised OpenBabel format" % format)
-    if not os.path.isfile(filename):
-        raise IOError("No such file: '%s'" % filename)
-    obmol = ob.OBMol()
-    print "sense string:", filename
-    print "amb string:", str(filename)
-    notatend = obconversion.ReadFile(obmol,str(filename))
-    print notatend
-    if not notatend:
-        raise caca
-    while notatend:
-        yield Molecule(obmol)
-        obmol = ob.OBMol()
-        notatend = obconversion.Read(obmol)
+    """
+    def __init__(self, query_files, db_files, parent = None):
+        """
+        """
+        print "thread created"
+        self.query_files = query_files
+        self.db_files = db_files
+        self.settings = QSettings()
+        super(DecoyFinderThread, self).__init__(parent)
+
+    info = Signal(unicode) #needs to be defined OUTSIDE __init__
+    progress = Signal(int)
+    finished = Signal()
+
+    def run(self):
+        """
+        """
+        self.info.emit(u"thread running")
+        try:
+            filecount = -1
+            for filecount, current_file in find_decoys(
+                        query_files = self.query_files
+                        ,db_files = self.db_files
+                        ,outputdir =  self.settings.value('outdir', os.getcwd())
+                        ,HBA_t = int(self.settings.value('HBA_t', 0))
+                        ,HBD_t = int(self.settings.value('HBD_t', 0))
+                        ,ClogP_t = float(self.settings.value('ClogP_t', 1))
+                        ,tanimoto_t = float(self.settings.value('tanimoto_t', 0.9))
+                        ,MW_t = int(self.settings.value('MW_t',40))
+                        ,RB_t = int(self.settings.value('RB_t',0))
+                        ):
+                self.info.emit("Reading %s" % current_file)
+                self.progress.emit(filecount)
+            self.progress.emit(filecount +1)
+        except:
+            self.info.emit("An error ocurred")
+        self.finished.emit()
 
 class MainWindow(QMainWindow, Ui_MainWindow):
     """
@@ -81,13 +80,21 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         """
         QMainWindow.__init__(self, parent)
         self.setupUi(self)
+        self.progressBar.setMinimum(0)
+        self.progressBar.setValue(0)
         self.settings = QSettings()
+        self.hbaBox.setValue(int(self.settings.value('HBA_t', 0)))
+        self.hbdBox.setValue(int(self.settings.value('HBD_t', 0)))
+        self.clogpBox.setValue(float(self.settings.value('ClogP_t', 1)))
+        self.tanimotoBox.setValue(float(self.settings.value('tanimoto_t', 0.9)))
+        self.molwtBox.setValue(int(self.settings.value('MW_t',40)))
+        self.rotbBox.setValue(int(self.settings.value('RB_t',0)))
         self.supported_files = self.tr('Molecule files') + ' ('
         for format in pybel.informats.iterkeys():
             self.supported_files += "*.%s " %format
             self.supported_files += "*.%s.gz " %format
         self.supported_files += ')'
-        self.outputDirectoryLineEdit.setText(self.settings.value('outdir'))
+        self.outputDirectoryLineEdit.setText(self.settings.value('outdir',os.getcwd()))
 
     def _getListWidgetItemTextList(self, listWidget):
         """
@@ -95,6 +102,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         itemlist = [listWidget.item(index).text() for index in xrange(listWidget.count())]
         return itemlist
 
+    def on_finder_finished(self):
+        """
+        """
+        self.tabWidget.setEnabled(True)
 
 
     @pyqtSignature("")
@@ -122,7 +133,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         """
         itemlist = self._getListWidgetItemTextList(self.dbListWidget)
         if self.dbComboBox.currentIndex() == 0:
-            print "select files"
+            #print "select files"
             dialog =  QFileDialog(self)
             dialog.setFileMode(QFileDialog.ExistingFiles)
             dialog.setNameFilter(self.supported_files)
@@ -163,33 +174,43 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 self.outputDirectoryLineEdit.setText(dir)
                 self.settings.setValue('outdir', dir)
             else:
-                pass # TODO: inform statusbar about it
+                self.statusbar.showMessage(self.tr("Unable to read selected directory"))
 
     @pyqtSignature("")
     def on_findDecoysButton_clicked(self):
         """
         Slot documentation goes here.
         """
-        # TODO: on_findDecoysButton_clicked
+        self.findDecoysButton.setEnabled(False)
         #print self.settings.value('outdir')
-#        query_files = self._getListWidgetItemTextList(self.queryList)
-#
-#        db_items = self._getListWidgetItemTextList(self.dbListWidget)
-#        db_files = []
-#        for item in db_items:
-#            if item.split()[0] == 'ZINC':
-#                pass #TODO download from ZINC
-#            elif os.path.isfile(item):
-#                db_files.append(str(item))
-#        print db_files
-        query_files = ['/home/ssorgatem/uni/PEI/trypsin_ligands.sdf.gz']
-        db_files = ["/home/ssorgatem/uni/PEI/ZINC/10_p0.101.sdf.gz"]
-        mols = readfile('sdf', '/home/ssorgatem/uni/PEI/trypsin_ligands.sdf.gz')
-        print mols.next().mol.title
-#        find_decoys(
-#                    query_files = query_files
-#                    ,db_files = db_files)
-                    #,outputdir =  self.settings.value('outdir'))
+        query_files = self._getListWidgetItemTextList(self.queryList)
+
+        db_items = self._getListWidgetItemTextList(self.dbListWidget)
+        db_files = []
+        self.progressBar.maximum = 0
+        for item in db_items:
+            if item.split()[0] == 'ZINC':
+                pass #TODO download from ZINC
+            elif os.path.isfile(item):
+                db_files.append(str(item))
+        self.progressBar.setMaximum(len(db_files))
+        self.finder = DecoyFinderThread(query_files, db_files)
+        #self.statusbar.showMessage("hola")
+        self.finder.info.connect(self.statusbar.showMessage)
+        self.finder.progress.connect(self.progressBar.setValue)
+        self.finder.finished.connect(self.on_finder_finished)
+        self.tabWidget.setEnabled(False)
+        print "starting thread"
+        self.finder.start()
+        print "started"
+
+    @pyqtSignature("")
+    def on_clearButton_clicked(self):
+        """
+        Slot documentation goes here.
+        """
+        self.progressBar.setMaximum(1)
+
 
     ############ Options tab  #############
     @pyqtSignature("")
@@ -197,56 +218,58 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         """
         Slot documentation goes here.
         """
-        # TODO: on_tanimotoBox_editingFinished
-        raise NotImplementedError
+        self.settings.setValue('tanimoto_t', self.tanimotoBox.value())
+        print "value changed"
+
 
     @pyqtSignature("")
     def on_clogpBox_editingFinished(self):
         """
         Slot documentation goes here.
         """
-        # TODO: on_clogpBox_editingFinished
-        raise NotImplementedError
+        self.settings.setValue('ClogP_t', self.clogpBox.value())
 
     @pyqtSignature("")
     def on_molwtBox_editingFinished(self):
         """
         Slot documentation goes here.
         """
-        # TODO: on_molwtBox_editingFinished
-        raise NotImplementedError
+        self.settings.setValue('MW_t', self.molwtBox.value())
 
     @pyqtSignature("")
     def on_rotbBox_editingFinished(self):
         """
         Slot documentation goes here.
         """
-        # TODO: on_rotbBox_editingFinished
-        raise NotImplementedError
+        self.settings.setValue('RB_t', self.rotbBox.value())
 
     @pyqtSignature("")
     def on_hbaBox_editingFinished(self):
         """
         Slot documentation goes here.
         """
-        # TODO: on_hbaBox_editingFinished
-        raise NotImplementedError
+        self.settings.setValue('HBA_t', self.hbaBox.value())
 
     @pyqtSignature("")
     def on_hbdBox_editingFinished(self):
         """
         Slot documentation goes here.
         """
-        # TODO: on_hbdBox_editingFinished
-        print self.hbdBox.value()
+        self.settings.setValue('HBD_t', self.hbdBox.value())
 
     @pyqtSignature("")
     def on_defaultsButton_clicked(self):
         """
         Slot documentation goes here.
         """
-        # TODO: on_defaultsButton_clicked
-        raise NotImplementedError
+        self.hbaBox.setValue(0)
+        self.hbdBox.setValue(0)
+        self.clogpBox.setValue(1)
+        self.tanimotoBox.setValue(0.9)
+        self.molwtBox.setValue(40)
+        self.rotbBox.setValue(0)
+        for field in (self.hbaBox, self.hbdBox, self.clogpBox, self.tanimotoBox, self.molwtBox, self.rotbBox):
+            field.editingFinished.emit()
 
     #################################
 
@@ -257,4 +280,4 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         Slot documentation goes here.
         """
         # TODO: on_actionAbout_activated
-        raise NotImplementedError
+        #raise NotImplementedError
