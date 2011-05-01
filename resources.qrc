@@ -1,0 +1,9 @@
+<RCC>
+  <qresource prefix="locales">
+    <file>locales/df_ca.qm</file>
+    <file>locales/df_de.qm</file>
+    <file>locales/df_es.qm</file>
+    <file>locales/df_fr.qm</file>
+  </qresource>
+  <qresource prefix="images"/>
+</RCC>
