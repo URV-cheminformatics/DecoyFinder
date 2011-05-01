@@ -30,16 +30,16 @@ VERSION = '0.1~alfa'
 def main():
     """
     """
-    #translator = QTranslator() #Build the translator
-    #translator.load("translations/df_%1" % (QLocale.system().name())) #Path to v4f's translation files
-    #qttranslator = QTranslator()#A translator for Qt standard strings
-    #qttranslator.load("qt_%1" % (QLocale.system().name()))
+    translator = QTranslator() #Build the translator
+    translator.load(":/locales/df_%s" % QLocale.system().name())
+    qttranslator = QTranslator()#A translator for Qt standard strings
+    qttranslator.load("qt_%s" % (QLocale.system().name()))
     Vapp = QApplication(sys.argv) #Creating the app
     Vapp.setOrganizationName(ORGNAME) #Setting organization and application's
     Vapp.setApplicationName(NAME)#name. It's only useful for QSettings
     Vapp.setApplicationVersion(VERSION)
-    #Vapp.installTranslator(translator)#Install translators into the application.
-    #Vapp.installTranslator(qttranslator)
+    Vapp.installTranslator(translator)#Install translators into the application.
+    Vapp.installTranslator(qttranslator)
     mw = MainWindow() #Now it's time to instantiate the main window
     mw.show() #And show it
     sys.exit(Vapp.exec_()) #When the app finishes, exit.

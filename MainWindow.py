@@ -22,8 +22,8 @@ Module implementing MainWindow.
 """
 
 import os, pybel
-from PySide.QtGui import QMainWindow, QFileDialog, QTableWidgetItem
-from PySide.QtCore import QSettings, QThread, Signal
+from PySide.QtGui import QMainWindow, QFileDialog, QTableWidgetItem, QMessageBox
+from PySide.QtCore import QSettings, QThread, Signal,  Qt
 from PySide.QtCore import Slot as pyqtSignature
 
 from find_decoys import get_fileformat, find_decoys, get_zinc_slice
@@ -33,6 +33,11 @@ from Ui_MainWindow import Ui_MainWindow
 class DecoyFinderThread(QThread):
     """
     """
+    info = Signal(unicode) #needs to be defined OUTSIDE __init__
+    progress = Signal(int)
+    finished = Signal(dict)
+    error = Signal(unicode)
+
     def __init__(self, query_files, db_files, parent = None):
         """
         """
@@ -42,16 +47,13 @@ class DecoyFinderThread(QThread):
         self.settings = QSettings()
         super(DecoyFinderThread, self).__init__(parent)
 
-    info = Signal(unicode) #needs to be defined OUTSIDE __init__
-    progress = Signal(int)
-    finished = Signal()
-
     def run(self):
         """
         """
-        self.info.emit(u"thread running")
+        self.info.emit(self.tr("Reading files..."))
+        result = {}
         try:
-            filecount = -1
+            self.filecount = 0
             for filecount, current_file in find_decoys(
                         query_files = self.query_files
                         ,db_files = self.db_files
@@ -63,12 +65,20 @@ class DecoyFinderThread(QThread):
                         ,MW_t = int(self.settings.value('MW_t',40))
                         ,RB_t = int(self.settings.value('RB_t',0))
                         ):
-                self.info.emit("Reading %s" % current_file)
-                self.progress.emit(filecount)
-            self.progress.emit(filecount +1)
-        except:
-            self.info.emit("An error ocurred")
-        self.finished.emit()
+                if current_file:
+                    self.filecount = filecount
+                    self.info.emit(self.tr("Reading %s") % current_file)
+                    self.progress.emit(self.filecount)
+                elif type(filecount) == dict:
+                    print "dict found"
+                    result = filecount
+                else:
+                    self.error.emit(tr('Unexpected error: %s; %s') % (filecount, current_file))
+            self.progress.emit(self.filecount +1)
+        except Exception, e:
+            err = unicode(e)
+            self.error.emit("Error: %s" % err)
+        self.finished.emit(result)
 
 class MainWindow(QMainWindow, Ui_MainWindow):
     """
@@ -102,10 +112,40 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         itemlist = [listWidget.item(index).text() for index in xrange(listWidget.count())]
         return itemlist
 
-    def on_finder_finished(self):
+    def on_finder_finished(self, resultdict):
         """
         """
+        self.resultsTable.setSortingEnabled(False)
         self.tabWidget.setEnabled(True)
+        self.findDecoysButton.setEnabled(True)
+        if len(resultdict):
+            resultlines = []
+            self.tabWidget.setCurrentIndex(1)
+            for ligand in resultdict.iterkeys():
+                self.resultsTable.insertRow(0)
+                self.resultsTable.setItem(0, 0,  QTableWidgetItem(ligand))
+                self.resultsTable.setItem(0, 1,  QTableWidgetItem(str(resultdict[ligand])))
+                outfile = os.path.join(self.settings.value('outdir'),  ligand + "_decoys.sdf")
+                if resultdict[ligand] and os.path.isfile(outfile):
+                    self.resultsTable.setItem(0, 2,  QTableWidgetItem(outfile))
+                else:
+                    self.resultsTable.setItem(0, 2,  QTableWidgetItem(self.tr("Not saved")))
+            self.resultsTable.sortByColumn(1, Qt.DescendingOrder)
+            self.resultsTable.resizeColumnToContents(0)
+            self.resultsTable.resizeColumnToContents(2)
+        self.statusbar.showMessage(self.tr("Done."))
+
+
+    def on_error(self, error):
+        """
+        """
+        #print error
+        QMessageBox.critical(None,
+            self.trUtf8("Error"),
+            self.trUtf8(error),
+            QMessageBox.StandardButtons(QMessageBox.Ok)
+            )
+
 
 
     @pyqtSignature("")
@@ -118,7 +158,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         dialog.setFileMode(QFileDialog.ExistingFiles)
         dialog.setNameFilter(self.supported_files)
         dialog.setDirectory(os.path.expanduser('~'))
-        dialog.setOption(QFileDialog.DontUseNativeDialog)
+        #dialog.setOption(QFileDialog.DontUseNativeDialog)
         if dialog.exec_():
             filelist = dialog.selectedFiles()
             for file in filelist:
@@ -138,7 +178,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             dialog.setFileMode(QFileDialog.ExistingFiles)
             dialog.setNameFilter(self.supported_files)
             dialog.setDirectory(os.path.expanduser('~'))
-            dialog.setOption(QFileDialog.DontUseNativeDialog)
+            #dialog.setOption(QFileDialog.DontUseNativeDialog)
             if dialog.exec_():
                 dblist = dialog.selectedFiles()
                 for file in dblist:
@@ -190,19 +230,25 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.progressBar.maximum = 0
         for item in db_items:
             if item.split()[0] == 'ZINC':
-                pass #TODO download from ZINC
+                #TODO download from ZINC
+                print item.split()[1]
+
             elif os.path.isfile(item):
                 db_files.append(str(item))
-        self.progressBar.setMaximum(len(db_files))
-        self.finder = DecoyFinderThread(query_files, db_files)
-        #self.statusbar.showMessage("hola")
-        self.finder.info.connect(self.statusbar.showMessage)
-        self.finder.progress.connect(self.progressBar.setValue)
-        self.finder.finished.connect(self.on_finder_finished)
-        self.tabWidget.setEnabled(False)
-        print "starting thread"
-        self.finder.start()
-        print "started"
+        if [] in (query_files , db_files):
+            self.on_error(self.tr('You must select at least one file containing quey molecules, and at least one molecule library file'))
+            self.findDecoysButton.setEnabled(True)
+        else:
+            self.progressBar.setMaximum(len(db_files))
+            self.finder = DecoyFinderThread(query_files, db_files)
+            self.finder.info.connect(self.statusbar.showMessage)
+            self.finder.progress.connect(self.progressBar.setValue)
+            self.finder.finished.connect(self.on_finder_finished)
+            self.finder.error.connect(self.on_error)
+            self.tabWidget.setEnabled(False)
+            print "starting thread"
+            self.finder.start()
+            print "started"
 
     @pyqtSignature("")
     def on_clearButton_clicked(self):
@@ -210,6 +256,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         Slot documentation goes here.
         """
         self.progressBar.setMaximum(1)
+        for row in xrange(self.resultsTable.rowCount()):
+            self.resultsTable.removeRow(row)
 
 
     ############ Options tab  #############
@@ -219,7 +267,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         Slot documentation goes here.
         """
         self.settings.setValue('tanimoto_t', self.tanimotoBox.value())
-        print "value changed"
+        #print "value changed"
 
 
     @pyqtSignature("")
@@ -279,5 +327,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         """
         Slot documentation goes here.
         """
+        print "Not implemented yet"
         # TODO: on_actionAbout_activated
         #raise NotImplementedError

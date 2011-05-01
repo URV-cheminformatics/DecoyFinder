@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>Decoy Finder</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -30,18 +30,46 @@
           <item>
            <layout class="QVBoxLayout" name="verticalLayout">
             <item>
-             <widget class="QLabel" name="label">
-              <property name="text">
-               <string>Query Molecules</string>
-              </property>
-             </widget>
+             <layout class="QHBoxLayout" name="horizontalLayout_4">
+              <item>
+               <widget class="QLabel" name="label">
+                <property name="text">
+                 <string>Query Molecules:</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_2">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item>
+               <widget class="QPushButton" name="pushButton">
+                <property name="text">
+                 <string>Clear</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
             </item>
             <item>
-             <widget class="QPushButton" name="addQueryButton">
-              <property name="text">
-               <string>Add query files</string>
-              </property>
-             </widget>
+             <layout class="QHBoxLayout" name="horizontalLayout_6">
+              <item>
+               <widget class="QPushButton" name="addQueryButton">
+                <property name="text">
+                 <string>Add query files</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
             </item>
             <item>
              <widget class="QListWidget" name="queryList"/>
@@ -51,11 +79,35 @@
           <item>
            <layout class="QVBoxLayout" name="verticalLayout_2">
             <item>
-             <widget class="QLabel" name="label_2">
-              <property name="text">
-               <string>Database files</string>
-              </property>
-             </widget>
+             <layout class="QHBoxLayout" name="horizontalLayout_5">
+              <item>
+               <widget class="QLabel" name="label_2">
+                <property name="text">
+                 <string>Molecule library files:</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_3">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item>
+               <widget class="QPushButton" name="pushButton_2">
+                <property name="text">
+                 <string>Clear</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
             </item>
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_3">
@@ -106,15 +158,18 @@
         </item>
         <item>
          <layout class="QFormLayout" name="formLayout_2">
-          <item row="0" column="1">
-           <widget class="QLineEdit" name="outputDirectoryLineEdit"/>
-          </item>
+          <property name="fieldGrowthPolicy">
+           <enum>QFormLayout::ExpandingFieldsGrow</enum>
+          </property>
           <item row="0" column="0">
            <widget class="QPushButton" name="outDirButton">
             <property name="text">
              <string>Output directory</string>
             </property>
            </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLineEdit" name="outputDirectoryLineEdit"/>
           </item>
          </layout>
         </item>
@@ -123,7 +178,7 @@
           <item>
            <widget class="QPushButton" name="clearButton">
             <property name="text">
-             <string>Clear</string>
+             <string>Clear all</string>
             </property>
            </widget>
           </item>
@@ -151,19 +206,48 @@
         </item>
        </layout>
       </widget>
+      <widget class="QWidget" name="tab">
+       <attribute name="title">
+        <string>Results</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout">
+        <item row="0" column="0">
+         <widget class="QTableWidget" name="resultsTable">
+          <property name="editTriggers">
+           <set>QAbstractItemView::NoEditTriggers</set>
+          </property>
+          <property name="alternatingRowColors">
+           <bool>true</bool>
+          </property>
+          <property name="selectionBehavior">
+           <enum>QAbstractItemView::SelectRows</enum>
+          </property>
+          <column>
+           <property name="text">
+            <string>Ligand</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Decoys found</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Saved to</string>
+           </property>
+          </column>
+         </widget>
+        </item>
+       </layout>
+      </widget>
       <widget class="QWidget" name="tabWidgetPage2" native="true">
        <attribute name="title">
         <string>Options</string>
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_3">
         <item>
-         <layout class="QFormLayout" name="formLayout">
-          <property name="sizeConstraint">
-           <enum>QLayout::SetMinimumSize</enum>
-          </property>
-          <property name="fieldGrowthPolicy">
-           <enum>QFormLayout::FieldsStayAtSizeHint</enum>
-          </property>
+         <layout class="QFormLayout" name="_3">
           <property name="labelAlignment">
            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
           </property>
@@ -300,7 +384,9 @@
    </property>
   </action>
  </widget>
- <resources/>
+ <resources>
+  <include location="resources.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>clearButton</sender>
@@ -363,6 +449,38 @@
     <hint type="destinationlabel">
      <x>49</x>
      <y>457</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>queryList</receiver>
+   <slot>clear()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>269</x>
+     <y>77</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>232</x>
+     <y>143</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_2</sender>
+   <signal>clicked()</signal>
+   <receiver>dbListWidget</receiver>
+   <slot>clear()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>535</x>
+     <y>90</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>497</x>
+     <y>151</y>
     </hint>
    </hints>
   </connection>

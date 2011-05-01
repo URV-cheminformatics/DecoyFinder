@@ -28,10 +28,6 @@
 
 import pybel, os, urllib2, tempfile
 
-from PySide.QtCore import QObject, QSettings
-
-#import glob
-
 ##### Aquesta part és necessària per a poder fer servir MACCS fingerprinting des de python
 pybel.fps.append("MACCS")
 pybel._fingerprinters = pybel._getplugins(pybel.ob.OBFingerprint.FindFingerprint, pybel.fps)
@@ -66,7 +62,7 @@ class ComparableMol():
     def __str__(self):
         return "Title: %s; HBA: %s; HBD: %s; CLogP: %s; MW:%s \n" % (self.title, self.hba, self.hbd, self.clogp, self.mw)
 
-def get_zinc_slice(slicename):
+def get_zinc_slice(slicename):#TODO: ZINC online
     """
     returns an iterable list of files from  online ZINC slices
     """
@@ -76,6 +72,7 @@ def get_zinc_slice(slicename):
         scriptcontent = handler.read().split('\n')
         handler.close()
         filelist = scriptcontent[1:-2]
+        yield len(filelist)
         parenturl = scriptcontent[0].split()[1].split('=')[1]
         for file in filelist:
             dbhandler = urllib2.urlopen(parenturl + file)
@@ -87,8 +84,9 @@ def get_zinc_slice(slicename):
             yield outfilename
             try:
                 os.remove(outfilename)
-            except:
+            except Exception,  e:
                 print "Unable to remove %s" % (outfilename)
+                print unicode(e)
     else:
         yield "Unknown slice"
 
@@ -157,14 +155,17 @@ def isdecoy(
 def save_decoys(ligands_dict, outputdir):
     """
     """
+    resultdict = {}
     for ligand in ligands_dict.iterkeys():
         decoy_list = ligands_dict[ligand]
         print ligand.title, len(decoy_list), "decoys found"
+        resultdict[ligand.title] = len(decoy_list)
         if decoy_list:
             decoyfile = pybel.Outputfile("sdf", os.path.join(str(outputdir), ligand.title + "_decoys.sdf"), overwrite = True)
             for decoy in decoy_list:
                 decoyfile.write(decoy.mol)
             decoyfile.close()
+    return resultdict
 
 def find_decoys(
                 query_files
@@ -179,15 +180,6 @@ def find_decoys(
                 ):
     """
     """
-    #TODO: GUI
-####################TESTING##########################
-#    if not query_files and not db_files:
-#        #"/home/ssorgatem/uni/PEI/ZINC/10_p0.101.sdf.gz"
-#        db_files = ["/home/ssorgatem/uni/PEI/ZINC/10_p0.101.sdf.gz"]
-#
-#        testfile = "/home/ssorgatem/uni/PEI/trypsin_ligands.sdf.gz" #STUB!
-#        query_files = [testfile]
-################################################
     print "Looking for decoys!"
 
     db_entry_gen = parse_db_files(db_files)
@@ -198,28 +190,10 @@ def find_decoys(
         #print db_mol.title
         yield filecount, db_file
         for ligand in ligands_dict.iterkeys():
-            #print ligand.title
-#            tanimoto = db_mol.fp | ligand.fp
-#            if  tanimoto < tanimoto_t \
-#            and ligand.hba - HBA_t <= db_mol.hba <= ligand.hba + HBA_t\
-#            and ligand.hbd - HBD_t <= db_mol.hbd <= ligand.hbd + HBD_t\
-#            and ligand.clogp - ClogP_t <= db_mol.clogp <= ligand.clogp + ClogP_t \
-#            and ligand.mw - MW_t <= db_mol.mw <= ligand.mw + MW_t \
-#            and ligand.rot - RB_t <= db_mol.rot <= ligand.rot + RB_t \
-#            :
             if isdecoy(db_mol,ligand,HBA_t,HBD_t,ClogP_t,tanimoto_t,MW_t,RB_t ):
                 ligands_dict[ligand].append(db_mol)
                 #print tanimoto, db_mol.title, ligand.title
-
-#    for ligand in ligands_dict.iterkeys():
-#        decoy_list = ligands_dict[ligand]
-#        print ligand.title, len(decoy_list), "decoys found"
-#        if decoy_list:
-#            decoyfile = pybel.Outputfile("sdf", os.path.join(str(outputdir), ligand.title + "_decoys.sdf"), overwrite = True)
-#            for decoy in decoy_list:
-#                decoyfile.write(decoy.mol)
-#            decoyfile.close()
-    save_decoys(ligands_dict, outputdir)
+    yield save_decoys(ligands_dict, outputdir), 0
     print "Done.\n"
 
 if __name__ == '__main__':
