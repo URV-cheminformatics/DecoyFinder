@@ -21,7 +21,7 @@
 Module implementing MainWindow.
 """
 
-import os, pybel
+import os, pybel,  itertools
 from PySide.QtGui import QMainWindow, QFileDialog, QTableWidgetItem, QMessageBox
 from PySide.QtCore import QSettings, QThread, Signal,  Qt
 from PySide.QtCore import Slot as pyqtSignature
@@ -64,13 +64,14 @@ class DecoyFinderThread(QThread):
                         ,tanimoto_t = float(self.settings.value('tanimoto_t', 0.9))
                         ,MW_t = int(self.settings.value('MW_t',40))
                         ,RB_t = int(self.settings.value('RB_t',0))
+                        , limit = int(self.settings.value('decoy_limit',36))
                         ):
                 if current_file:
                     self.filecount = filecount
                     self.info.emit(self.tr("Reading %s") % current_file)
                     self.progress.emit(self.filecount)
                 elif type(filecount) == dict:
-                    print "dict found"
+                    #print "dict found"
                     result = filecount
                 else:
                     self.error.emit(tr('Unexpected error: %s; %s') % (filecount, current_file))
@@ -99,6 +100,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.tanimotoBox.setValue(float(self.settings.value('tanimoto_t', 0.9)))
         self.molwtBox.setValue(int(self.settings.value('MW_t',40)))
         self.rotbBox.setValue(int(self.settings.value('RB_t',0)))
+        self.decoyLimitSpinBox.setValue(int(self.settings.value('decoy_limit',36)))
         self.supported_files = self.tr('Molecule files') + ' ('
         for format in pybel.informats.iterkeys():
             self.supported_files += "*.%s " %format
@@ -227,19 +229,35 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         db_items = self._getListWidgetItemTextList(self.dbListWidget)
         db_files = []
+        zinc_iter = iter('')
+        total_files = 0
         self.progressBar.maximum = 0
         for item in db_items:
             if item.split()[0] == 'ZINC':
                 #TODO download from ZINC
                 print item.split()[1]
+                zinc_file_gen = get_zinc_slice(item.split()[1])
+                zfilecount = zinc_file_gen.next()
+#                zincg = ZincGenerator(item.split()[1])
+#                zfilecount = len(zincg.filelist)
+#                zinc_file_gen = zincg.generate()
+                if zfilecount:
+                    total_files += zfilecount
+                    zinc_iter = itertools.chain(zinc_iter, zinc_file_gen)
+                else:
+                    self.on_error(filecount)
 
             elif os.path.isfile(item):
                 db_files.append(str(item))
-        if [] in (query_files , db_files):
-            self.on_error(self.tr('You must select at least one file containing quey molecules, and at least one molecule library file'))
+        total_files += len(db_files)
+
+        db_files =itertools.chain(db_files,  zinc_iter)
+        if [] == query_files  or not total_files:
+            self.on_error(self.tr('You must select at least one file containing query molecules, and at least one molecule library file or source'))
             self.findDecoysButton.setEnabled(True)
         else:
-            self.progressBar.setMaximum(len(db_files))
+            print total_files
+            self.progressBar.setMaximum(total_files)
             self.finder = DecoyFinderThread(query_files, db_files)
             self.finder.info.connect(self.statusbar.showMessage)
             self.finder.progress.connect(self.progressBar.setValue)
@@ -256,8 +274,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         Slot documentation goes here.
         """
         self.progressBar.setMaximum(1)
-        for row in xrange(self.resultsTable.rowCount()):
-            self.resultsTable.removeRow(row)
+        while  self.resultsTable.rowCount():
+            self.resultsTable.removeRow(0)
 
 
     ############ Options tab  #############
@@ -306,6 +324,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.settings.setValue('HBD_t', self.hbdBox.value())
 
     @pyqtSignature("")
+    def on_decoyLimitSpinBox_editingFinished(self):
+        """
+        Slot documentation goes here.
+        """
+        self.settings.setValue('decoy_limit', self.decoyLimitSpinBox.value())
+
+    @pyqtSignature("")
     def on_defaultsButton_clicked(self):
         """
         Slot documentation goes here.
@@ -316,7 +341,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.tanimotoBox.setValue(0.9)
         self.molwtBox.setValue(40)
         self.rotbBox.setValue(0)
-        for field in (self.hbaBox, self.hbdBox, self.clogpBox, self.tanimotoBox, self.molwtBox, self.rotbBox):
+        self.decoyLimitSpinBox.setValue(36)
+        for field in (self.hbaBox, self.hbdBox, self.clogpBox, self.tanimotoBox, self.molwtBox, self.rotbBox,  decoyLimitSpinBox):
             field.editingFinished.emit()
 
     #################################

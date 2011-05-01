@@ -27,6 +27,7 @@
 # - exact same number of rotational bonds
 
 import pybel, os, urllib2, tempfile
+from copy import copy
 
 ##### Aquesta part és necessària per a poder fer servir MACCS fingerprinting des de python
 pybel.fps.append("MACCS")
@@ -62,33 +63,40 @@ class ComparableMol():
     def __str__(self):
         return "Title: %s; HBA: %s; HBD: %s; CLogP: %s; MW:%s \n" % (self.title, self.hba, self.hbd, self.clogp, self.mw)
 
-def get_zinc_slice(slicename):#TODO: ZINC online
+def get_zinc_slice(slicename):
     """
     returns an iterable list of files from  online ZINC slices
     """
     if slicename in ('all', 'single', 'usual', 'metals'):
         script = "http://zinc.docking.org/subset1/10/%s.sdf.csh" % slicename
         handler = urllib2.urlopen(script)
+        print "Reading ZINC data..."
         scriptcontent = handler.read().split('\n')
         handler.close()
         filelist = scriptcontent[1:-2]
+        print slicename
         yield len(filelist)
+        #print filelist
+        #print "Provant si va o no"
         parenturl = scriptcontent[0].split()[1].split('=')[1]
         for file in filelist:
+            #print "treballant amb %s" % file
             dbhandler = urllib2.urlopen(parenturl + file)
-            outfilename = os.path.join(tempfile.tempdir, file)
+            outfilename = os.path.join(tempfile.gettempdir(), file)
+            #print "destinació:%s" % outfilename
             outfile = open(outfilename, "wb")
             outfile.write(dbhandler.read())
             dbhandler.close()
             outfile.close()
-            yield outfilename
+            yield copy(outfilename)
+            #print outfilename
             try:
                 os.remove(outfilename)
             except Exception,  e:
                 print "Unable to remove %s" % (outfilename)
                 print unicode(e)
     else:
-        yield "Unknown slice"
+        raise Exception,  u"Unknown slice"
 
 def get_fileformat(file):
     """
@@ -158,7 +166,7 @@ def save_decoys(ligands_dict, outputdir):
     resultdict = {}
     for ligand in ligands_dict.iterkeys():
         decoy_list = ligands_dict[ligand]
-        print ligand.title, len(decoy_list), "decoys found"
+        #print ligand.title, len(decoy_list), "decoys found"
         resultdict[ligand.title] = len(decoy_list)
         if decoy_list:
             decoyfile = pybel.Outputfile("sdf", os.path.join(str(outputdir), ligand.title + "_decoys.sdf"), overwrite = True)
@@ -177,6 +185,7 @@ def find_decoys(
                 ,tanimoto_t = 0.9
                 ,MW_t = 40
                 ,RB_t = 0
+                ,limit = 36
                 ):
     """
     """
@@ -189,14 +198,20 @@ def find_decoys(
     for db_mol, filecount, db_file in db_entry_gen:
         #print db_mol.title
         yield filecount, db_file
+        break_loop = 1
         for ligand in ligands_dict.iterkeys():
-            if isdecoy(db_mol,ligand,HBA_t,HBD_t,ClogP_t,tanimoto_t,MW_t,RB_t ):
-                ligands_dict[ligand].append(db_mol)
-                #print tanimoto, db_mol.title, ligand.title
+            if not limit  or (limit and len(ligands_dict[ligand]) <  limit):
+                break_loop = 0
+                if isdecoy(db_mol,ligand,HBA_t,HBD_t,ClogP_t,tanimoto_t,MW_t,RB_t ):
+                    ligands_dict[ligand].append(db_mol)
+                    #print tanimoto, db_mol.title, ligand.title
+        if break_loop:
+            break
     yield save_decoys(ligands_dict, outputdir), 0
     print "Done.\n"
 
 if __name__ == '__main__':
+    pass
     #TODO: OptParse
-    find_decoys('','')
+    #find_decoys('','')
 

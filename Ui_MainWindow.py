@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file '/home/ssorgatem/uni/PEI/decoys/MainWindow.ui'
 #
-# Created: Sun May  1 14:16:30 2011
+# Created: Sun May  1 23:05:28 2011
 #      by: pyside-uic 0.2.8 running on PySide 1.0.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -169,6 +169,12 @@ class Ui_MainWindow(object):
         self.hbdBox = QtGui.QSpinBox(self.tabWidgetPage2)
         self.hbdBox.setObjectName("hbdBox")
         self._3.setWidget(2, QtGui.QFormLayout.FieldRole, self.hbdBox)
+        self.decoyLimitLabel = QtGui.QLabel(self.tabWidgetPage2)
+        self.decoyLimitLabel.setObjectName("decoyLimitLabel")
+        self._3.setWidget(6, QtGui.QFormLayout.LabelRole, self.decoyLimitLabel)
+        self.decoyLimitSpinBox = QtGui.QSpinBox(self.tabWidgetPage2)
+        self.decoyLimitSpinBox.setObjectName("decoyLimitSpinBox")
+        self._3.setWidget(6, QtGui.QFormLayout.FieldRole, self.decoyLimitSpinBox)
         self.verticalLayout_3.addLayout(self._3)
         self.defaultsButton = QtGui.QPushButton(self.tabWidgetPage2)
         self.defaultsButton.setObjectName("defaultsButton")
@@ -234,6 +240,8 @@ class Ui_MainWindow(object):
         self.molecularWeightLabel.setText(QtGui.QApplication.translate("MainWindow", "Molecular weight ±", None, QtGui.QApplication.UnicodeUTF8))
         self.rtotationalBondsLabel.setText(QtGui.QApplication.translate("MainWindow", "Rotational bonds ±", None, QtGui.QApplication.UnicodeUTF8))
         self.molwtBox.setSuffix(QtGui.QApplication.translate("MainWindow", " Da", None, QtGui.QApplication.UnicodeUTF8))
+        self.decoyLimitLabel.setText(QtGui.QApplication.translate("MainWindow", "Decoy limit:", None, QtGui.QApplication.UnicodeUTF8))
+        self.decoyLimitSpinBox.setToolTip(QtGui.QApplication.translate("MainWindow", "Limit how many decoys to find for each ligand. If the limit is 0, there is no limit.", None, QtGui.QApplication.UnicodeUTF8))
         self.defaultsButton.setText(QtGui.QApplication.translate("MainWindow", "Load Defaults", None, QtGui.QApplication.UnicodeUTF8))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tabWidgetPage2), QtGui.QApplication.translate("MainWindow", "Options", None, QtGui.QApplication.UnicodeUTF8))
         self.menuHelp.setTitle(QtGui.QApplication.translate("MainWindow", "Help", None, QtGui.QApplication.UnicodeUTF8))
