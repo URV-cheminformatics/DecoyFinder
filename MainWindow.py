@@ -21,10 +21,19 @@
 Module implementing MainWindow.
 """
 
-import os, pybel,  itertools
-from PySide.QtGui import QMainWindow, QFileDialog, QTableWidgetItem, QMessageBox
-from PySide.QtCore import QSettings, QThread, Signal,  Qt
-from PySide.QtCore import Slot as pyqtSignature
+import os, pybel,  itertools,  random
+try:
+    from PySide.QtGui import QMainWindow, QFileDialog, QTableWidgetItem, QMessageBox
+    from PySide.QtCore import QSettings, QThread, Signal,  Qt
+    from PySide.QtCore import Slot as pyqtSignature
+except:
+    print "PySide not found! trying PyQt4"
+    import sip
+    sip.setapi('QString', 2)
+    sip.setapi('QVariant', 2)
+    from PyQt4.QtGui import QMainWindow, QFileDialog, QTableWidgetItem, QMessageBox
+    from PyQt4.QtCore import QSettings, QThread, Qt, pyqtSignature
+    from PyQt4.QtCore import pyqtSignal as Signal
 
 from find_decoys import get_fileformat, find_decoys, get_zinc_slice
 from Ui_MainWindow import Ui_MainWindow
@@ -135,6 +144,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.resultsTable.sortByColumn(1, Qt.DescendingOrder)
             self.resultsTable.resizeColumnToContents(0)
             self.resultsTable.resizeColumnToContents(2)
+            self.progressBar.setValue(self.progressBar.maximum())
         self.statusbar.showMessage(self.tr("Done."))
 
 
@@ -238,9 +248,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 print item.split()[1]
                 zinc_file_gen = get_zinc_slice(item.split()[1])
                 zfilecount = zinc_file_gen.next()
-#                zincg = ZincGenerator(item.split()[1])
-#                zfilecount = len(zincg.filelist)
-#                zinc_file_gen = zincg.generate()
                 if zfilecount:
                     total_files += zfilecount
                     zinc_iter = itertools.chain(zinc_iter, zinc_file_gen)
@@ -250,7 +257,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             elif os.path.isfile(item):
                 db_files.append(str(item))
         total_files += len(db_files)
-
+        random.shuffle(db_files)
         db_files =itertools.chain(db_files,  zinc_iter)
         if [] == query_files  or not total_files:
             self.on_error(self.tr('You must select at least one file containing query molecules, and at least one molecule library file or source'))
@@ -342,7 +349,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.molwtBox.setValue(40)
         self.rotbBox.setValue(0)
         self.decoyLimitSpinBox.setValue(36)
-        for field in (self.hbaBox, self.hbdBox, self.clogpBox, self.tanimotoBox, self.molwtBox, self.rotbBox,  decoyLimitSpinBox):
+        for field in (self.hbaBox, self.hbdBox, self.clogpBox, self.tanimotoBox, self.molwtBox, self.rotbBox,  self.decoyLimitSpinBox):
             field.editingFinished.emit()
 
     #################################

@@ -26,10 +26,9 @@
 # - Molecular weight +/-40 Da
 # - exact same number of rotational bonds
 
-import pybel, os, urllib2, tempfile
-from copy import copy
+import pybel, os, urllib2, tempfile, random
 
-##### Aquesta part és necessària per a poder fer servir MACCS fingerprinting des de python
+##### Aquesta part és necessària per a poder fer servir MACCS fingerprinting des de pybel
 pybel.fps.append("MACCS")
 pybel._fingerprinters = pybel._getplugins(pybel.ob.OBFingerprint.FindFingerprint, pybel.fps)
 #####
@@ -76,6 +75,7 @@ def get_zinc_slice(slicename):
         filelist = scriptcontent[1:-2]
         print slicename
         yield len(filelist)
+        random.shuffle(filelist)
         #print filelist
         #print "Provant si va o no"
         parenturl = scriptcontent[0].split()[1].split('=')[1]
@@ -88,7 +88,7 @@ def get_zinc_slice(slicename):
             outfile.write(dbhandler.read())
             dbhandler.close()
             outfile.close()
-            yield copy(outfilename)
+            yield outfilename
             #print outfilename
             try:
                 os.remove(outfilename)

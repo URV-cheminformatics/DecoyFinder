@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE Project SYSTEM "Project-4.6.dtd">
 <!-- eric4 project file for project df -->
-<!-- Saved: 2011-05-01, 11:33:34 -->
+<!-- Saved: 2011-05-02, 03:50:21 -->
 <!-- Copyright (C) 2011 Adrià Cereto-Massagué, adrian.cereto@gmail.com -->
 <Project version="4.6">
   <Language>ca</Language>
@@ -12,12 +12,13 @@
   <Author>Adrià Cereto-Massagué</Author>
   <Email>adrian.cereto@gmail.com</Email>
   <TranslationPattern>locales/df_%language%.ts</TranslationPattern>
-  <TranslationsBinPath>locales/df_%language%.qm</TranslationsBinPath>
+  <TranslationsBinPath>locales/</TranslationsBinPath>
   <Sources>
     <Source>find_decoys.py</Source>
     <Source>Ui_MainWindow.py</Source>
     <Source>MainWindow.py</Source>
     <Source>decoy_finder.py</Source>
+    <Source>resources_rc.py</Source>
   </Sources>
   <Forms>
     <Form>MainWindow.ui</Form>
@@ -29,6 +30,7 @@
     <Translation>locales/df_fr.ts</Translation>
   </Translations>
   <Resources>
+    <Resource>resources.qrc</Resource>
   </Resources>
   <Interfaces>
   </Interfaces>

@@ -6,9 +6,14 @@
 #      by: The Resource Compiler for PySide (Qt v4.7.2)
 #
 # WARNING! All changes made in this file will be lost!
-
-from PySide import QtCore
-
+try:
+    from PySide import QtCore
+except:
+    print "PySide not found! trying PyQt4"
+    import sip
+    sip.setapi('QString', 2)
+    sip.setapi('QVariant', 2)
+    from PyQt4 import QtCore
 qt_resource_data = "\
 \x00\x00\x00\x10\
 \x3c\

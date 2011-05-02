@@ -2,12 +2,18 @@
 
 # Form implementation generated from reading ui file '/home/ssorgatem/uni/PEI/decoys/MainWindow.ui'
 #
-# Created: Sun May  1 23:05:28 2011
+# Created: Mon May  2 20:02:12 2011
 #      by: pyside-uic 0.2.8 running on PySide 1.0.1
 #
 # WARNING! All changes made in this file will be lost!
-
-from PySide import QtCore, QtGui
+try:
+    from PySide import QtCore, QtGui
+except:
+    print "PySide not found! trying PyQt4"
+    import sip
+    sip.setapi('QString', 2)
+    sip.setapi('QVariant', 2)
+    from PyQt4 import QtCore, QtGui
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -176,9 +182,16 @@ class Ui_MainWindow(object):
         self.decoyLimitSpinBox.setObjectName("decoyLimitSpinBox")
         self._3.setWidget(6, QtGui.QFormLayout.FieldRole, self.decoyLimitSpinBox)
         self.verticalLayout_3.addLayout(self._3)
+        self.horizontalLayout_7 = QtGui.QHBoxLayout()
+        self.horizontalLayout_7.setObjectName("horizontalLayout_7")
+        spacerItem3 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
+        self.horizontalLayout_7.addItem(spacerItem3)
         self.defaultsButton = QtGui.QPushButton(self.tabWidgetPage2)
         self.defaultsButton.setObjectName("defaultsButton")
-        self.verticalLayout_3.addWidget(self.defaultsButton)
+        self.horizontalLayout_7.addWidget(self.defaultsButton)
+        spacerItem4 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
+        self.horizontalLayout_7.addItem(spacerItem4)
+        self.verticalLayout_3.addLayout(self.horizontalLayout_7)
         self.tabWidget.addTab(self.tabWidgetPage2, "")
         self.verticalLayout_4.addWidget(self.tabWidget)
         self.progressBar = QtGui.QProgressBar(self.centralwidget)
