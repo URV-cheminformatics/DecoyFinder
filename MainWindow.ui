@@ -20,7 +20,7 @@
       <property name="currentIndex">
        <number>0</number>
       </property>
-      <widget class="QWidget" name="tabWidgetPage1" native="true">
+      <widget class="QWidget" name="tabWidgetPage1">
        <attribute name="title">
         <string>Query</string>
        </attribute>
@@ -241,7 +241,7 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="tabWidgetPage2" native="true">
+      <widget class="QWidget" name="tabWidgetPage2">
        <attribute name="title">
         <string>Options</string>
        </attribute>
@@ -484,7 +484,7 @@
    <sender>clearButton</sender>
    <signal>clicked()</signal>
    <receiver>statusbar</receiver>
-   <slot>clear()</slot>
+   <slot>clearMessage()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>50</x>

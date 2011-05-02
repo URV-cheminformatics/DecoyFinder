@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE Project SYSTEM "Project-4.6.dtd">
 <!-- eric4 project file for project df -->
-<!-- Saved: 2011-05-02, 03:50:21 -->
+<!-- Saved: 2011-05-02, 23:44:34 -->
 <!-- Copyright (C) 2011 Adrià Cereto-Massagué, adrian.cereto@gmail.com -->
 <Project version="4.6">
   <Language>ca</Language>
@@ -35,6 +35,7 @@
   <Interfaces>
   </Interfaces>
   <Others>
+    <Other>README</Other>
   </Others>
   <Vcs>
     <VcsType>None</VcsType>

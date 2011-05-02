@@ -220,7 +220,7 @@ class Ui_MainWindow(object):
         QtCore.QObject.connect(self.clearButton, QtCore.SIGNAL("clicked()"), self.queryList.clear)
         QtCore.QObject.connect(self.clearButton, QtCore.SIGNAL("clicked()"), self.dbListWidget.clear)
         QtCore.QObject.connect(self.clearButton, QtCore.SIGNAL("clicked()"), self.progressBar.reset)
-        QtCore.QObject.connect(self.clearButton, QtCore.SIGNAL("clicked()"), self.statusbar.clear)
+        QtCore.QObject.connect(self.clearButton, QtCore.SIGNAL("clicked()"), self.statusbar.clearMessage)
         QtCore.QObject.connect(self.pushButton, QtCore.SIGNAL("clicked()"), self.queryList.clear)
         QtCore.QObject.connect(self.pushButton_2, QtCore.SIGNAL("clicked()"), self.dbListWidget.clear)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
