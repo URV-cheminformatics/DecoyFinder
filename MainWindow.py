@@ -136,7 +136,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 self.resultsTable.insertRow(0)
                 self.resultsTable.setItem(0, 0,  QTableWidgetItem(ligand))
                 self.resultsTable.setItem(0, 1,  QTableWidgetItem(str(resultdict[ligand])))
-                outfile = os.path.join(self.settings.value('outdir'),  ligand + "_decoys.sdf")
+                outfile = os.path.join(self.settings.value('outdir',  os.getcwd()),  ligand + "_decoys.sdf")
                 if resultdict[ligand] and os.path.isfile(outfile):
                     self.resultsTable.setItem(0, 2,  QTableWidgetItem(outfile))
                 else:
@@ -144,7 +144,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.resultsTable.sortByColumn(1, Qt.DescendingOrder)
             self.resultsTable.resizeColumnToContents(0)
             self.resultsTable.resizeColumnToContents(2)
-            self.progressBar.setValue(self.progressBar.maximum())
+            self.progressBar.setValue(self.progressBar.maximum)
         self.statusbar.showMessage(self.tr("Done."))
 
 
