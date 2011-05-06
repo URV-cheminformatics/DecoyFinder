@@ -2,6 +2,14 @@
 <ui version="4.0">
  <class>MainWindow</class>
  <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>591</width>
+    <height>443</height>
+   </rect>
+  </property>
   <property name="windowTitle">
    <string>Decoy Finder</string>
   </property>
@@ -56,10 +64,17 @@
                 </property>
                </spacer>
               </item>
-              <item>
-               <widget class="QPushButton" name="pushButton">
+             </layout>
+            </item>
+            <item>
+             <layout class="QGridLayout" name="gridLayout_2">
+              <property name="bottomMargin">
+               <number>4</number>
+              </property>
+              <item row="0" column="0">
+               <widget class="QCheckBox" name="kdecoysCheckBox">
                 <property name="text">
-                 <string>Clear</string>
+                 <string>Use  known decoys</string>
                 </property>
                </widget>
               </item>
@@ -68,22 +83,9 @@
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_6">
               <item>
-               <spacer name="horizontalSpacer_6">
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>40</width>
-                  <height>20</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-              <item>
                <widget class="QPushButton" name="addQueryButton">
                 <property name="text">
-                 <string>Add query files</string>
+                 <string>Add</string>
                 </property>
                </widget>
               </item>
@@ -100,52 +102,8 @@
                 </property>
                </spacer>
               </item>
-             </layout>
-            </item>
-            <item>
-             <widget class="QListWidget" name="queryList"/>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <layout class="QVBoxLayout" name="verticalLayout_6">
-            <item>
-             <layout class="QHBoxLayout" name="horizontalLayout_2">
               <item>
-               <spacer name="horizontalSpacer_16">
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>40</width>
-                  <height>20</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-              <item>
-               <widget class="QLabel" name="label_3">
-                <property name="text">
-                 <string>Known decoys</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <spacer name="horizontalSpacer_12">
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>40</width>
-                  <height>20</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-              <item>
-               <widget class="QPushButton" name="pushButton_4">
+               <widget class="QPushButton" name="pushButton">
                 <property name="text">
                  <string>Clear</string>
                 </property>
@@ -154,46 +112,102 @@
              </layout>
             </item>
             <item>
-             <layout class="QHBoxLayout" name="horizontalLayout_9">
-              <item>
-               <spacer name="horizontalSpacer_13">
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>40</width>
-                  <height>20</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-              <item>
-               <widget class="QPushButton" name="addDecoysButton">
-                <property name="text">
-                 <string>Add known decoy files</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <spacer name="horizontalSpacer_14">
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>40</width>
-                  <height>20</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-             </layout>
-            </item>
-            <item>
-             <widget class="QListWidget" name="decoyList"/>
+             <widget class="QListWidget" name="queryList"/>
             </item>
            </layout>
+          </item>
+          <item>
+           <widget class="QFrame" name="kdecoysFrame">
+            <property name="frameShape">
+             <enum>QFrame::NoFrame</enum>
+            </property>
+            <property name="lineWidth">
+             <number>0</number>
+            </property>
+            <layout class="QVBoxLayout" name="verticalLayout_6">
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_2">
+               <item>
+                <spacer name="horizontalSpacer_16">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>40</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item>
+                <widget class="QLabel" name="label_3">
+                 <property name="text">
+                  <string>Known decoys</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <spacer name="horizontalSpacer_12">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>40</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <layout class="QVBoxLayout" name="verticalLayout_7">
+               <property name="topMargin">
+                <number>12</number>
+               </property>
+               <property name="bottomMargin">
+                <number>12</number>
+               </property>
+              </layout>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_9">
+               <item>
+                <widget class="QPushButton" name="addDecoysButton">
+                 <property name="text">
+                  <string>Add</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <spacer name="horizontalSpacer_14">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>40</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item>
+                <widget class="QPushButton" name="pushButton_4">
+                 <property name="text">
+                  <string>Clear</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <widget class="QListWidget" name="decoyList"/>
+             </item>
+            </layout>
+           </widget>
           </item>
           <item>
            <widget class="Line" name="line">
@@ -239,30 +253,10 @@
                 </property>
                </spacer>
               </item>
-              <item>
-               <widget class="QPushButton" name="pushButton_2">
-                <property name="text">
-                 <string>Clear</string>
-                </property>
-               </widget>
-              </item>
              </layout>
             </item>
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_3">
-              <item>
-               <spacer name="horizontalSpacer_8">
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>40</width>
-                  <height>20</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
               <item>
                <widget class="QComboBox" name="dbComboBox">
                 <item>
@@ -300,13 +294,6 @@
                </widget>
               </item>
               <item>
-               <widget class="QPushButton" name="addDButton">
-                <property name="text">
-                 <string>Add potential decoy files</string>
-                </property>
-               </widget>
-              </item>
-              <item>
                <spacer name="horizontalSpacer_9">
                 <property name="orientation">
                  <enum>Qt::Horizontal</enum>
@@ -318,6 +305,37 @@
                  </size>
                 </property>
                </spacer>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_8">
+              <item>
+               <widget class="QPushButton" name="addDButton">
+                <property name="text">
+                 <string>Add</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_10">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item>
+               <widget class="QPushButton" name="pushButton_2">
+                <property name="text">
+                 <string>Clear</string>
+                </property>
+               </widget>
               </item>
              </layout>
             </item>
@@ -336,7 +354,7 @@
           <item row="0" column="0">
            <widget class="QPushButton" name="outDirButton">
             <property name="text">
-             <string>Output directory</string>
+             <string>Output file</string>
             </property>
            </widget>
           </item>
@@ -398,15 +416,24 @@
            <property name="text">
             <string>Ligand</string>
            </property>
+           <property name="textAlignment">
+            <set>AlignHCenter|AlignVCenter|AlignCenter</set>
+           </property>
           </column>
           <column>
            <property name="text">
             <string>Decoys found</string>
            </property>
+           <property name="textAlignment">
+            <set>AlignHCenter|AlignVCenter|AlignCenter</set>
+           </property>
           </column>
           <column>
            <property name="text">
             <string>Saved to</string>
+           </property>
+           <property name="textAlignment">
+            <set>AlignHCenter|AlignVCenter|AlignCenter</set>
            </property>
           </column>
          </widget>
@@ -430,6 +457,9 @@
            <widget class="QLabel" name="tanimotoCutoffLabel">
             <property name="text">
              <string>Active ligand &lt;-&gt; decoy Tanimoto &lt;</string>
+            </property>
+            <property name="buddy">
+             <cstring>kdecoysFrame</cstring>
             </property>
            </widget>
           </item>
@@ -526,7 +556,28 @@
            </widget>
           </item>
           <item row="7" column="1">
-           <widget class="QDoubleSpinBox" name="dTanimotoBox"/>
+           <widget class="QDoubleSpinBox" name="dTanimotoBox">
+            <property name="maximum">
+             <double>1.000000000000000</double>
+            </property>
+           </widget>
+          </item>
+          <item row="8" column="1">
+           <widget class="QLineEdit" name="cachDirectoryLineEdit">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+           </widget>
+          </item>
+          <item row="8" column="0">
+           <widget class="QPushButton" name="cacheButton">
+            <property name="text">
+             <string>Caché directory</string>
+            </property>
+           </widget>
           </item>
          </layout>
         </item>
@@ -588,8 +639,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1081</width>
-     <height>21</height>
+     <width>591</width>
+     <height>23</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuHelp">
@@ -654,8 +705,8 @@
      <y>374</y>
     </hint>
     <hint type="destinationlabel">
-     <x>29</x>
-     <y>389</y>
+     <x>33</x>
+     <y>425</y>
     </hint>
    </hints>
   </connection>
@@ -671,7 +722,7 @@
     </hint>
     <hint type="destinationlabel">
      <x>49</x>
-     <y>416</y>
+     <y>451</y>
     </hint>
    </hints>
   </connection>
@@ -682,8 +733,8 @@
    <slot>clear()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>196</x>
-     <y>81</y>
+     <x>198</x>
+     <y>140</y>
     </hint>
     <hint type="destinationlabel">
      <x>197</x>
@@ -698,44 +749,28 @@
    <slot>clear()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>885</x>
-     <y>81</y>
+     <x>670</x>
+     <y>146</y>
     </hint>
     <hint type="destinationlabel">
-     <x>497</x>
-     <y>151</y>
+     <x>671</x>
+     <y>299</y>
     </hint>
    </hints>
   </connection>
   <connection>
-   <sender>pushButton_4</sender>
-   <signal>clicked()</signal>
-   <receiver>decoyList</receiver>
-   <slot>clear()</slot>
+   <sender>kdecoysCheckBox</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>kdecoysFrame</receiver>
+   <slot>setVisible(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>414</x>
-     <y>67</y>
+     <x>71</x>
+     <y>102</y>
     </hint>
     <hint type="destinationlabel">
-     <x>346</x>
-     <y>140</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>clearButton</sender>
-   <signal>clicked()</signal>
-   <receiver>decoyList</receiver>
-   <slot>clear()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>63</x>
-     <y>364</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>306</x>
-     <y>312</y>
+     <x>295</x>
+     <y>144</y>
     </hint>
    </hints>
   </connection>

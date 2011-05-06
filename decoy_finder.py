@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python -OO
 #-*- coding:utf-8 -*-
 #
 #       decoy_finder.py is part of Decoy Finder
@@ -45,15 +45,15 @@ def main():
     translator.load(":/locales/df_%s" % QLocale.system().name())
     qttranslator = QTranslator()#A translator for Qt standard strings
     qttranslator.load("qt_%s" % (QLocale.system().name()))
-    Vapp = QApplication(sys.argv) #Creating the app
-    Vapp.setOrganizationName(ORGNAME) #Setting organization and application's
-    Vapp.setApplicationName(NAME)#name. It's only useful for QSettings
-    Vapp.setApplicationVersion(VERSION)
-    Vapp.installTranslator(translator)#Install translators into the application.
-    Vapp.installTranslator(qttranslator)
+    App = QApplication(sys.argv) #Creating the app
+    App.setOrganizationName(ORGNAME) #Setting organization and application's
+    App.setApplicationName(NAME)#name. It's only useful for QSettings
+    App.setApplicationVersion(VERSION)
+    App.installTranslator(translator)#Install translators into the application.
+    App.installTranslator(qttranslator)
     mw = MainWindow() #Now it's time to instantiate the main window
     mw.show() #And show it
-    sys.exit(Vapp.exec_()) #When the app finishes, exit.
+    sys.exit(App.exec_()) #When the app finishes, exit.
 
 if __name__ == '__main__':
     main()

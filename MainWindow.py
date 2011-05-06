@@ -23,7 +23,7 @@
 Module implementing MainWindow.
 """
 
-import os, pybel,  itertools,  random
+import os, pybel,  itertools,  random, tempfile
 try:
     from PySide.QtGui import QMainWindow, QFileDialog, QTableWidgetItem, QMessageBox
     from PySide.QtCore import QSettings, QThread, Signal,  Qt
@@ -46,13 +46,14 @@ class DecoyFinderThread(QThread):
     """
     info = Signal(unicode) #needs to be defined OUTSIDE __init__
     progress = Signal(int)
-    finished = Signal(dict)
+    finished = Signal(tuple)
     error = Signal(unicode)
 
-    def __init__(self, query_files, db_files, parent = None):
+    def __init__(self, query_files, db_files, decoy_files,  parent = None):
         """
         """
         print "thread created"
+        self.decoy_files = decoy_files
         self.query_files = query_files
         self.db_files = db_files
         self.settings = QSettings()
@@ -68,22 +69,25 @@ class DecoyFinderThread(QThread):
             for filecount, current_file in find_decoys(
                         query_files = self.query_files
                         ,db_files = self.db_files
-                        ,outputdir =  self.settings.value('outdir', os.getcwd())
+                        ,outputfile =  self.settings.value('outputfile', os.getcwd())
                         ,HBA_t = int(self.settings.value('HBA_t', 0))
                         ,HBD_t = int(self.settings.value('HBD_t', 0))
                         ,ClogP_t = float(self.settings.value('ClogP_t', 1))
                         ,tanimoto_t = float(self.settings.value('tanimoto_t', 0.9))
                         ,MW_t = int(self.settings.value('MW_t',40))
                         ,RB_t = int(self.settings.value('RB_t',0))
-                        , limit = int(self.settings.value('decoy_limit',36))
+                        ,limit = int(self.settings.value('decoy_limit',36))
+                        ,tanimoto_d = float(self.settings.value('tanimoto_d', 0.9))
+                        ,decoy_files = self.decoy_files
                         ):
-                if current_file:
+                if type(filecount) != dict:
                     self.filecount = filecount
                     self.info.emit(self.tr("Reading %s") % current_file)
                     self.progress.emit(self.filecount)
                 elif type(filecount) == dict:
                     #print "dict found"
-                    result = filecount
+                    outputfile = current_file
+                    result = filecount,  outputfile
                 else:
                     self.error.emit(tr('Unexpected error: %s; %s') % (filecount, current_file))
             self.progress.emit(self.filecount +1)
@@ -102,9 +106,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         """
         QMainWindow.__init__(self, parent)
         self.setupUi(self)
+        self.kdecoysFrame.setVisible(False)
         self.progressBar.setMinimum(0)
         self.progressBar.setValue(0)
         self.settings = QSettings()
+        ######Display current settings########
         self.hbaBox.setValue(int(self.settings.value('HBA_t', 0)))
         self.hbdBox.setValue(int(self.settings.value('HBD_t', 0)))
         self.clogpBox.setValue(float(self.settings.value('ClogP_t', 1)))
@@ -112,13 +118,16 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.molwtBox.setValue(int(self.settings.value('MW_t',40)))
         self.rotbBox.setValue(int(self.settings.value('RB_t',0)))
         self.decoyLimitSpinBox.setValue(int(self.settings.value('decoy_limit',36)))
+        self.dTanimotoBox.setValue(float(self.settings.value('tanimoto_d', 0.9)))
+        self.cachDirectoryLineEdit.setText(self.settings.value('cachedir',tempfile.gettempdir()))
+        ########################
         self.supported_files = self.tr('Molecule files') + ' ('
         for format in pybel.informats.iterkeys():
             self.supported_files += "*.%s " %format
             if os.name != 'nt':
                 self.supported_files += "*.%s.gz " %format
         self.supported_files += ')'
-        self.outputDirectoryLineEdit.setText(self.settings.value('outdir',os.getcwd()))
+        self.outputDirectoryLineEdit.setText(self.settings.value('outputfile',os.path.join(os.getcwd(), 'found_decoys.sdf') ))
 
     def _getListWidgetItemTextList(self, listWidget):
         """
@@ -126,24 +135,22 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         itemlist = [listWidget.item(index).text() for index in xrange(listWidget.count())]
         return itemlist
 
-    def on_finder_finished(self, resultdict):
+    def on_finder_finished(self, resulttuple):
         """
         """
+
         self.resultsTable.setSortingEnabled(False)
         self.tabWidget.setEnabled(True)
         self.findDecoysButton.setEnabled(True)
-        if len(resultdict):
+        if len(resulttuple) and len(resulttuple[0]):
+            resultdict,  outfile = resulttuple
             resultlines = []
             self.tabWidget.setCurrentIndex(1)
             for ligand in resultdict.iterkeys():
                 self.resultsTable.insertRow(0)
-                self.resultsTable.setItem(0, 0,  QTableWidgetItem(ligand))
+                self.resultsTable.setItem(0, 0,  QTableWidgetItem(ligand.title))
                 self.resultsTable.setItem(0, 1,  QTableWidgetItem(str(resultdict[ligand])))
-                outfile = os.path.join(self.settings.value('outdir',  os.getcwd()),  ligand + "_decoys.sdf")#TODO:
-                if resultdict[ligand] and os.path.isfile(outfile):
-                    self.resultsTable.setItem(0, 2,  QTableWidgetItem(outfile))
-                else:
-                    self.resultsTable.setItem(0, 2,  QTableWidgetItem(self.tr("Not saved")))
+                self.resultsTable.setItem(0, 2,  QTableWidgetItem(outfile))
             self.resultsTable.sortByColumn(1, Qt.DescendingOrder)
             self.resultsTable.resizeColumnToContents(0)
             self.resultsTable.resizeColumnToContents(2)
@@ -174,10 +181,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         dialog =  QFileDialog(self)
         dialog.setFileMode(QFileDialog.ExistingFiles)
         dialog.setNameFilter(self.supported_files)
-        dialog.setDirectory(os.path.expanduser('~'))
+        dialog.setDirectory(self.settings.value('lastdir', os.path.expanduser('~')))
         #dialog.setOption(QFileDialog.DontUseNativeDialog)
         if dialog.exec_():
             filelist = dialog.selectedFiles()
+            self.settings.setValue('lastdir', os.path.dirname(unicode(filelist[0])))
             for file in filelist:
                 if file not in itemlist:
                     self.queryList.addItem(file)
@@ -194,10 +202,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             dialog =  QFileDialog(self)
             dialog.setFileMode(QFileDialog.ExistingFiles)
             dialog.setNameFilter(self.supported_files)
-            dialog.setDirectory(os.path.expanduser('~'))
+            dialog.setDirectory(self.settings.value('lastdir',os.path.expanduser('~')))
             #dialog.setOption(QFileDialog.DontUseNativeDialog)
             if dialog.exec_():
                 dblist = dialog.selectedFiles()
+                self.settings.setValue('lastdir', os.path.dirname(unicode(dblist[0])))
                 for file in dblist:
                     if file not in itemlist:
                         self.dbListWidget.addItem(file)
@@ -214,7 +223,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         """
         dir = self.outputDirectoryLineEdit.text()
         if os.path.isdir(dir):
-            self.settings.setValue('outdir', dir)
+            self.settings.setValue('outputfile', dir)
 
     @pyqtSignature("")
     def on_outDirButton_clicked(self):
@@ -222,16 +231,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         Slot documentation goes here.
         """
         dialog =  QFileDialog(self)
-        dialog.setFileMode(QFileDialog.DirectoryOnly)
-        dialog.setDirectory(os.path.expanduser('~'))
-        dialog.setOption(QFileDialog.DontUseNativeDialog)
+        dialog.setFileMode(QFileDialog.AnyFile)
+        dialog.setDirectory(self.settings.value('lastdir',os.path.expanduser('~')))
+        #dialog.setOption(QFileDialog.DontUseNativeDialog)
         if dialog.exec_():
-            dir = dialog.selectedFiles()[0]
-            if os.path.isdir(dir):
-                self.outputDirectoryLineEdit.setText(dir)
-                self.settings.setValue('outdir', dir)
-            else:
-                self.statusbar.showMessage(self.tr("Unable to read selected directory"))
+            file = dialog.selectedFiles()[0]
+            self.outputDirectoryLineEdit.setText(file)
+            self.settings.setValue('outputfile', file)
+            self.settings.setValue('lastdir', os.path.dirname(unicode(file)))
 
     @pyqtSignature("")
     def on_findDecoysButton_clicked(self):
@@ -242,6 +249,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         #print self.settings.value('outdir')
         query_files = self._getListWidgetItemTextList(self.queryList)
 
+        decoy_files = self._getListWidgetItemTextList(self.decoyList)
+
         db_items = self._getListWidgetItemTextList(self.dbListWidget)
         db_files = []
         zinc_iter = iter('')
@@ -251,7 +260,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             if item.split()[0] == 'ZINC':
                 #TODO download from ZINC
                 print item.split()[1]
-                zinc_file_gen = get_zinc_slice(item.split()[1])
+                usecache = self.cacheCheckBox.isChecked()
+                zinc_file_gen = get_zinc_slice(item.split()[1], self.settings.value('cachedir',tempfile.gettempdir()),  usecache)
                 zfilecount = zinc_file_gen.next()
                 if zfilecount:
                     total_files += zfilecount
@@ -270,7 +280,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         else:
             print total_files
             self.progressBar.setMaximum(total_files)
-            self.finder = DecoyFinderThread(query_files, db_files)
+            self.finder = DecoyFinderThread(query_files, db_files, decoy_files)
             self.finder.info.connect(self.statusbar.showMessage)
             self.finder.progress.connect(self.progressBar.setValue)
             self.finder.finished.connect(self.on_finder_finished)
@@ -343,6 +353,40 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.settings.setValue('decoy_limit', self.decoyLimitSpinBox.value())
 
     @pyqtSignature("")
+    def on_dTanimotoBox_editingFinished(self):
+        """
+        Slot documentation goes here.
+        """
+        self.settings.setValue('tanimoto_d', self.dTanimotoBox.value())
+
+    @pyqtSignature("")
+    def on_cachDirectoryLineEdit_editingFinished(self):
+        """
+        Slot documentation goes here.
+        """
+        dir = self.cachDirectoryLineEdit.text()
+        if os.path.isdir(dir):
+            self.settings.setValue('cachedir', dir)
+
+    @pyqtSignature("")
+    def on_cacheButton_clicked(self):
+        """
+        Slot documentation goes here.
+        """
+        dialog =  QFileDialog(self)
+        dialog.setFileMode(QFileDialog.Directory)
+        dialog.setOption(QFileDialog.ShowDirsOnly, True)
+        dialog.setDirectory(self.settings.value('cachedir',os.path.expanduser('~')))
+        if dialog.exec_():
+            dir = dialog.selectedFiles()[0]
+            if os.path.isdir(dir):
+                self.cachDirectoryLineEdit.setText(dir)
+                self.cachDirectoryLineEdit.editingFinished.emit()
+            else:
+                self.on_error('Could no acces selected directory.\nPlease, choose a different one')
+
+
+    @pyqtSignature("")
     def on_defaultsButton_clicked(self):
         """
         Slot documentation goes here.
@@ -354,7 +398,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.molwtBox.setValue(40)
         self.rotbBox.setValue(0)
         self.decoyLimitSpinBox.setValue(36)
-        for field in (self.hbaBox, self.hbdBox, self.clogpBox, self.tanimotoBox, self.molwtBox, self.rotbBox,  self.decoyLimitSpinBox):
+        self.dTanimotoBox.setValue(0.9)
+        self.cachDirectoryLineEdit.setText(tempfile.gettempdir())
+        for field in (self.hbaBox, self.hbdBox, self.clogpBox, self.tanimotoBox, self.molwtBox, self.rotbBox,  self.decoyLimitSpinBox, self.dTanimotoBox, self.cachDirectoryLineEdit):
             field.editingFinished.emit()
 
     #################################

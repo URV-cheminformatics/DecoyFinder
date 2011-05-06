@@ -67,7 +67,7 @@ class ComparableMol():
     def __str__(self):
         return "Title: %s; HBA: %s; HBD: %s; CLogP: %s; MW:%s \n" % (self.title, self.hba, self.hbd, self.clogp, self.mw)
 
-def get_zinc_slice(slicename,  cachedir = tempfile.gettempdir()):
+def get_zinc_slice(slicename,  cachedir = tempfile.gettempdir(),  keepcache = False):
     """
     returns an iterable list of files from  online ZINC slices
     """
@@ -86,13 +86,17 @@ def get_zinc_slice(slicename,  cachedir = tempfile.gettempdir()):
         parenturl = scriptcontent[0].split()[1].split('=')[1]
         for file in filelist:
             #print "treballant amb %s" % file
-            dbhandler = urllib2.urlopen(parenturl + file)
+
             outfilename = os.path.join(cachedir, file)
-            #print "destinació:%s" % outfilename
-            outfile = open(outfilename, "wb")
-            outfile.write(dbhandler.read())
-            dbhandler.close()
-            outfile.close()
+            if not (keepcache and os.path.isfile(outfilename)):
+                print 'File not cached or cache disabled; downloading file from %s' % parenturl
+                dbhandler = urllib2.urlopen(parenturl + file)
+                outfile = open(outfilename, "wb")
+                outfile.write(dbhandler.read())
+                dbhandler.close()
+                outfile.close()
+            else:
+                print "Loading cached file: %s" % outfilename
             yield outfilename
             #print outfilename
             try:
@@ -122,7 +126,8 @@ def parse_db_files(filelist):
     """
     """
     filecount = 0
-    random.shuffle(filelist)
+    if type(filelist) == list:
+        random.shuffle(filelist)
     for dbfile in filelist:
         mols = pybel.readfile(get_fileformat(dbfile), dbfile)
         for mol in mols:
@@ -178,20 +183,26 @@ def isdecoy(
 def save_decoys(decoys_dict, outputfile):
     """
     """
+    print 'saving %s decoys' % len(decoys_dict)
     fileexists = 0
-    if os.path.splitext(outputfile)[1].lower() != 'sdf':
+    if os.path.splitext(outputfile)[1].lower()[1:] not in pybel.outformats.keys():
         outputfile += "_decoys.sdf"
     while os.path.isfile(outputfile):
         fileexists += 1
-        outputfile = os.path.splitext(outputfile)[0] + "_%s" % fileexists + os.path.splitext(outputfile)[1]
+        filename,  extension = os.path.splitext(outputfile)
+        if filename.endswith("_%s" % (fileexists -1)):
+            filename[-1] = fileexists
+        else:
+            filename += "_%s" % fileexists
+        outputfile = filename + extension
 
-    decoyfile = pybel.Outputfile("sdf", outputfile)#, overwrite = True)
-
+    format = str(os.path.splitext(outputfile)[1][1:].lower())
+    decoyfile = pybel.Outputfile(format, str(outputfile))
     for decoyfp in decoys_dict.iterkeys():
         decoy = decoys_dict[decoyfp]
         decoyfile.write(decoy.mol)
-
     decoyfile.close()
+    return outputfile
 
 def find_decoys(
                 query_files
@@ -217,6 +228,13 @@ def find_decoys(
 
     ligands_dict = parse_query_files(query_files)
 
+    yield 0,  'known decoy files...'
+
+    for ligand in ligands_dict.iterkeys():
+        for decoyfp in decoys_dict.iterkeys():
+            if isdecoy(decoys_dict[decoyfp],ligand,HBA_t,HBD_t,ClogP_t,tanimoto_t,MW_t,RB_t ):
+                ligands_dict[ligand] +=1
+
     for db_mol, filecount, db_file in db_entry_gen:
         #print db_mol.title
         yield filecount, db_file
@@ -226,17 +244,17 @@ def find_decoys(
                 break_loop = 0
                 if isdecoy(db_mol,ligand,HBA_t,HBD_t,ClogP_t,tanimoto_t,MW_t,RB_t ):
                     not_repeated = True
-                    for fp in decoys_dict.iterkeys():
-                        if fp|db_mol.fp >= tanimoto_d:
-                            not_repeated = False
+                    if tanimoto_d < 1:
+                        for fp in decoys_dict.iterkeys():
+                            if fp|db_mol.fp >= tanimoto_d:
+                                not_repeated = False
                     if not_repeated:
                         ligands_dict[ligand] += 1
                         decoys_dict[db_mol.fp] = db_mol
                     #print tanimoto, db_mol.title, ligand.title
         if break_loop:
             break
-    save_decoys(decoys_dict, outputfile)
-    yield ligands_dict,  0
+    yield ligands_dict,  save_decoys(decoys_dict, outputfile)
     print "Done.\n"
 
 if __name__ == '__main__':
