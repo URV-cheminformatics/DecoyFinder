@@ -1,5 +1,7 @@
-# -*- coding: utf-8 -*-
-
+#-*- coding:utf-8 -*-
+#
+#       MainWindow.py is part of Decoy Finder
+#
 #       Copyright 2011 Adrià Cereto Massagué <adrian.cereto@gmail.com>
 #
 #       This program is free software; you can redistribute it and/or modify
@@ -113,7 +115,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.supported_files = self.tr('Molecule files') + ' ('
         for format in pybel.informats.iterkeys():
             self.supported_files += "*.%s " %format
-            self.supported_files += "*.%s.gz " %format
+            if os.name != 'nt':
+                self.supported_files += "*.%s.gz " %format
         self.supported_files += ')'
         self.outputDirectoryLineEdit.setText(self.settings.value('outdir',os.getcwd()))
 
@@ -136,7 +139,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 self.resultsTable.insertRow(0)
                 self.resultsTable.setItem(0, 0,  QTableWidgetItem(ligand))
                 self.resultsTable.setItem(0, 1,  QTableWidgetItem(str(resultdict[ligand])))
-                outfile = os.path.join(self.settings.value('outdir',  os.getcwd()),  ligand + "_decoys.sdf")
+                outfile = os.path.join(self.settings.value('outdir',  os.getcwd()),  ligand + "_decoys.sdf")#TODO:
                 if resultdict[ligand] and os.path.isfile(outfile):
                     self.resultsTable.setItem(0, 2,  QTableWidgetItem(outfile))
                 else:
@@ -145,6 +148,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.resultsTable.resizeColumnToContents(0)
             self.resultsTable.resizeColumnToContents(2)
             self.progressBar.setValue(self.progressBar.maximum)
+        else:
+            self.on_error(self.tr('No decoys found. Try to set lower requirements in the options tab.'))
         self.statusbar.showMessage(self.tr("Done."))
 
 

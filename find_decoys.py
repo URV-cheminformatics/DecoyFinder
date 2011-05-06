@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 #-*- coding:utf-8 -*-
-
+#
+#       find_decoys.py is part of Decoy Finder
+#
 #       Copyright 2011 Adrià Cereto Massagué <adrian.cereto@gmail.com>
 #
 #       This program is free software; you can redistribute it and/or modify
@@ -28,17 +30,20 @@
 
 import pybel, os, urllib2, tempfile, random
 
-##### Aquesta part és necessària per a poder fer servir MACCS fingerprinting des de pybel
-pybel.fps.append("MACCS")
-pybel._fingerprinters = pybel._getplugins(pybel.ob.OBFingerprint.FindFingerprint, pybel.fps)
+##### Aquesta part és necessària per a poder fer servir MACCS fingerprinting des de pybel en versions antiquades d'openbabel
+if "MACCS" not in pybel.fps:
+    pybel.fps.append("MACCS")
+    pybel._fingerprinters = pybel._getplugins(pybel.ob.OBFingerprint.FindFingerprint, pybel.fps)
 #####
 
 #Alguns valors per defecte:
+#TODO: known decoys; decoys diferent; tots a un fitxer
 
 HBA_t = 0 #1
 HBD_t = 0#1
 ClogP_t = 1#1.5
 tanimoto_t = 0.9
+tanimoto_d = 0.9
 MW_t = 40
 RB_t = 0
 
@@ -62,7 +67,7 @@ class ComparableMol():
     def __str__(self):
         return "Title: %s; HBA: %s; HBD: %s; CLogP: %s; MW:%s \n" % (self.title, self.hba, self.hbd, self.clogp, self.mw)
 
-def get_zinc_slice(slicename):
+def get_zinc_slice(slicename,  cachedir = tempfile.gettempdir()):
     """
     returns an iterable list of files from  online ZINC slices
     """
@@ -73,7 +78,7 @@ def get_zinc_slice(slicename):
         scriptcontent = handler.read().split('\n')
         handler.close()
         filelist = scriptcontent[1:-2]
-        print slicename
+        #print slicename
         yield len(filelist)
         random.shuffle(filelist)
         #print filelist
@@ -82,7 +87,7 @@ def get_zinc_slice(slicename):
         for file in filelist:
             #print "treballant amb %s" % file
             dbhandler = urllib2.urlopen(parenturl + file)
-            outfilename = os.path.join(tempfile.gettempdir(), file)
+            outfilename = os.path.join(cachedir, file)
             #print "destinació:%s" % outfilename
             outfile = open(outfilename, "wb")
             outfile.write(dbhandler.read())
@@ -117,12 +122,12 @@ def parse_db_files(filelist):
     """
     """
     filecount = 0
+    random.shuffle(filelist)
     for dbfile in filelist:
         mols = pybel.readfile(get_fileformat(dbfile), dbfile)
         for mol in mols:
             yield ComparableMol(mol), filecount, dbfile
         filecount += 1
-
 
 def parse_query_files(filelist):
     """
@@ -130,11 +135,21 @@ def parse_query_files(filelist):
     query_dict = {}
     for file in filelist:
         file = str(file)
-        mols = pybel.readfile(get_fileformat(file),
-                              file)
+        mols = pybel.readfile(get_fileformat(file), file)
         for mol in mols:
-            query_dict[ComparableMol(mol)] = []
+            query_dict[ComparableMol(mol)] = 0
     return query_dict
+
+def parse_decoy_files(decoyfilelist):
+    """
+    """
+    decoy_dict = {}
+    for decoyfile in decoyfilelist:
+        decoyfile = str(decoyfile)
+        mols = pybel.readfile(get_fileformat(decoyfile), decoyfile)
+        for mol in mols:
+            decoy_dict[mol.fp] = ComparableMol(mol)
+    return decoy_dict
 
 def isdecoy(
                 db_mol
@@ -160,36 +175,43 @@ def isdecoy(
     else:
         return False
 
-def save_decoys(ligands_dict, outputdir):
+def save_decoys(decoys_dict, outputfile):
     """
     """
-    resultdict = {}
-    for ligand in ligands_dict.iterkeys():
-        decoy_list = ligands_dict[ligand]
-        #print ligand.title, len(decoy_list), "decoys found"
-        resultdict[ligand.title] = len(decoy_list)
-        if decoy_list:
-            decoyfile = pybel.Outputfile("sdf", os.path.join(str(outputdir), ligand.title + "_decoys.sdf"), overwrite = True)
-            for decoy in decoy_list:
-                decoyfile.write(decoy.mol)
-            decoyfile.close()
-    return resultdict
+    fileexists = 0
+    if os.path.splitext(outputfile)[1].lower() != 'sdf':
+        outputfile += "_decoys.sdf"
+    while os.path.isfile(outputfile):
+        fileexists += 1
+        outputfile = os.path.splitext(outputfile)[0] + "_%s" % fileexists + os.path.splitext(outputfile)[1]
+
+    decoyfile = pybel.Outputfile("sdf", outputfile)#, overwrite = True)
+
+    for decoyfp in decoys_dict.iterkeys():
+        decoy = decoys_dict[decoyfp]
+        decoyfile.write(decoy.mol)
+
+    decoyfile.close()
 
 def find_decoys(
                 query_files
                 ,db_files
-                ,outputdir = '.'
+                ,outputfile = 'found_decoys'
                 ,HBA_t = 0 #1
                 ,HBD_t = 0#1
                 ,ClogP_t = 1#1.5
                 ,tanimoto_t = 0.9
+                ,tanimoto_d = 0.9
                 ,MW_t = 40
                 ,RB_t = 0
                 ,limit = 36
+                ,decoy_files = []
                 ):
     """
     """
     print "Looking for decoys!"
+
+    decoys_dict = parse_decoy_files(decoy_files)
 
     db_entry_gen = parse_db_files(db_files)
 
@@ -200,14 +222,21 @@ def find_decoys(
         yield filecount, db_file
         break_loop = 1
         for ligand in ligands_dict.iterkeys():
-            if not limit  or (limit and len(ligands_dict[ligand]) <  limit):
+            if not limit  or (limit and ligands_dict[ligand] <  limit):
                 break_loop = 0
                 if isdecoy(db_mol,ligand,HBA_t,HBD_t,ClogP_t,tanimoto_t,MW_t,RB_t ):
-                    ligands_dict[ligand].append(db_mol)
+                    not_repeated = True
+                    for fp in decoys_dict.iterkeys():
+                        if fp|db_mol.fp >= tanimoto_d:
+                            not_repeated = False
+                    if not_repeated:
+                        ligands_dict[ligand] += 1
+                        decoys_dict[db_mol.fp] = db_mol
                     #print tanimoto, db_mol.title, ligand.title
         if break_loop:
             break
-    yield save_decoys(ligands_dict, outputdir), 0
+    save_decoys(decoys_dict, outputfile)
+    yield ligands_dict,  0
     print "Done.\n"
 
 if __name__ == '__main__':

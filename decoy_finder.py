@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 #-*- coding:utf-8 -*-
-
+#
+#       decoy_finder.py is part of Decoy Finder
+#
 #       Copyright 2011 Adrià Cereto Massagué <adrian.cereto@gmail.com>
 #
 #       This program is free software; you can redistribute it and/or modify
@@ -34,7 +36,7 @@ from MainWindow import MainWindow
 
 ORGNAME = 'Universitat Rovira i Virgili - Grup de recerca en nutrigenòmica'
 NAME = 'Decoy Finder'
-VERSION = '0.1~alfa'
+VERSION = '0.2~alfa'
 
 def main():
     """
