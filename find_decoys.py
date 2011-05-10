@@ -37,7 +37,6 @@ if "MACCS" not in pybel.fps:
 #####
 
 #Alguns valors per defecte:
-#TODO: known decoys; decoys diferent; tots a un fitxer
 
 HBA_t = 0 #1
 HBD_t = 0#1
@@ -97,7 +96,7 @@ def get_zinc_slice(slicename,  cachedir = tempfile.gettempdir(),  keepcache = Fa
                 outfile.close()
             else:
                 print "Loading cached file: %s" % outfilename
-            yield outfilename
+            yield str(outfilename)
             #print outfilename
             try:
                 os.remove(outfilename)
@@ -153,7 +152,8 @@ def parse_decoy_files(decoyfilelist):
         decoyfile = str(decoyfile)
         mols = pybel.readfile(get_fileformat(decoyfile), decoyfile)
         for mol in mols:
-            decoy_dict[mol.fp] = ComparableMol(mol)
+            cmol = ComparableMol(mol)
+            decoy_dict[cmol.fp.__str__()] = cmol
     return decoy_dict
 
 def isdecoy(
@@ -184,25 +184,28 @@ def save_decoys(decoys_dict, outputfile):
     """
     """
     print 'saving %s decoys' % len(decoys_dict)
-    fileexists = 0
-    if os.path.splitext(outputfile)[1].lower()[1:] not in pybel.outformats.keys():
-        outputfile += "_decoys.sdf"
-    while os.path.isfile(outputfile):
-        fileexists += 1
-        filename,  extension = os.path.splitext(outputfile)
-        if filename.endswith("_%s" % (fileexists -1)):
-            filename[-1] = fileexists
-        else:
-            filename += "_%s" % fileexists
-        outputfile = filename + extension
+    if len(decoys_dict):
+        fileexists = 0
+        if os.path.splitext(outputfile)[1].lower()[1:] not in pybel.outformats.keys():
+            outputfile += "_decoys.sdf"
+        while os.path.isfile(outputfile):
+            fileexists += 1
+            filename,  extension = os.path.splitext(outputfile)
+            if filename.endswith("_%s" % (fileexists -1)):
+                filename = '_'.join(filename.split('_')[:-1]) +"_%s" % fileexists
+            else:
+                filename += "_%s" % fileexists
+            outputfile = filename + extension
 
-    format = str(os.path.splitext(outputfile)[1][1:].lower())
-    decoyfile = pybel.Outputfile(format, str(outputfile))
-    for decoyfp in decoys_dict.iterkeys():
-        decoy = decoys_dict[decoyfp]
-        decoyfile.write(decoy.mol)
-    decoyfile.close()
-    return outputfile
+        format = str(os.path.splitext(outputfile)[1][1:].lower())
+        decoyfile = pybel.Outputfile(format, str(outputfile))
+        for decoyfp in decoys_dict.iterkeys():
+            decoy = decoys_dict[decoyfp]
+            decoyfile.write(decoy.mol)
+        decoyfile.close()
+        return outputfile
+    else:
+        return 'No decoys found'
 
 def find_decoys(
                 query_files
@@ -222,13 +225,15 @@ def find_decoys(
     """
     print "Looking for decoys!"
 
+    yield 0,  'known decoy files...'
     decoys_dict = parse_decoy_files(decoy_files)
 
     db_entry_gen = parse_db_files(db_files)
 
     ligands_dict = parse_query_files(query_files)
 
-    yield 0,  'known decoy files...'
+    rejected = 0
+    limitreached = False
 
     for ligand in ligands_dict.iterkeys():
         for decoyfp in decoys_dict.iterkeys():
@@ -246,16 +251,23 @@ def find_decoys(
                     not_repeated = True
                     if tanimoto_d < 1:
                         for fp in decoys_dict.iterkeys():
-                            if fp|db_mol.fp >= tanimoto_d:
+                            decoy_T = decoys_dict[fp].fp | db_mol.fp
+                            if  decoy_T >= tanimoto_d:
+#                                print decoy_T
+#                                print 'discarding too similar molecule'
+                                rejected +=1
                                 not_repeated = False
                     if not_repeated:
                         ligands_dict[ligand] += 1
-                        decoys_dict[db_mol.fp] = db_mol
+                        decoys_dict[db_mol.fp.__str__()] = db_mol
                     #print tanimoto, db_mol.title, ligand.title
         if break_loop:
+            print 'limit successfully reached'
+            limitreached = True
             break
-    yield ligands_dict,  save_decoys(decoys_dict, outputfile)
-    print "Done.\n"
+    print '%s rejected decoys due to similarity' % rejected
+    #Last, special yield:
+    yield ligands_dict,  (save_decoys(decoys_dict, outputfile), limitreached)
 
 if __name__ == '__main__':
     pass

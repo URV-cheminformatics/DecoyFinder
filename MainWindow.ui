@@ -17,6 +17,9 @@
    <layout class="QVBoxLayout" name="verticalLayout_4">
     <item>
      <widget class="QTabWidget" name="tabWidget">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
       <property name="currentIndex">
        <number>0</number>
       </property>
@@ -165,11 +168,27 @@
              <item>
               <layout class="QVBoxLayout" name="verticalLayout_7">
                <property name="topMargin">
-                <number>12</number>
+                <number>14</number>
                </property>
                <property name="bottomMargin">
-                <number>12</number>
+                <number>14</number>
                </property>
+               <item>
+                <spacer name="verticalSpacer">
+                 <property name="orientation">
+                  <enum>Qt::Vertical</enum>
+                 </property>
+                 <property name="sizeType">
+                  <enum>QSizePolicy::Preferred</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>0</width>
+                   <height>0</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
               </layout>
              </item>
              <item>
@@ -287,7 +306,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QCheckBox" name="checkBox">
+               <widget class="QCheckBox" name="cacheCheckBox">
                 <property name="text">
                  <string>Use caché</string>
                 </property>
@@ -546,6 +565,9 @@
             <property name="toolTip">
              <string>Limit how many decoys to find for each ligand. If the limit is 0, there is no limit.</string>
             </property>
+            <property name="maximum">
+             <number>99999</number>
+            </property>
            </widget>
           </item>
           <item row="7" column="0">
@@ -665,16 +687,64 @@
   <connection>
    <sender>clearButton</sender>
    <signal>clicked()</signal>
-   <receiver>queryList</receiver>
-   <slot>clear()</slot>
+   <receiver>progressBar</receiver>
+   <slot>reset()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>68</x>
+     <x>48</x>
      <y>374</y>
     </hint>
     <hint type="destinationlabel">
-     <x>75</x>
-     <y>283</y>
+     <x>33</x>
+     <y>416</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>clearButton</sender>
+   <signal>clicked()</signal>
+   <receiver>statusbar</receiver>
+   <slot>clearMessage()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>59</x>
+     <y>374</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>49</x>
+     <y>442</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_4</sender>
+   <signal>clicked()</signal>
+   <receiver>decoyList</receiver>
+   <slot>clear()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>280</x>
+     <y>136</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>275</x>
+     <y>193</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>clearButton</sender>
+   <signal>clicked()</signal>
+   <receiver>decoyList</receiver>
+   <slot>clear()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>87</x>
+     <y>362</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>236</x>
+     <y>263</y>
     </hint>
    </hints>
   </connection>
@@ -695,34 +765,34 @@
    </hints>
   </connection>
   <connection>
-   <sender>clearButton</sender>
+   <sender>pushButton_2</sender>
    <signal>clicked()</signal>
-   <receiver>progressBar</receiver>
-   <slot>reset()</slot>
+   <receiver>dbListWidget</receiver>
+   <slot>clear()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>48</x>
-     <y>374</y>
+     <x>575</x>
+     <y>146</y>
     </hint>
     <hint type="destinationlabel">
-     <x>33</x>
-     <y>425</y>
+     <x>576</x>
+     <y>299</y>
     </hint>
    </hints>
   </connection>
   <connection>
    <sender>clearButton</sender>
    <signal>clicked()</signal>
-   <receiver>statusbar</receiver>
-   <slot>clearMessage()</slot>
+   <receiver>queryList</receiver>
+   <slot>clear()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>59</x>
+     <x>68</x>
      <y>374</y>
     </hint>
     <hint type="destinationlabel">
-     <x>49</x>
-     <y>451</y>
+     <x>75</x>
+     <y>283</y>
     </hint>
    </hints>
   </connection>
@@ -733,28 +803,12 @@
    <slot>clear()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>198</x>
+     <x>161</x>
      <y>140</y>
     </hint>
     <hint type="destinationlabel">
-     <x>197</x>
+     <x>169</x>
      <y>256</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>pushButton_2</sender>
-   <signal>clicked()</signal>
-   <receiver>dbListWidget</receiver>
-   <slot>clear()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>670</x>
-     <y>146</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>671</x>
-     <y>299</y>
     </hint>
    </hints>
   </connection>

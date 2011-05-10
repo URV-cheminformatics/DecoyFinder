@@ -63,7 +63,8 @@ class DecoyFinderThread(QThread):
         """
         """
         self.info.emit(self.tr("Reading files..."))
-        result = {}
+        #result = ()
+        limitreached = True
         try:
             self.filecount = 0
             for filecount, current_file in find_decoys(
@@ -86,14 +87,15 @@ class DecoyFinderThread(QThread):
                     self.progress.emit(self.filecount)
                 elif type(filecount) == dict:
                     #print "dict found"
-                    outputfile = current_file
-                    result = filecount,  outputfile
+                    outputfile = current_file[0]
+                    limitreached = current_file[1]
+                    result = (filecount,  outputfile,  limitreached)
                 else:
-                    self.error.emit(tr('Unexpected error: %s; %s') % (filecount, current_file))
+                    self.error.emit(self.trUtf8('Unexpected error: %s; %s') % (filecount, current_file))
             self.progress.emit(self.filecount +1)
         except Exception, e:
             err = unicode(e)
-            self.error.emit("Error: %s" % err)
+            self.error.emit(self.trUtf8("Error: %s" % err))
         self.finished.emit(result)
 
 class MainWindow(QMainWindow, Ui_MainWindow):
@@ -106,10 +108,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         """
         QMainWindow.__init__(self, parent)
         self.setupUi(self)
+        self.settings = QSettings()
         self.kdecoysFrame.setVisible(False)
+        self.cacheCheckBox.setVisible(False)
+        self.cacheCheckBox.setChecked(bool(int(self.settings.value('usecache',  False))))
         self.progressBar.setMinimum(0)
         self.progressBar.setValue(0)
-        self.settings = QSettings()
         ######Display current settings########
         self.hbaBox.setValue(int(self.settings.value('HBA_t', 0)))
         self.hbdBox.setValue(int(self.settings.value('HBD_t', 0)))
@@ -120,6 +124,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.decoyLimitSpinBox.setValue(int(self.settings.value('decoy_limit',36)))
         self.dTanimotoBox.setValue(float(self.settings.value('tanimoto_d', 0.9)))
         self.cachDirectoryLineEdit.setText(self.settings.value('cachedir',tempfile.gettempdir()))
+        self.outputDirectoryLineEdit.setText(self.settings.value('outputfile',os.path.join(os.getcwd(), 'found_decoys.sdf') ))
         ########################
         self.supported_files = self.tr('Molecule files') + ' ('
         for format in pybel.informats.iterkeys():
@@ -127,36 +132,50 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             if os.name != 'nt':
                 self.supported_files += "*.%s.gz " %format
         self.supported_files += ')'
-        self.outputDirectoryLineEdit.setText(self.settings.value('outputfile',os.path.join(os.getcwd(), 'found_decoys.sdf') ))
 
     def _getListWidgetItemTextList(self, listWidget):
         """
         """
-        itemlist = [listWidget.item(index).text() for index in xrange(listWidget.count())]
+        itemlist = [str(listWidget.item(index).text()) for index in xrange(listWidget.count())]
         return itemlist
 
     def on_finder_finished(self, resulttuple):
         """
         """
-
+        if not self.progressBar.maximum:
+            self.progressBar.setMaximum(1)
+        self.progressBar.setValue(self.progressBar.maximum)
         self.resultsTable.setSortingEnabled(False)
         self.tabWidget.setEnabled(True)
-        self.findDecoysButton.setEnabled(True)
-        if len(resulttuple) and len(resulttuple[0]):
-            resultdict,  outfile = resulttuple
-            resultlines = []
+        #self.findDecoysButton.setEnabled(True)
+        resultdict,  outfile,  limitreached = resulttuple
+        if len(resultdict):
+            ndecoys = 0
             self.tabWidget.setCurrentIndex(1)
             for ligand in resultdict.iterkeys():
                 self.resultsTable.insertRow(0)
                 self.resultsTable.setItem(0, 0,  QTableWidgetItem(ligand.title))
                 self.resultsTable.setItem(0, 1,  QTableWidgetItem(str(resultdict[ligand])))
                 self.resultsTable.setItem(0, 2,  QTableWidgetItem(outfile))
+                ndecoys += resultdict[ligand]
             self.resultsTable.sortByColumn(1, Qt.DescendingOrder)
             self.resultsTable.resizeColumnToContents(0)
             self.resultsTable.resizeColumnToContents(2)
-            self.progressBar.setValue(self.progressBar.maximum)
+            if ndecoys and not limitreached:
+                answer = QMessageBox.question(None,
+                    self.trUtf8("Not enough decoys found"),
+                    self.trUtf8("""Not enough decoys for each ligand were found. Please, try to loosen search constraints in the options tab.\n Found decoys have been added to known decoys list'"""),
+                    QMessageBox.StandardButtons(\
+                        QMessageBox.Abort | \
+                        QMessageBox.Retry))
+                if answer == QMessageBox.Retry:
+                    self.tabWidget.setCurrentIndex(0)
+                    self.decoyList.addItem(outfile)
+                    self.kdecoysCheckBox.setChecked(True)
+            else:
+                self.on_error(self.tr('No decoys found. Try to set lower requirements in the options tab.'))
         else:
-            self.on_error(self.tr('No decoys found. Try to set lower requirements in the options tab.'))
+            self.on_error(self.tr('No active ligands found. Check your query files.'))
         self.statusbar.showMessage(self.tr("Done."))
 
 
@@ -190,6 +209,22 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 if file not in itemlist:
                     self.queryList.addItem(file)
 
+    @pyqtSignature("")
+    def on_addDecoysButton_clicked(self):
+        """
+        Slot documentation goes here.
+        """
+        itemlist = self._getListWidgetItemTextList(self.decoyList)
+        dialog =  QFileDialog(self)
+        dialog.setFileMode(QFileDialog.ExistingFiles)
+        dialog.setNameFilter(self.supported_files)
+        dialog.setDirectory(self.settings.value('lastdir', os.path.expanduser('~')))
+        if dialog.exec_():
+            filelist = dialog.selectedFiles()
+            self.settings.setValue('lastdir', os.path.dirname(unicode(filelist[0])))
+            for file in filelist:
+                if file not in itemlist:
+                    self.decoyList.addItem(file)
 
     @pyqtSignature("")
     def on_addDButton_clicked(self):
@@ -222,8 +257,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         Slot documentation goes here.
         """
         dir = self.outputDirectoryLineEdit.text()
-        if os.path.isdir(dir):
-            self.settings.setValue('outputfile', dir)
+        self.settings.setValue('outputfile', dir)
 
     @pyqtSignature("")
     def on_outDirButton_clicked(self):
@@ -245,7 +279,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         """
         Slot documentation goes here.
         """
-        self.findDecoysButton.setEnabled(False)
+        #self.findDecoysButton.setEnabled(False)
+        self.tabWidget.setEnabled(False)
         #print self.settings.value('outdir')
         query_files = self._getListWidgetItemTextList(self.queryList)
 
@@ -259,7 +294,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         for item in db_items:
             if item.split()[0] == 'ZINC':
                 #TODO download from ZINC
-                print item.split()[1]
+                #print item.split()[1]
                 usecache = self.cacheCheckBox.isChecked()
                 zinc_file_gen = get_zinc_slice(item.split()[1], self.settings.value('cachedir',tempfile.gettempdir()),  usecache)
                 zfilecount = zinc_file_gen.next()
@@ -276,16 +311,19 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         db_files =itertools.chain(db_files,  zinc_iter)
         if [] == query_files  or not total_files:
             self.on_error(self.tr('You must select at least one file containing query molecules, and at least one molecule library file or source'))
-            self.findDecoysButton.setEnabled(True)
+            #self.findDecoysButton.setEnabled(True)
+            self.tabWidget.setEnabled(True)
         else:
-            print total_files
-            self.progressBar.setMaximum(total_files)
+            if total_files == 1:
+                self.progressBar.setMaximum(0)
+                self.progressBar.setValue(0)
+            else:
+                self.progressBar.setMaximum(total_files)
             self.finder = DecoyFinderThread(query_files, db_files, decoy_files)
             self.finder.info.connect(self.statusbar.showMessage)
             self.finder.progress.connect(self.progressBar.setValue)
             self.finder.finished.connect(self.on_finder_finished)
             self.finder.error.connect(self.on_error)
-            self.tabWidget.setEnabled(False)
             print "starting thread"
             self.finder.start()
             print "started"
@@ -299,6 +337,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         while  self.resultsTable.rowCount():
             self.resultsTable.removeRow(0)
 
+    @pyqtSignature(int)
+    def on_dbComboBox_currentIndexChanged(self,  index):
+        """
+        Slot documentation goes here.
+        """
+        self.cacheCheckBox.setVisible(bool(index))
 
     ############ Options tab  #############
     @pyqtSignature("")
