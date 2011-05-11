@@ -26,16 +26,16 @@ Module implementing MainWindow.
 import os, pybel,  itertools,  random, tempfile
 try:
     from PySide.QtGui import QMainWindow, QFileDialog, QTableWidgetItem, QMessageBox
-    from PySide.QtCore import QSettings, QThread, Signal,  Qt
-    from PySide.QtCore import Slot as pyqtSignature
+    from PySide.QtCore import QSettings, QThread, Signal, Qt, Slot
 except:
     print "PySide not found! trying PyQt4"
     import sip
     sip.setapi('QString', 2)
     sip.setapi('QVariant', 2)
     from PyQt4.QtGui import QMainWindow, QFileDialog, QTableWidgetItem, QMessageBox
-    from PyQt4.QtCore import QSettings, QThread, Qt, pyqtSignature
+    from PyQt4.QtCore import QSettings, QThread, Qt
     from PyQt4.QtCore import pyqtSignal as Signal
+    from PyQt4.QtCore import pyqtSignature as Slot
 
 from find_decoys import get_fileformat, find_decoys, get_zinc_slice
 from Ui_MainWindow import Ui_MainWindow
@@ -191,7 +191,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
 
 
-    @pyqtSignature("")
+    @Slot("")
     def on_addQueryButton_clicked(self):
         """
         Slot documentation goes here.
@@ -209,7 +209,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 if file not in itemlist:
                     self.queryList.addItem(file)
 
-    @pyqtSignature("")
+    @Slot("")
     def on_addDecoysButton_clicked(self):
         """
         Slot documentation goes here.
@@ -226,7 +226,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 if file not in itemlist:
                     self.decoyList.addItem(file)
 
-    @pyqtSignature("")
+    @Slot("")
     def on_addDButton_clicked(self):
         """
         Slot documentation goes here.
@@ -251,7 +251,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 if text not in itemlist and 'ZINC all' not in itemlist:
                     self.dbListWidget.addItem(self.dbComboBox.currentText())
 
-    @pyqtSignature("")
+    @Slot("")
     def on_outputDirectoryLineEdit_editingFinished(self):
         """
         Slot documentation goes here.
@@ -259,7 +259,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         dir = self.outputDirectoryLineEdit.text()
         self.settings.setValue('outputfile', dir)
 
-    @pyqtSignature("")
+    @Slot("")
     def on_outDirButton_clicked(self):
         """
         Slot documentation goes here.
@@ -274,7 +274,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.settings.setValue('outputfile', file)
             self.settings.setValue('lastdir', os.path.dirname(unicode(file)))
 
-    @pyqtSignature("")
+    @Slot("")
     def on_findDecoysButton_clicked(self):
         """
         Slot documentation goes here.
@@ -328,7 +328,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.finder.start()
             print "started"
 
-    @pyqtSignature("")
+    @Slot("")
     def on_clearButton_clicked(self):
         """
         Slot documentation goes here.
@@ -337,7 +337,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         while  self.resultsTable.rowCount():
             self.resultsTable.removeRow(0)
 
-    @pyqtSignature(int)
+    @Slot(int)
     def on_dbComboBox_currentIndexChanged(self,  index):
         """
         Slot documentation goes here.
@@ -345,7 +345,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.cacheCheckBox.setVisible(bool(index))
 
     ############ Options tab  #############
-    @pyqtSignature("")
+    @Slot("")
     def on_tanimotoBox_editingFinished(self):
         """
         Slot documentation goes here.
@@ -354,56 +354,56 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         #print "value changed"
 
 
-    @pyqtSignature("")
+    @Slot("")
     def on_clogpBox_editingFinished(self):
         """
         Slot documentation goes here.
         """
         self.settings.setValue('ClogP_t', self.clogpBox.value())
 
-    @pyqtSignature("")
+    @Slot("")
     def on_molwtBox_editingFinished(self):
         """
         Slot documentation goes here.
         """
         self.settings.setValue('MW_t', self.molwtBox.value())
 
-    @pyqtSignature("")
+    @Slot("")
     def on_rotbBox_editingFinished(self):
         """
         Slot documentation goes here.
         """
         self.settings.setValue('RB_t', self.rotbBox.value())
 
-    @pyqtSignature("")
+    @Slot("")
     def on_hbaBox_editingFinished(self):
         """
         Slot documentation goes here.
         """
         self.settings.setValue('HBA_t', self.hbaBox.value())
 
-    @pyqtSignature("")
+    @Slot("")
     def on_hbdBox_editingFinished(self):
         """
         Slot documentation goes here.
         """
         self.settings.setValue('HBD_t', self.hbdBox.value())
 
-    @pyqtSignature("")
+    @Slot("")
     def on_decoyLimitSpinBox_editingFinished(self):
         """
         Slot documentation goes here.
         """
         self.settings.setValue('decoy_limit', self.decoyLimitSpinBox.value())
 
-    @pyqtSignature("")
+    @Slot("")
     def on_dTanimotoBox_editingFinished(self):
         """
         Slot documentation goes here.
         """
         self.settings.setValue('tanimoto_d', self.dTanimotoBox.value())
 
-    @pyqtSignature("")
+    @Slot("")
     def on_cachDirectoryLineEdit_editingFinished(self):
         """
         Slot documentation goes here.
@@ -412,7 +412,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if os.path.isdir(dir):
             self.settings.setValue('cachedir', dir)
 
-    @pyqtSignature("")
+    @Slot("")
     def on_cacheButton_clicked(self):
         """
         Slot documentation goes here.
@@ -430,7 +430,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 self.on_error('Could no acces selected directory.\nPlease, choose a different one')
 
 
-    @pyqtSignature("")
+    @Slot("")
     def on_defaultsButton_clicked(self):
         """
         Slot documentation goes here.
@@ -450,7 +450,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     #################################
 
 
-    @pyqtSignature("")
+    @Slot("")
     def on_actionAbout_activated(self):
         """
         Slot documentation goes here.
