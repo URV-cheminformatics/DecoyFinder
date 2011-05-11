@@ -98,11 +98,12 @@ def get_zinc_slice(slicename,  cachedir = tempfile.gettempdir(),  keepcache = Fa
                 print "Loading cached file: %s" % outfilename
             yield str(outfilename)
             #print outfilename
-            try:
-                os.remove(outfilename)
-            except Exception,  e:
-                print "Unable to remove %s" % (outfilename)
-                print unicode(e)
+            if not keepcache:
+                try:
+                    os.remove(outfilename)
+                except Exception,  e:
+                    print "Unable to remove %s" % (outfilename)
+                    print unicode(e)
     else:
         raise Exception,  u"Unknown slice"
 
