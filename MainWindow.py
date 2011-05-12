@@ -24,18 +24,9 @@ Module implementing MainWindow.
 """
 
 import os, pybel,  itertools,  random, tempfile
-try:
-    from PySide.QtGui import QMainWindow, QFileDialog, QTableWidgetItem, QMessageBox
-    from PySide.QtCore import QSettings, QThread, Signal, Qt, Slot
-except:
-    print "PySide not found! trying PyQt4"
-    import sip
-    sip.setapi('QString', 2)
-    sip.setapi('QVariant', 2)
-    from PyQt4.QtGui import QMainWindow, QFileDialog, QTableWidgetItem, QMessageBox
-    from PyQt4.QtCore import QSettings, QThread, Qt
-    from PyQt4.QtCore import pyqtSignal as Signal
-    from PyQt4.QtCore import pyqtSignature as Slot
+
+from PySide.QtGui import QMainWindow, QFileDialog, QTableWidgetItem, QMessageBox
+from PySide.QtCore import QSettings, QThread, Signal, Qt, Slot
 
 from find_decoys import get_fileformat, find_decoys, get_zinc_slice
 from Ui_MainWindow import Ui_MainWindow

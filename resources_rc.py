@@ -8,12 +8,6 @@
 # WARNING! All changes made in this file will be lost!
 try:
     from PySide import QtCore
-except:
-    print "PySide not found! trying PyQt4"
-    import sip
-    sip.setapi('QString', 2)
-    sip.setapi('QVariant', 2)
-    from PyQt4 import QtCore
 qt_resource_data = "\
 \x00\x00\x00\x10\
 \x3c\
