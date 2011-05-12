@@ -164,8 +164,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                         self.tabWidget.setCurrentIndex(0)
                         self.decoyList.addItem(outfile)
                         self.kdecoysCheckBox.setChecked(True)
-            else:
-                self.on_error(self.tr('No decoys found. Try to set lower requirements in the options tab.'))
+                else:
+                    self.on_error(self.tr('No decoys found. Try to set lower requirements in the options tab.'))
         else:
             self.on_error(self.tr('No active ligands found. Check your query files.'))
         self.statusbar.showMessage(self.tr("Done."))
