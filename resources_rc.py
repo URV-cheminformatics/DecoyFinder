@@ -6,8 +6,9 @@
 #      by: The Resource Compiler for PySide (Qt v4.7.2)
 #
 # WARNING! All changes made in this file will be lost!
-try:
-    from PySide import QtCore
+
+from PySide import QtCore
+
 qt_resource_data = "\
 \x00\x00\x00\x10\
 \x3c\
