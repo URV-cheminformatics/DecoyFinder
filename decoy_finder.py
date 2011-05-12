@@ -21,16 +21,9 @@
 #       MA 02110-1301, USA.
 
 import sys
-try:
-    from PySide.QtGui import QApplication
-    from PySide.QtCore import QTranslator, QLocale
-except:
-    print "PySide not found! trying PyQt4"
-    import sip
-    sip.setapi('QString', 2)
-    sip.setapi('QVariant', 2)
-    from PyQt4.QtGui import QApplication
-    from PyQt4.QtCore import QTranslator, QLocale
+
+from PySide.QtGui import QApplication
+from PySide.QtCore import QTranslator, QLocale
 
 from MainWindow import MainWindow
 
