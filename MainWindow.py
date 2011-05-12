@@ -25,8 +25,10 @@ Module implementing MainWindow.
 
 import os, itertools, random, tempfile
 
-from PySide.QtGui import QMainWindow, QFileDialog, QTableWidgetItem, QMessageBox
-from PySide.QtCore import QSettings, QThread, Signal, Qt, Slot
+from PyQt4.QtGui import QMainWindow, QFileDialog, QTableWidgetItem, QMessageBox
+from PyQt4.QtCore import QSettings, QThread, Qt
+from PyQt4.QtCore import pyqtSignal as Signal
+from PyQt4.QtCore import pyqtSignature as Slot
 
 import decoy_finder
 from find_decoys import get_fileformat, find_decoys, get_zinc_slice,  informats,  ZINC_subsets
@@ -381,7 +383,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         while  self.resultsTable.rowCount():
             self.resultsTable.removeRow(0)
 
-    @Slot(int)
+    @Slot('int')
     def on_dbComboBox_currentIndexChanged(self,  index):
         """
         Slot documentation goes here.
@@ -389,7 +391,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         for widget in (self.cacheCheckBox, self.zsubComboBox, self.zinclabel):
             widget.setEnabled(bool(index))
 
-    @Slot(int)
+    @Slot('int')
     def on_cacheCheckBox_stateChanged(self,  index):
         """
         Slot documentation goes here.
