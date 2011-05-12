@@ -71,7 +71,8 @@ def get_zinc_slice(slicename,  cachedir = tempfile.gettempdir(),  keepcache = Fa
     returns an iterable list of files from  online ZINC slices
     """
     if slicename in ('all', 'single', 'usual', 'metals'):
-        script = "http://zinc.docking.org/subset1/10/%s.sdf.csh" % slicename
+        subset = '10' #subset 'everything'
+        script = "http://zinc.docking.org/subset1/%s/%s.sdf.csh" % (subset,slicename)
         handler = urllib2.urlopen(script)
         print "Reading ZINC data..."
         scriptcontent = handler.read().split('\n')
@@ -226,15 +227,18 @@ def find_decoys(
     """
     print "Looking for decoys!"
 
-    yield 0,  'known decoy files...'
+    yield 0,  'known decoy files...' #TODO: print only when needed
     decoys_dict = parse_decoy_files(decoy_files)
 
     db_entry_gen = parse_db_files(db_files)
 
     ligands_dict = parse_query_files(query_files)
-
+   
+    ligands_ndecoys_dict = {}
+    
     rejected = 0
     limitreached = False
+    ndecoys = 0
 
     for ligand in ligands_dict.iterkeys():
         for decoyfp in decoys_dict.iterkeys():
@@ -244,31 +248,39 @@ def find_decoys(
     for db_mol, filecount, db_file in db_entry_gen:
         #print db_mol.title
         yield filecount, db_file
-        break_loop = 1
-        for ligand in ligands_dict.iterkeys():
-            if not limit  or (limit and ligands_dict[ligand] <  limit):
-                break_loop = 0
-                if isdecoy(db_mol,ligand,HBA_t,HBD_t,ClogP_t,tanimoto_t,MW_t,RB_t ):
-                    not_repeated = True
-                    if tanimoto_d < 1:
-                        for fp in decoys_dict.iterkeys():
-                            decoy_T = decoys_dict[fp].fp | db_mol.fp
-                            if  decoy_T >= tanimoto_d:
-#                                print decoy_T
-#                                print 'discarding too similar molecule'
-                                rejected +=1
-                                not_repeated = False
-                    if not_repeated:
-                        ligands_dict[ligand] += 1
-                        decoys_dict[db_mol.fp.__str__()] = db_mol
-                    #print tanimoto, db_mol.title, ligand.title
-        if break_loop:
-            print 'limit successfully reached'
-            limitreached = True
-            break
+        if ligands_dict:
+            #print len(ligands_dict), 'actives pending'
+            for ligand in ligands_dict.iterkeys():
+                if not limit  or (limit and ligands_dict[ligand] <  limit):
+                    if isdecoy(db_mol,ligand,HBA_t,HBD_t,ClogP_t,tanimoto_t,MW_t,RB_t ):
+                        not_repeated = True
+                        if tanimoto_d < 1:
+                            for fp in decoys_dict.iterkeys():
+                                decoy_T = decoys_dict[fp].fp | db_mol.fp
+                                if  decoy_T >= tanimoto_d:
+    #                                print decoy_T
+    #                                print 'discarding too similar molecule'
+                                    rejected +=1
+                                    not_repeated = False
+                        if not_repeated:
+                            ligands_dict[ligand] += 1
+                            ndecoys +=1
+                            decoys_dict[db_mol.fp.__str__()] = db_mol
+                            #yield ndecoys, db_file
+                            print ndecoys
+                        #print tanimoto, db_mol.title, ligand.title
+                else:
+                    print 'limit successfully reached for ', ligand.title
+                    #limitreached += 1
+                    ligands_ndecoys_dict[ligand] = ligands_dict.pop(ligand)
+                    break
+    if len(ligands_dict) == 0:
+        limitreached = True
+    else:
+        ligands_ndecoys_dict.update(ligands_dict)
     print '%s rejected decoys due to similarity' % rejected
     #Last, special yield:
-    yield ligands_dict,  (save_decoys(decoys_dict, outputfile), limitreached)
+    yield ligands_ndecoys_dict,  (save_decoys(decoys_dict, outputfile), limitreached)
 
 if __name__ == '__main__':
     pass
