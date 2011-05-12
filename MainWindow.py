@@ -52,7 +52,7 @@ class DecoyFinderThread(QThread):
     def __init__(self, query_files, db_files, decoy_files,  parent = None):
         """
         """
-        print "thread created"
+        #print "thread created"
         self.decoy_files = decoy_files
         self.query_files = query_files
         self.db_files = db_files
@@ -161,17 +161,18 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.resultsTable.sortByColumn(1, Qt.DescendingOrder)
             self.resultsTable.resizeColumnToContents(0)
             self.resultsTable.resizeColumnToContents(2)
-            if ndecoys and not limitreached:
-                answer = QMessageBox.question(None,
-                    self.trUtf8("Not enough decoys found"),
-                    self.trUtf8("""Not enough decoys for each ligand were found. Please, try to loosen search constraints in the options tab.\n Found decoys have been added to known decoys list'"""),
-                    QMessageBox.StandardButtons(\
-                        QMessageBox.Abort | \
-                        QMessageBox.Retry))
-                if answer == QMessageBox.Retry:
-                    self.tabWidget.setCurrentIndex(0)
-                    self.decoyList.addItem(outfile)
-                    self.kdecoysCheckBox.setChecked(True)
+            if not limitreached:
+                if ndecoys:
+                    answer = QMessageBox.question(None,
+                        self.trUtf8("Not enough decoys found"),
+                        self.trUtf8("""Not enough decoys for each ligand were found. Please, try to loosen search constraints in the options tab.\n Found decoys have been added to known decoys list'"""),
+                        QMessageBox.StandardButtons(\
+                            QMessageBox.Abort | \
+                            QMessageBox.Retry))
+                    if answer == QMessageBox.Retry:
+                        self.tabWidget.setCurrentIndex(0)
+                        self.decoyList.addItem(outfile)
+                        self.kdecoysCheckBox.setChecked(True)
             else:
                 self.on_error(self.tr('No decoys found. Try to set lower requirements in the options tab.'))
         else:
