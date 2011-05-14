@@ -1,3 +1,7 @@
 *.pyc
 *.pyo
 *~
+.ro*
+*eric*
+*.e4p
+
