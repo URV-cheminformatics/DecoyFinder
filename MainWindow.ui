@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>591</width>
+    <width>597</width>
     <height>443</height>
    </rect>
   </property>
@@ -466,6 +466,9 @@
        <layout class="QVBoxLayout" name="verticalLayout_3">
         <item>
          <layout class="QFormLayout" name="_3">
+          <property name="fieldGrowthPolicy">
+           <enum>QFormLayout::ExpandingFieldsGrow</enum>
+          </property>
           <property name="labelAlignment">
            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
           </property>
@@ -499,12 +502,18 @@
             </property>
            </widget>
           </item>
+          <item row="1" column="1">
+           <widget class="QSpinBox" name="hbaBox"/>
+          </item>
           <item row="2" column="0">
            <widget class="QLabel" name="hBDLabel">
             <property name="text">
              <string>HBD ±</string>
             </property>
            </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QSpinBox" name="hbdBox"/>
           </item>
           <item row="3" column="0">
            <widget class="QLabel" name="clogPLabel">
@@ -527,13 +536,6 @@
             </property>
            </widget>
           </item>
-          <item row="5" column="0">
-           <widget class="QLabel" name="rtotationalBondsLabel">
-            <property name="text">
-             <string>Rotational bonds ±</string>
-            </property>
-           </widget>
-          </item>
           <item row="4" column="1">
            <widget class="QSpinBox" name="molwtBox">
             <property name="suffix">
@@ -544,14 +546,15 @@
             </property>
            </widget>
           </item>
+          <item row="5" column="0">
+           <widget class="QLabel" name="rtotationalBondsLabel">
+            <property name="text">
+             <string>Rotational bonds ±</string>
+            </property>
+           </widget>
+          </item>
           <item row="5" column="1">
            <widget class="QSpinBox" name="rotbBox"/>
-          </item>
-          <item row="1" column="1">
-           <widget class="QSpinBox" name="hbaBox"/>
-          </item>
-          <item row="2" column="1">
-           <widget class="QSpinBox" name="hbdBox"/>
           </item>
           <item row="6" column="0">
            <widget class="QLabel" name="decoyLimitLabel">
@@ -582,6 +585,16 @@
             <property name="maximum">
              <double>1.000000000000000</double>
             </property>
+            <property name="singleStep">
+             <double>0.100000000000000</double>
+            </property>
+           </widget>
+          </item>
+          <item row="8" column="0">
+           <widget class="QPushButton" name="cacheButton">
+            <property name="text">
+             <string>Caché directory</string>
+            </property>
            </widget>
           </item>
           <item row="8" column="1">
@@ -591,13 +604,6 @@
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
-            </property>
-           </widget>
-          </item>
-          <item row="8" column="0">
-           <widget class="QPushButton" name="cacheButton">
-            <property name="text">
-             <string>Caché directory</string>
             </property>
            </widget>
           </item>
@@ -646,11 +652,17 @@
     </item>
     <item>
      <widget class="QProgressBar" name="progressBar">
+      <property name="value">
+       <number>0</number>
+      </property>
       <property name="alignment">
        <set>Qt::AlignCenter</set>
       </property>
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="format">
+       <string>%v decoys found</string>
       </property>
      </widget>
     </item>
@@ -661,7 +673,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>591</width>
+     <width>597</width>
      <height>23</height>
     </rect>
    </property>

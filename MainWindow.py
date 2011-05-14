@@ -39,6 +39,7 @@ class DecoyFinderThread(QThread):
     progress = Signal(int)
     finished = Signal(tuple)
     error = Signal(unicode)
+    progLimit = Signal(int)
 
     def __init__(self, query_files, db_files, decoy_files,  parent = None):
         """
@@ -58,10 +59,13 @@ class DecoyFinderThread(QThread):
         limitreached = True
         try:
             self.filecount = 0
-            for filecount, current_file in find_decoys(
+            self.currentfile = ''
+            limit = int(self.settings.value('decoy_limit'))
+            for info in find_decoys(
+            #for filecount, current_file in find_decoys(
                         query_files = self.query_files
                         ,db_files = self.db_files
-                        ,outputfile =  self.settings.value('outputfile', os.getcwd())
+                        ,outputfile =  self.settings.value('outputfile')
                         ,HBA_t = int(self.settings.value('HBA_t', 0))
                         ,HBD_t = int(self.settings.value('HBD_t', 0))
                         ,ClogP_t = float(self.settings.value('ClogP_t', 1))
@@ -72,18 +76,30 @@ class DecoyFinderThread(QThread):
                         ,tanimoto_d = float(self.settings.value('tanimoto_d', 0.9))
                         ,decoy_files = self.decoy_files
                         ):
-                if type(filecount) != dict:
-                    self.filecount = filecount
-                    self.info.emit(self.tr("Reading %s") % current_file)
-                    self.progress.emit(self.filecount)
-                elif type(filecount) == dict:
+                if info[0] in ('file',  'ndecoys'):
+                    if not(limit):
+                        if info[0] == 'file':
+                            self.filecount = info[1]
+                            if self.currentfile != info[2]:
+                                self.currentfile = info[2]
+                                self.info.emit(self.trUtf8("Reading %s") % self.currentfile)
+                            self.progress.emit(self.filecount)
+                    else:
+                        if info[0] == 'ndecoys':
+                            self.progress.emit(info[1])
+                            self.info.emit(self.trUtf8("%s decoy sets completed") % info[2])
+                elif info[0] == 'result':
                     #print "dict found"
-                    outputfile = current_file[0]
-                    limitreached = current_file[1]
-                    result = (filecount,  outputfile,  limitreached)
-                else:
-                    self.error.emit(self.trUtf8('Unexpected error: %s; %s') % (filecount, current_file))
-            self.progress.emit(self.filecount +1)
+                    outputfile = info[2][0]
+                    limitreached =  info[2][1]
+                    result = ( info[1],  outputfile,  limitreached)
+                elif info[0] == 'total_limit':
+                    self.progLimit.emit(info[1])
+                #else:
+                    #self.error.emit(self.trUtf8('Unexpected error: %s; %s') % (self.filecount, self.current_file))
+
+            if self.filecount:
+                self.progress.emit(self.filecount +1)
         except Exception, e:
             err = unicode(e)
             self.error.emit(self.trUtf8("Error: %s" % err))
@@ -133,9 +149,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def on_finder_finished(self, resulttuple):
         """
         """
-        if not self.progressBar.maximum:
-            self.progressBar.setMaximum(1)
-        self.progressBar.setValue(self.progressBar.maximum)
+#        if not self.progressBar.maximum:
+#            self.progressBar.setMaximum(1)
+#        self.progressBar.setValue(self.progressBar.maximum)
         self.resultsTable.setSortingEnabled(False)
         self.tabWidget.setEnabled(True)
         #self.findDecoysButton.setEnabled(True)
@@ -174,7 +190,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def on_error(self, error):
         """
         """
-        #print error
+        print error
         QMessageBox.critical(None,
             self.trUtf8("Error"),
             self.trUtf8(error),
@@ -306,16 +322,18 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             #self.findDecoysButton.setEnabled(True)
             self.tabWidget.setEnabled(True)
         else:
-            if total_files == 1:
-                self.progressBar.setMaximum(0)
-                self.progressBar.setValue(0)
-            else:
-                self.progressBar.setMaximum(total_files)
+            if not int(self.settings.value('decoy_limit')):
+                if total_files == 1:
+                    self.progressBar.setMaximum(0)
+                    self.progressBar.setValue(0)
+                else:
+                    self.progressBar.setMaximum(total_files)
             self.finder = DecoyFinderThread(query_files, db_files, decoy_files)
             self.finder.info.connect(self.statusbar.showMessage)
             self.finder.progress.connect(self.progressBar.setValue)
             self.finder.finished.connect(self.on_finder_finished)
             self.finder.error.connect(self.on_error)
+            self.finder.progLimit.connect(self.progressBar.setMaximum)
             print "starting thread"
             self.finder.start()
             print "started"

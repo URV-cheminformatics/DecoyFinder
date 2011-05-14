@@ -29,7 +29,7 @@ from MainWindow import MainWindow
 
 ORGNAME = 'Universitat Rovira i Virgili - Grup de recerca en nutrigenòmica'
 NAME = 'Decoy Finder'
-VERSION = '0.2~alfa'
+VERSION = '0.3~alfa'
 
 def main():
     """
