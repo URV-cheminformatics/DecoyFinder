@@ -41,15 +41,16 @@ class DecoyFinderThread(QThread):
     error = Signal(unicode)
     progLimit = Signal(int)
 
-    def __init__(self, query_files, db_files, decoy_files,  parent = None):
+    def __init__(self, query_files, db_files, decoy_files, stopfile):
         """
         """
         #print "thread created"
         self.decoy_files = decoy_files
         self.query_files = query_files
         self.db_files = db_files
+        self.stopfile = stopfile
         self.settings = QSettings()
-        super(DecoyFinderThread, self).__init__(parent)
+        super(DecoyFinderThread, self).__init__(None)
 
     def run(self):
         """
@@ -75,6 +76,7 @@ class DecoyFinderThread(QThread):
                         ,limit = int(self.settings.value('decoy_limit',36))
                         ,tanimoto_d = float(self.settings.value('tanimoto_d', 0.9))
                         ,decoy_files = self.decoy_files
+                        ,stopfile = self.stopfile
                         ):
                 if info[0] in ('file',  'ndecoys'):
                     if not(limit):
@@ -139,6 +141,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             if os.name != 'nt':
                 self.supported_files += "*.%s.gz " %format
         self.supported_files += ')'
+        ########################
+        self.stopfile = '' #File to stop iteration
 
     def _getListWidgetItemTextList(self, listWidget):
         """
@@ -154,7 +158,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 #        self.progressBar.setValue(self.progressBar.maximum)
         self.resultsTable.setSortingEnabled(False)
         self.tabWidget.setEnabled(True)
-        #self.findDecoysButton.setEnabled(True)
+        self.stopButton.setEnabled(False)
+        self.findDecoysButton.setEnabled(True)
+        self.clearButton.setEnabled(True)
         resultdict,  outfile,  limitreached = resulttuple
         if len(resultdict):
             ndecoys = 0
@@ -287,8 +293,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         """
         Slot documentation goes here.
         """
-        #self.findDecoysButton.setEnabled(False)
         self.tabWidget.setEnabled(False)
+        self.clearButton.setEnabled(False)
+        self.findDecoysButton.setEnabled(False)
         #print self.settings.value('outdir')
         query_files = self._getListWidgetItemTextList(self.queryList)
 
@@ -319,8 +326,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         db_files =itertools.chain(db_files,  zinc_iter)
         if [] == query_files  or not total_files:
             self.on_error(self.tr('You must select at least one file containing query molecules, and at least one molecule library file or source'))
-            #self.findDecoysButton.setEnabled(True)
             self.tabWidget.setEnabled(True)
+            self.clearButton.setEnabled(True)
+            self.findDecoysButton.setEnabled(True)
         else:
             if not int(self.settings.value('decoy_limit')):
                 if total_files == 1:
@@ -328,7 +336,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                     self.progressBar.setValue(0)
                 else:
                     self.progressBar.setMaximum(total_files)
-            self.finder = DecoyFinderThread(query_files, db_files, decoy_files)
+            rsg = tempfile._RandomNameSequence()
+            self.stopfile = os.path.join(tempfile.gettempdir(),  rsg.next() + rsg.next())
+            self.finder = DecoyFinderThread(query_files, db_files, decoy_files,  self.stopfile)
             self.finder.info.connect(self.statusbar.showMessage)
             self.finder.progress.connect(self.progressBar.setValue)
             self.finder.finished.connect(self.on_finder_finished)
@@ -336,7 +346,21 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.finder.progLimit.connect(self.progressBar.setMaximum)
             print "starting thread"
             self.finder.start()
+            self.stopButton.setEnabled(True)
             print "started"
+
+    @Slot("")
+    def on_stopButton_clicked(self):
+        """
+        Slot documentation goes here.
+        """
+        if self.stopfile:
+            self.stopButton.setEnabled(False)
+            stopfile = open(self.stopfile,  'wb')
+            stopfile.close()
+            while os.path.isfile(self.stopfile):
+                pass #Wait until the finder thread stops
+            self.stopfile = ''
 
     @Slot("")
     def on_clearButton_clicked(self):

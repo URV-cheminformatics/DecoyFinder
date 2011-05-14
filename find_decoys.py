@@ -222,6 +222,7 @@ def find_decoys(
                 ,RB_t = 0
                 ,limit = 36
                 ,decoy_files = []
+                ,stopfile = ''
                 ):
     """
     """
@@ -277,10 +278,12 @@ def find_decoys(
                             if ligands_dict[ligand] ==  limit:
                                 print 'limit successfully reached for ', ligand.title
                                 ligands_ndecoys_dict[ligand] = ligands_dict.pop(ligand)
-#            else:
-#                ligands_dict.pop(ligand)
-#                break
-#    if len(ligands_dict) == 0:
+        else:
+            break
+        if os.path.exists(stopfile):
+            os.remove(stopfile)
+            break
+
     if total_limit == ndecoys:
         print 'limit successfully reached for all ligands'
         limitreached = True
