@@ -89,7 +89,7 @@ def get_zinc_slice(slicename,  cachedir = tempfile.gettempdir(),  keepcache = Fa
 
             outfilename = os.path.join(cachedir, file)
             if not (keepcache and os.path.isfile(outfilename)):
-                print 'File not cached or cache disabled; downloading file from %s' % parenturl
+                print 'File not cached or cache disabled; downloading %s' % parenturl + file
                 dbhandler = urllib2.urlopen(parenturl + file)
                 outfile = open(outfilename, "wb")
                 outfile.write(dbhandler.read())
