@@ -242,11 +242,13 @@ def find_decoys(
 
     ligands_dict = parse_query_files(query_files)
 
+    nactive_ligands = len(ligands_dict)
+
     ligands_ndecoys_dict = {}
 
     rejected = 0
     limitreached = False
-    total_limit = len(ligands_dict)*limit
+    total_limit = nactive_ligands*limit
     yield ('total_limit',  total_limit)
 
     if decoy_files:
@@ -261,54 +263,41 @@ def find_decoys(
     else:
         decoys_dict = {}
 
-    ndecoys = len(decoys_dict)
-
-    yield ('ndecoys',  ndecoys,  len(ligands_ndecoys_dict))
+    yield ('ndecoys',  len(decoys_dict),  len(ligands_ndecoys_dict))
 
     for db_mol, filecount, db_file in db_entry_gen:
         #print db_mol.title
         yield ('file',  filecount, db_file)
-        if ligands_dict:
-            #print len(ligands_dict), 'actives pending'
-            for ligand in ligands_dict.keys():
-                if not limit  or (limit and ligands_dict[ligand] <  limit):
+        if not limit or ((len(decoys_dict) < total_limit) or (len(ligands_ndecoys_dict) < nactive_ligands)):
+            too_similar = False
+            if tanimoto_d < Decimal(1):
+                for fp in decoys_dict.iterkeys():
+                    decoy_T = Decimal(str(decoys_dict[fp].fp | db_mol.fp))
+                    if  decoy_T >= tanimoto_d:
+                        too_similar = True
+            if not too_similar:
+                for ligand in ligands_dict.iterkeys():
                     if isdecoy(db_mol,ligand,HBA_t,HBD_t,ClogP_t,tanimoto_t,MW_t,RB_t ):
-                        not_repeated = True
-                        if tanimoto_d < Decimal(1):
-                            for fp in decoys_dict.iterkeys():
-                                decoy_T = Decimal(str(decoys_dict[fp].fp | db_mol.fp))
-                                if  decoy_T >= tanimoto_d:
-    #                                print decoy_T
-    #                                print 'discarding too similar molecule'
-                                    rejected +=1
-                                    not_repeated = False
-                        if not_repeated:
-                            ligands_dict[ligand] += 1
-                            ndecoys +=1
+                        ligands_dict[ligand] += 1
+                        if db_mol.fp.__str__() not in decoys_dict:
                             decoys_dict[db_mol.fp.__str__()] = db_mol
-                            #yield ndecoys, db_file
-                            print '%s decoys found' % ndecoys
-                            yield ('ndecoys',  ndecoys, len(ligands_ndecoys_dict))
-                            if ligands_dict[ligand] ==  limit:
-                                print 'limit successfully reached for ', ligand.title
-                                ligands_ndecoys_dict[ligand] = ligands_dict.pop(ligand)
-                else:
-                    ligands_ndecoys_dict[ligand] = ligands_dict.pop(ligand)
+                            print '%s decoys found' % len(decoys_dict)
+                            yield ('ndecoys',  len(decoys_dict), len(ligands_ndecoys_dict))
+                        if ligands_dict[ligand] ==  limit:
+                            print 'limit successfully reached for ', ligand.title
+                            ligands_ndecoys_dict[ligand] = ligands_dict[ligand]
         else:
             break
         if os.path.exists(stopfile):
             os.remove(stopfile)
             break
 
-    if total_limit == ndecoys:
+    if limit:
+        print 'Completed %s of %s decoy sets' % (len(ligands_ndecoys_dict), nactive_ligands )
+    if total_limit >= len(decoys_dict) and len(ligands_ndecoys_dict) >= nactive_ligands:
         print 'limit successfully reached for all ligands'
         limitreached = True
-        #Fix a last molecule = decoy error:
-        if not ligands_ndecoys_dict:
-            ligands_ndecoys_dict.update(ligands_dict)
-    else:
-        ligands_ndecoys_dict.update(ligands_dict)
-    print '%s rejected decoys due to similarity' % rejected
+    ligands_ndecoys_dict.update(ligands_dict)
     #Last, special yield:
     yield ('result',  ligands_ndecoys_dict,  (save_decoys(decoys_dict, outputfile), limitreached))
 
