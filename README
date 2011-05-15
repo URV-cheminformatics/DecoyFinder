@@ -1,8 +1,9 @@
 Dependencies:
 - Core:
-    - Python >= 2.5 (may work in Jython or IronPython if  using cinfony)
+    - Python >= 2.5 < 3   (may work in Jython or IronPython if  using cinfony)
+    - argparse python module (if using python < 2.7)
     - OpenBabel >= 2.3 (may be replaceable if using cinfony)
     - pybel OR cinfony
 
 - GUI:
-    - PySide >= 1.0 OR PyQt4 >= 4.6* (PyQt4 untested)
+    - PySide >= 1.0 (or PyQt4 >= 4.6 for PyQt4 version)

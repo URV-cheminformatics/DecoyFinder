@@ -23,12 +23,12 @@
 Module implementing MainWindow.
 """
 
-import os, pybel,  itertools,  random, tempfile
+import os, itertools, random, tempfile
 
 from PySide.QtGui import QMainWindow, QFileDialog, QTableWidgetItem, QMessageBox
 from PySide.QtCore import QSettings, QThread, Signal, Qt, Slot
 
-from find_decoys import get_fileformat, find_decoys, get_zinc_slice
+from find_decoys import get_fileformat, find_decoys, get_zinc_slice,  informats
 from Ui_MainWindow import Ui_MainWindow
 
 
@@ -135,12 +135,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.cachDirectoryLineEdit.setText(self.settings.value('cachedir',tempfile.gettempdir()))
         self.outputDirectoryLineEdit.setText(self.settings.value('outputfile',os.path.join(os.getcwd(), 'found_decoys.sdf') ))
         ########################
-        self.supported_files = self.tr('Molecule files') + ' ('
-        for format in pybel.informats.iterkeys():
-            self.supported_files += "*.%s " %format
-            if os.name != 'nt':
-                self.supported_files += "*.%s.gz " %format
-        self.supported_files += ')'
+        self.supported_files = self.tr('Molecule files') + ' (' + informats + ')'
         ########################
         self.stopfile = '' #File to stop iteration
 

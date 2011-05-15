@@ -28,13 +28,19 @@
 # - Molecular weight +/-40 Da
 # - exact same number of rotational bonds
 
-import pybel, os, urllib2, tempfile, random
+import pybel, os, urllib2, tempfile, random,  sys
 
 ##### Aquesta part és necessària per a poder fer servir MACCS fingerprinting des de pybel en versions antiquades d'openbabel
 if "MACCS" not in pybel.fps:
     pybel.fps.append("MACCS")
     pybel._fingerprinters = pybel._getplugins(pybel.ob.OBFingerprint.FindFingerprint, pybel.fps)
 #####
+informats = ''
+for format in pybel.informats.iterkeys():
+    informats += "*.%s " %format
+    if os.name != 'nt':
+        informats += "*.%s.gz " %format
+
 
 #Alguns valors per defecte:
 
@@ -47,9 +53,8 @@ MW_t = 40
 RB_t = 0
 
 #Creem dos filtres per aconseguir els HBD i HBA:
-HBD = pybel.Smarts("[#7,#8;!H0]")
 HBA = pybel.Smarts("[#7,#8]")
-
+HBD = pybel.Smarts("[#7,#8;!H0]")
 
 class ComparableMol():
     """
@@ -229,7 +234,6 @@ def find_decoys(
     print "Looking for decoys!"
 
     yield 0,  'known decoy files...' #TODO: print only when needed
-    decoys_dict = parse_decoy_files(decoy_files)
 
     db_entry_gen = parse_db_files(db_files)
 
@@ -241,15 +245,18 @@ def find_decoys(
     limitreached = False
     ndecoys = 0
     total_limit = len(ligands_dict)*limit
-
     yield ('total_limit',  total_limit)
 
-    for ligand in ligands_dict.iterkeys():
-        for decoyfp in decoys_dict.iterkeys():
-            if isdecoy(decoys_dict[decoyfp],ligand,HBA_t,HBD_t,ClogP_t,tanimoto_t,MW_t,RB_t ):
-                ligands_dict[ligand] +=1
-                ndecoys +=1
-                yield ('ndecoys',  ndecoys)
+    if decoy_files:
+        decoys_dict = parse_decoy_files(decoy_files)
+        for ligand in ligands_dict.iterkeys():
+            for decoyfp in decoys_dict.iterkeys():
+                if isdecoy(decoys_dict[decoyfp],ligand,HBA_t,HBD_t,ClogP_t,tanimoto_t,MW_t,RB_t ):
+                    ligands_dict[ligand] +=1
+                    ndecoys +=1
+                    yield ('ndecoys',  ndecoys)
+    else:
+        decoys_dict = {}
 
     for db_mol, filecount, db_file in db_entry_gen:
         #print db_mol.title
@@ -273,7 +280,7 @@ def find_decoys(
                             ndecoys +=1
                             decoys_dict[db_mol.fp.__str__()] = db_mol
                             #yield ndecoys, db_file
-                            print ndecoys
+                            print '%s decoys found' % ndecoys
                             yield ('ndecoys',  ndecoys, len(ligands_ndecoys_dict))
                             if ligands_dict[ligand] ==  limit:
                                 print 'limit successfully reached for ', ligand.title
@@ -296,8 +303,73 @@ def find_decoys(
     #Last, special yield:
     yield ('result',  ligands_ndecoys_dict,  (save_decoys(decoys_dict, outputfile), limitreached))
 
+def main(args = sys.argv[1:]):
+    """
+    Run this function to run as a command-line application
+    """
+    try:
+        import argparse
+    except:
+        exit("Unable to import module 'argparse'.\nInstall the argparse python module or upgrade to python 2.7 or higher")
+
+    parser = argparse.ArgumentParser(description='All margins are relative to active ligands\' values')
+    parser.add_argument('-a',  '--active-ligands-files', nargs='+', required=True
+                        , help='Files containing active ligands'
+                        , dest='query_files')
+    parser.add_argument('-b', '--database-files', nargs='+', required=True
+                        , help='Files containing possible decoys'
+                        , dest='db_files')
+    parser.add_argument('-d', '--known-decoys-files', nargs='+'
+                        , help='Files containing known decoy molecules'
+                        , dest='decoy_files')
+    parser.add_argument('-o', '--output-file', default='found_decoys.sdf'
+                        , help='Output file name'
+                        , dest='outputfile')
+    decopts = parser.add_argument_group('Decoy finding options')
+    decopts.add_argument('-l', '--decoys-per-set', default=36, type=int
+                        , help='Number of decoys to search for each active ligand'
+                        , dest='limit')
+    decopts.add_argument('-t', '--tanimoto-with-active', default=tanimoto_t, type=float
+                        , help='Upper tanimoto threshold between active ligand and decoys'
+                        , dest='tanimoto_t')
+    decopts.add_argument('-i', '--inter-decoy-tanimoto', default=tanimoto_d, type=float
+                        , help='Upper tanimoto threshold between decoys'
+                        , dest='tanimoto_d')
+    decopts.add_argument('-c','--clogp-margin', default=ClogP_t, type=float
+                        , help='Decoy log P value margin'
+                        , dest='ClogP_t')
+    decopts.add_argument('-y', '--hba-margin', default=HBA_t, type=float
+                        , help='Decoy hydrogen bond acceptors margin'
+                        , dest='HBA_t')
+    decopts.add_argument('-g', '--hbd-margin', default=HBD_t, type=float
+                        , help='Decoy hydrogen bond donors margin'
+                        , dest='HBD_t')
+    decopts.add_argument('-r', '--rotational-bonds-margin', default=RB_t, type=float
+                        , help='Decoy rotational bonds margin'
+                        , dest='RB_t')
+    decopts.add_argument('-w',  '--molecular-weight-margin', default=MW_t, type=float
+                        , help='Molecular weight margin'
+                        , dest='MW_t')
+
+    ns = parser.parse_args(args)
+
+    for info in find_decoys(
+        query_files = ns.query_files
+        ,db_files = ns.db_files
+        ,outputfile = ns.outputfile
+        ,HBA_t = ns.HBA_t
+        ,HBD_t = ns.HBD_t
+        ,ClogP_t = ns.ClogP_t
+        ,tanimoto_t = ns.tanimoto_t
+        ,MW_t = ns.MW_t
+        ,RB_t = ns.RB_t
+        ,limit = ns.limit
+        ,tanimoto_d = ns.tanimoto_d
+        ,decoy_files = ns.decoy_files
+    ):
+        pass
+
+
 if __name__ == '__main__':
-    pass
-    #TODO: OptParse
-    #find_decoys('','')
+    main()
 
