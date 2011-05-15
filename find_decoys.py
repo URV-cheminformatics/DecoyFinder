@@ -41,7 +41,8 @@ informats = ''
 for format in pybel.informats.iterkeys():
     informats += "*.%s " %format
     if os.name != 'nt':
-        informats += "*.%s.gz " %format
+        for compression in ('gz', 'tar',  'bz',  'bz2',  'tar.gz',  'tar.bz',  'tar.bz2'):
+            informats += "*.%s.%s " % (format,  compression)
 
 
 #Alguns valors per defecte:
@@ -120,7 +121,7 @@ def get_fileformat(file):
     """
     index = -1
     ext = file.split(".")[index].lower()
-    while ext == 'gz':
+    while ext in ('gz', 'tar',  'bz',  'bz2'):
         index -= 1
         ext = file.split(".")[index].lower()
     if ext in pybel.informats.keys():
