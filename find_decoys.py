@@ -233,8 +233,6 @@ def find_decoys(
     """
     print "Looking for decoys!"
 
-    yield 0,  'known decoy files...' #TODO: print only when needed
-
     db_entry_gen = parse_db_files(db_files)
 
     ligands_dict = parse_query_files(query_files)
@@ -243,20 +241,24 @@ def find_decoys(
 
     rejected = 0
     limitreached = False
-    ndecoys = 0
     total_limit = len(ligands_dict)*limit
     yield ('total_limit',  total_limit)
 
     if decoy_files:
+        yield ('file', 0, 'known decoy files...')
         decoys_dict = parse_decoy_files(decoy_files)
-        for ligand in ligands_dict.iterkeys():
+        for ligand in ligands_dict.keys():
             for decoyfp in decoys_dict.iterkeys():
                 if isdecoy(decoys_dict[decoyfp],ligand,HBA_t,HBD_t,ClogP_t,tanimoto_t,MW_t,RB_t ):
                     ligands_dict[ligand] +=1
-                    ndecoys +=1
-                    yield ('ndecoys',  ndecoys)
+            if limit and ligands_dict[ligand] >= limit:
+                ligands_ndecoys_dict[ligand] = ligands_dict.pop(ligand)
     else:
         decoys_dict = {}
+
+    ndecoys = len(decoys_dict)
+
+    yield ('ndecoys',  ndecoys,  len(ligands_ndecoys_dict))
 
     for db_mol, filecount, db_file in db_entry_gen:
         #print db_mol.title
@@ -285,6 +287,8 @@ def find_decoys(
                             if ligands_dict[ligand] ==  limit:
                                 print 'limit successfully reached for ', ligand.title
                                 ligands_ndecoys_dict[ligand] = ligands_dict.pop(ligand)
+                else:
+                    ligands_ndecoys_dict[ligand] = ligands_dict.pop(ligand)
         else:
             break
         if os.path.exists(stopfile):
