@@ -29,6 +29,8 @@
 # - exact same number of rotational bonds
 
 import pybel, os, urllib2, tempfile, random,  sys
+from decimal import Decimal
+#Decimal() serveix per fer operacions exactes amb decimals, ja que el built-in float és imprecís
 
 ##### Aquesta part és necessària per a poder fer servir MACCS fingerprinting des de pybel en versions antiquades d'openbabel
 if "MACCS" not in pybel.fps:
@@ -64,7 +66,7 @@ class ComparableMol():
         self.fp = mol.calcfp("MACCS")
         self.hba = len(HBA.findall(mol))
         self.hbd = len(HBD.findall(mol))
-        self.clogp = mol.calcdesc(['logP'])['logP']
+        self.clogp = Decimal(str(mol.calcdesc(['logP'])['logP']))
         self.mw = mol.molwt
         self.rot = mol.OBMol.NumRotors()
         self.title = mol.title
@@ -168,14 +170,14 @@ def isdecoy(
                 ,ligand
                 ,HBA_t = 0 #1
                 ,HBD_t = 0#1
-                ,ClogP_t = 1#1.5
-                ,tanimoto_t = 0.9
+                ,ClogP_t = Decimal(1)#1.5
+                ,tanimoto_t = Decimal('0.9')
                 ,MW_t = 40
                 ,RB_t = 0
                 ):
     """
     """
-    tanimoto = db_mol.fp | ligand.fp
+    tanimoto = Decimal(str(db_mol.fp | ligand.fp))
     if  tanimoto < tanimoto_t \
     and ligand.hba - HBA_t <= db_mol.hba <= ligand.hba + HBA_t\
     and ligand.hbd - HBD_t <= db_mol.hbd <= ligand.hbd + HBD_t\
@@ -231,6 +233,9 @@ def find_decoys(
                 ):
     """
     """
+    tanimoto_t = Decimal(str(tanimoto_t))
+    tanimoto_d = Decimal(str(tanimoto_d))
+    ClogP_t = Decimal(str(ClogP_t))
     print "Looking for decoys!"
 
     db_entry_gen = parse_db_files(db_files)
@@ -269,9 +274,9 @@ def find_decoys(
                 if not limit  or (limit and ligands_dict[ligand] <  limit):
                     if isdecoy(db_mol,ligand,HBA_t,HBD_t,ClogP_t,tanimoto_t,MW_t,RB_t ):
                         not_repeated = True
-                        if tanimoto_d < 1:
+                        if tanimoto_d < Decimal(1):
                             for fp in decoys_dict.iterkeys():
-                                decoy_T = decoys_dict[fp].fp | db_mol.fp
+                                decoy_T = Decimal(str(decoys_dict[fp].fp | db_mol.fp))
                                 if  decoy_T >= tanimoto_d:
     #                                print decoy_T
     #                                print 'discarding too similar molecule'
