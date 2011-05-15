@@ -268,7 +268,7 @@ def find_decoys(
     for db_mol, filecount, db_file in db_entry_gen:
         #print db_mol.title
         yield ('file',  filecount, db_file)
-        if not limit or ((len(decoys_dict) < total_limit) or (len(complete_ligand_sets) < nactive_ligands)):
+        if not limit or len(decoys_dict) < total_limit or len(complete_ligand_sets) < nactive_ligands:
             too_similar = False
             if tanimoto_d < Decimal(1):
                 for fp in decoys_dict.iterkeys():
@@ -278,6 +278,7 @@ def find_decoys(
             if not too_similar:
                 for ligand in ligands_dict.iterkeys():
                     if isdecoy(db_mol,ligand,HBA_t,HBD_t,ClogP_t,tanimoto_t,MW_t,RB_t ):
+                        #print ligands_dict[ligand]
                         ligands_dict[ligand] += 1
                         if db_mol.fp.__str__() not in decoys_dict:
                             decoys_dict[db_mol.fp.__str__()] = db_mol
@@ -290,16 +291,18 @@ def find_decoys(
             break
         if os.path.exists(stopfile):
             os.remove(stopfile)
+            print 'stopping by user request'
             break
 
     if limit:
         print 'Completed %s of %s decoy sets' % (len(complete_ligand_sets), nactive_ligands )
-    if total_limit >= len(decoys_dict) and len(complete_ligand_sets) >= nactive_ligands:
-        print 'limit successfully reached for all ligands'
-        limitreached = True
-    complete_ligand_sets.update(ligands_dict)
+        limitreached = len(complete_ligand_sets) >= nactive_ligands
+    if limitreached and total_limit <= len(decoys_dict):
+        print "Found all wanted decoys"
+    else:
+        print "Not all wanted decoys found"
     #Last, special yield:
-    yield ('result',  complete_ligand_sets,  (save_decoys(decoys_dict, outputfile), limitreached))
+    yield ('result',  ligands_dict,  (save_decoys(decoys_dict, outputfile), limitreached))
 
 def main(args = sys.argv[1:]):
     """
