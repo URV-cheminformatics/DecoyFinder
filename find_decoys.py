@@ -49,11 +49,11 @@ for format in pybel.informats.iterkeys():
 
 HBA_t = 0 #1
 HBD_t = 0#1
-ClogP_t = 1#1.5
-tanimoto_t = 0.9
-tanimoto_d = 0.9
+ClogP_t = Decimal(1)#1.5
+tanimoto_t = Decimal('0.9')
+tanimoto_d = Decimal('0.9')
 MW_t = 40
-RB_t = 0
+RB_t = 0#1
 
 #Creem dos filtres per aconseguir els HBD i HBA:
 HBA = pybel.Smarts("[#7,#8]")
@@ -157,14 +157,14 @@ def parse_query_files(filelist):
 def parse_decoy_files(decoyfilelist):
     """
     """
-    decoy_dict = {}
+    decoy_set = set()
     for decoyfile in decoyfilelist:
         decoyfile = str(decoyfile)
         mols = pybel.readfile(get_fileformat(decoyfile), decoyfile)
         for mol in mols:
             cmol = ComparableMol(mol)
-            decoy_dict[cmol.fp.__str__()] = cmol
-    return decoy_dict
+            decoy_set.add(cmol)
+    return decoy_set
 
 def isdecoy(
                 db_mol
@@ -190,13 +190,13 @@ def isdecoy(
     else:
         return False
 
-def save_decoys(decoys_dict, outputfile):
+def save_decoys(decoy_set, outputfile):
     """
     """
-    print 'saving %s decoys' % len(decoys_dict)
-    if len(decoys_dict):
+    print 'saving %s decoys' % len(decoy_set)
+    if len(decoy_set):
         fileexists = 0
-        if os.path.splitext(outputfile)[1].lower()[1:] not in pybel.outformats.keys():
+        if os.path.splitext(outputfile)[1].lower()[1:] not in pybel.outformats:
             outputfile += "_decoys.sdf"
         while os.path.isfile(outputfile):
             fileexists += 1
@@ -209,8 +209,7 @@ def save_decoys(decoys_dict, outputfile):
 
         format = str(os.path.splitext(outputfile)[1][1:].lower())
         decoyfile = pybel.Outputfile(format, str(outputfile))
-        for decoyfp in decoys_dict.iterkeys():
-            decoy = decoys_dict[decoyfp]
+        for decoy in decoy_set:
             decoyfile.write(decoy.mol)
         decoyfile.close()
         return outputfile
@@ -247,33 +246,32 @@ def find_decoys(
 
     complete_ligand_sets = {}
 
-    rejected = 0
     limitreached = False
     total_limit = nactive_ligands*limit
     yield ('total_limit',  total_limit)
 
     if decoy_files:
         yield ('file', 0, 'known decoy files...')
-        decoys_dict = parse_decoy_files(decoy_files)
+        decoys_set = parse_decoy_files(decoy_files)
         for ligand in ligands_dict.keys():
-            for decoyfp in decoys_dict.iterkeys():
-                if isdecoy(decoys_dict[decoyfp],ligand,HBA_t,HBD_t,ClogP_t,tanimoto_t,MW_t,RB_t ):
+            for decoy in decoys_set:
+                if isdecoy(decoy,ligand,HBA_t,HBD_t,ClogP_t,tanimoto_t,MW_t,RB_t ):
                     ligands_dict[ligand] +=1
             if limit and ligands_dict[ligand] >= limit:
                 complete_ligand_sets[ligand] = ligands_dict.pop(ligand)
     else:
-        decoys_dict = {}
+        decoys_set = set()
 
-    yield ('ndecoys',  len(decoys_dict),  len(complete_ligand_sets))
+    yield ('ndecoys',  len(decoys_set),  len(complete_ligand_sets))
 
     for db_mol, filecount, db_file in db_entry_gen:
         #print db_mol.title
         yield ('file',  filecount, db_file)
-        if not limit or len(decoys_dict) < total_limit or len(complete_ligand_sets) < nactive_ligands:
+        if not limit or len(decoys_set) < total_limit or len(complete_ligand_sets) < nactive_ligands:
             too_similar = False
             if tanimoto_d < Decimal(1):
-                for fp in decoys_dict.iterkeys():
-                    decoy_T = Decimal(str(decoys_dict[fp].fp | db_mol.fp))
+                for decoy in decoys_set:
+                    decoy_T = Decimal(str(decoy.fp | db_mol.fp))
                     if  decoy_T >= tanimoto_d:
                         too_similar = True
             if not too_similar:
@@ -281,10 +279,10 @@ def find_decoys(
                     if isdecoy(db_mol,ligand,HBA_t,HBD_t,ClogP_t,tanimoto_t,MW_t,RB_t ):
                         #print ligands_dict[ligand]
                         ligands_dict[ligand] += 1
-                        if db_mol.fp.__str__() not in decoys_dict:
-                            decoys_dict[db_mol.fp.__str__()] = db_mol
-                            print '%s decoys found' % len(decoys_dict)
-                            yield ('ndecoys',  len(decoys_dict), len(complete_ligand_sets))
+                        if db_mol.fp.__str__() not in decoys_set:
+                            decoys_set.add(db_mol)
+                            print '%s decoys found' % len(decoys_set)
+                            yield ('ndecoys',  len(decoys_set), len(complete_ligand_sets))
                         if ligands_dict[ligand] ==  limit:
                             print 'limit successfully reached for ', ligand.title
                             complete_ligand_sets[ligand] = ligands_dict[ligand]
@@ -298,12 +296,12 @@ def find_decoys(
     if limit:
         print 'Completed %s of %s decoy sets' % (len(complete_ligand_sets), nactive_ligands )
         limitreached = len(complete_ligand_sets) >= nactive_ligands
-    if limitreached and total_limit <= len(decoys_dict):
+    if limitreached and total_limit <= len(decoys_set):
         print "Found all wanted decoys"
     else:
         print "Not all wanted decoys found"
     #Last, special yield:
-    yield ('result',  ligands_dict,  (save_decoys(decoys_dict, outputfile), limitreached))
+    yield ('result',  ligands_dict,  (save_decoys(decoys_set, outputfile), limitreached))
 
 def main(args = sys.argv[1:]):
     """
