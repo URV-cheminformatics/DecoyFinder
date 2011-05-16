@@ -246,21 +246,25 @@ def find_decoys(
 
     nactive_ligands = len(ligands_dict)
 
-    complete_ligand_sets = {}
+    complete_ligand_sets = set()
 
     minreached = False
     total_min = nactive_ligands*min
     yield ('total_min',  total_min,  nactive_ligands)
 
+    decoys_can_set = set()
+
     if decoy_files:
         yield ('file', 0, 'known decoy files...')
         decoys_set = parse_decoy_files(decoy_files)
-        for ligand in ligands_dict.keys():
-            for decoy in decoys_set:
+        for decoy in decoys_set:
+            can = decoy.mol.write('can')
+            for ligand in ligands_dict.keys():
                 if isdecoy(decoy,ligand,HBA_t,HBD_t,ClogP_t,tanimoto_t,MW_t,RB_t ):
                     ligands_dict[ligand] +=1
-            if min and ligands_dict[ligand] >= min:
-                complete_ligand_sets[ligand] = ligands_dict.pop(ligand)
+                    decoys_can_set.add(can)
+                    if min and ligands_dict[ligand] == min:
+                        complete_ligand_sets.add(ligand)
     else:
         decoys_set = set()
 
@@ -281,15 +285,16 @@ def find_decoys(
                     if max and ligands_dict[ligand] >= max:
                         continue
                     if isdecoy(db_mol,ligand,HBA_t,HBD_t,ClogP_t,tanimoto_t,MW_t,RB_t ):
-                        #print ligands_dict[ligand]
                         ligands_dict[ligand] += 1
-                        if db_mol.fp.__str__() not in decoys_set:
+                        can = db_mol.mol.write('can')
+                        if can not in decoys_can_set:
                             decoys_set.add(db_mol)
+                            decoys_can_set.add(can)
                             print '%s decoys found' % len(decoys_set)
                             yield ('ndecoys',  len(decoys_set), len(complete_ligand_sets))
                         if ligands_dict[ligand] ==  min:
                             print 'Decoy set completed for ', ligand.title
-                            complete_ligand_sets[ligand] = ligands_dict[ligand]
+                            complete_ligand_sets.add(ligand)
         else:
             break
         if os.path.exists(stopfile):
