@@ -228,7 +228,7 @@ def find_decoys(
                 ,tanimoto_d = 0.9
                 ,MW_t = 40
                 ,RB_t = 0
-                ,limit = 36
+                ,min = 36
                 ,decoy_files = []
                 ,stopfile = ''
                 ):
@@ -247,9 +247,9 @@ def find_decoys(
 
     complete_ligand_sets = {}
 
-    limitreached = False
-    total_limit = nactive_ligands*limit
-    yield ('total_limit',  total_limit,  nactive_ligands)
+    minreached = False
+    total_min = nactive_ligands*min
+    yield ('total_min',  total_min,  nactive_ligands)
 
     if decoy_files:
         yield ('file', 0, 'known decoy files...')
@@ -258,7 +258,7 @@ def find_decoys(
             for decoy in decoys_set:
                 if isdecoy(decoy,ligand,HBA_t,HBD_t,ClogP_t,tanimoto_t,MW_t,RB_t ):
                     ligands_dict[ligand] +=1
-            if limit and ligands_dict[ligand] >= limit:
+            if min and ligands_dict[ligand] >= min:
                 complete_ligand_sets[ligand] = ligands_dict.pop(ligand)
     else:
         decoys_set = set()
@@ -268,7 +268,7 @@ def find_decoys(
     for db_mol, filecount, db_file in db_entry_gen:
         #print db_mol.title
         yield ('file',  filecount, db_file)
-        if not limit or len(decoys_set) < total_limit or len(complete_ligand_sets) < nactive_ligands:
+        if not min or len(decoys_set) < total_min or len(complete_ligand_sets) < nactive_ligands:
             too_similar = False
             if tanimoto_d < Decimal(1):
                 for decoy in decoys_set:
@@ -284,8 +284,8 @@ def find_decoys(
                             decoys_set.add(db_mol)
                             print '%s decoys found' % len(decoys_set)
                             yield ('ndecoys',  len(decoys_set), len(complete_ligand_sets))
-                        if ligands_dict[ligand] ==  limit:
-                            print 'limit successfully reached for ', ligand.title
+                        if ligands_dict[ligand] ==  min:
+                            print 'Decoy set completed for ', ligand.title
                             complete_ligand_sets[ligand] = ligands_dict[ligand]
         else:
             break
@@ -294,15 +294,15 @@ def find_decoys(
             print 'stopping by user request'
             break
 
-    if limit:
+    if min:
         print 'Completed %s of %s decoy sets' % (len(complete_ligand_sets), nactive_ligands )
-        limitreached = len(complete_ligand_sets) >= nactive_ligands
-    if limitreached and total_limit <= len(decoys_set):
+        minreached = len(complete_ligand_sets) >= nactive_ligands
+    if minreached and total_min <= len(decoys_set):
         print "Found all wanted decoys"
     else:
         print "Not all wanted decoys found"
     #Last, special yield:
-    yield ('result',  ligands_dict,  (save_decoys(decoys_set, outputfile), limitreached))
+    yield ('result',  ligands_dict,  (save_decoys(decoys_set, outputfile), minreached))
 
 def main(args = sys.argv[1:]):
     """
@@ -327,9 +327,9 @@ def main(args = sys.argv[1:]):
                         , help='Output file name'
                         , dest='outputfile')
     decopts = parser.add_argument_group('Decoy finding options')
-    decopts.add_argument('-l', '--decoys-per-set', default=36, type=int
+    decopts.add_argument('-m', '--minimum-decoys-per-set', default=36, type=int
                         , help='Number of decoys to search for each active ligand'
-                        , dest='limit')
+                        , dest='min')
     decopts.add_argument('-t', '--tanimoto-with-active', default=tanimoto_t, type=float
                         , help='Upper tanimoto threshold between active ligand and decoys'
                         , dest='tanimoto_t')
@@ -364,7 +364,7 @@ def main(args = sys.argv[1:]):
         ,tanimoto_t = ns.tanimoto_t
         ,MW_t = ns.MW_t
         ,RB_t = ns.RB_t
-        ,limit = ns.limit
+        ,min = ns.min
         ,tanimoto_d = ns.tanimoto_d
         ,decoy_files = ns.decoy_files
     ):

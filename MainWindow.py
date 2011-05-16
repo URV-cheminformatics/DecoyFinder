@@ -58,11 +58,11 @@ class DecoyFinderThread(QThread):
         """
         self.info.emit(self.tr("Reading files..."))
         #result = ()
-        limitreached = True
+        minreached = True
         try:
             self.filecount = 0
             self.currentfile = ''
-            limit = int(self.settings.value('decoy_limit'))
+            min = int(self.settings.value('decoy_min', 36))
             for info in find_decoys(
             #for filecount, current_file in find_decoys(
                         query_files = self.query_files
@@ -74,13 +74,13 @@ class DecoyFinderThread(QThread):
                         ,tanimoto_t = float(self.settings.value('tanimoto_t', 0.9))
                         ,MW_t = int(self.settings.value('MW_t',40))
                         ,RB_t = int(self.settings.value('RB_t',0))
-                        ,limit = int(self.settings.value('decoy_limit',36))
+                        ,min = int(self.settings.value('decoy_min',36))
                         ,tanimoto_d = float(self.settings.value('tanimoto_d', 0.9))
                         ,decoy_files = self.decoy_files
                         ,stopfile = self.stopfile
                         ):
                 if info[0] in ('file',  'ndecoys'):
-                    if not limit:
+                    if not min:
                         if info[0] == 'file':
                             self.filecount = info[1]
                             if self.currentfile != info[2]:
@@ -89,18 +89,18 @@ class DecoyFinderThread(QThread):
                             self.progress.emit(self.filecount)
                     else:
                         if info[0] == 'ndecoys':
-                            if info[1] > self.total_limit:
+                            if info[1] > self.total_min:
                                 self.progLimit.emit(info[1])
                             self.progress.emit(info[1])
                             self.info.emit(self.trUtf8("%s of %s decoy sets completed") % (info[2],  self.nactive_ligands))
                 elif info[0] == 'result':
                     #print "dict found"
                     outputfile = info[2][0]
-                    limitreached =  info[2][1]
-                    result = ( info[1],  outputfile,  limitreached)
-                elif info[0] == 'total_limit':
-                    self.total_limit = info[1]
-                    self.progLimit.emit(self.total_limit)
+                    minreached =  info[2][1]
+                    result = ( info[1],  outputfile,  minreached)
+                elif info[0] == 'total_min':
+                    self.total_min = info[1]
+                    self.progLimit.emit(self.total_min)
                     self.nactive_ligands = info[2]
                 #else:
                     #self.error.emit(self.trUtf8('Unexpected error: %s; %s') % (self.filecount, self.current_file))
@@ -137,7 +137,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.tanimotoBox.setValue(float(self.settings.value('tanimoto_t', 0.9)))
         self.molwtBox.setValue(int(self.settings.value('MW_t',40)))
         self.rotbBox.setValue(int(self.settings.value('RB_t',0)))
-        self.decoyLimitSpinBox.setValue(int(self.settings.value('decoy_limit',36)))
+        self.decoyMinSpinBox.setValue(int(self.settings.value('decoy_min',36)))
         self.dTanimotoBox.setValue(float(self.settings.value('tanimoto_d', 0.9)))
         self.cachDirectoryLineEdit.setText(self.settings.value('cachedir',tempfile.gettempdir()))
         self.outputDirectoryLineEdit.setText(self.settings.value('outputfile',os.path.join(os.getcwd(), 'found_decoys.sdf') ))
@@ -163,7 +163,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.stopButton.setEnabled(False)
         self.findDecoysButton.setEnabled(True)
         self.clearButton.setEnabled(True)
-        resultdict,  outfile,  limitreached = resulttuple
+        resultdict,  outfile,  minreached = resulttuple
         if len(resultdict):
             ndecoys = 0
             self.tabWidget.setCurrentIndex(1)
@@ -176,7 +176,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.resultsTable.sortByColumn(1, Qt.DescendingOrder)
             self.resultsTable.resizeColumnToContents(0)
             self.resultsTable.resizeColumnToContents(2)
-            if not limitreached:
+            if not minreached:
                 if ndecoys:
                     answer = QMessageBox.question(None,
                         self.trUtf8("Not enough decoys found"),
@@ -331,7 +331,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.clearButton.setEnabled(True)
             self.findDecoysButton.setEnabled(True)
         else:
-            if not int(self.settings.value('decoy_limit')):
+            if not int(self.settings.value('decoy_min',  36)):
                 if total_files == 1:
                     self.progressBar.setMaximum(0)
                     self.progressBar.setValue(0)
@@ -345,7 +345,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.finder.finished.connect(self.on_finder_finished)
             self.finder.error.connect(self.on_error)
             self.finder.progLimit.connect(self.progressBar.setMaximum)
-            if int(self.settings.value('decoy_limit')):
+            if int(self.settings.value('decoy_min',  36)):
                 self.progressBar.setFormat('%v of %m decoys found')
             else:
                 self.progressBar.setFormat('%v decoys found')
@@ -437,11 +437,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.settings.setValue('HBD_t', self.hbdBox.value())
 
     @Slot("")
-    def on_decoyLimitSpinBox_editingFinished(self):
+    def on_decoyMinSpinBox_editingFinished(self):
         """
         Slot documentation goes here.
         """
-        self.settings.setValue('decoy_limit', self.decoyLimitSpinBox.value())
+        self.settings.setValue('decoy_min', self.decoyMinSpinBox.value())
 
     @Slot("")
     def on_dTanimotoBox_editingFinished(self):
@@ -488,10 +488,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.tanimotoBox.setValue(0.9)
         self.molwtBox.setValue(40)
         self.rotbBox.setValue(0)
-        self.decoyLimitSpinBox.setValue(36)
+        self.decoyMinSpinBox.setValue(36)
         self.dTanimotoBox.setValue(0.9)
         self.cachDirectoryLineEdit.setText(tempfile.gettempdir())
-        for field in (self.hbaBox, self.hbdBox, self.clogpBox, self.tanimotoBox, self.molwtBox, self.rotbBox,  self.decoyLimitSpinBox, self.dTanimotoBox, self.cachDirectoryLineEdit):
+        for field in (self.hbaBox, self.hbdBox, self.clogpBox, self.tanimotoBox, self.molwtBox, self.rotbBox,  self.decoyMinSpinBox, self.dTanimotoBox, self.cachDirectoryLineEdit):
             field.editingFinished.emit()
 
     #################################
