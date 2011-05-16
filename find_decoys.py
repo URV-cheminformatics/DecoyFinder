@@ -76,7 +76,7 @@ class ComparableMol():
     def __str__(self):
         return "Title: %s; HBA: %s; HBD: %s; CLogP: %s; MW:%s \n" % (self.title, self.hba, self.hbd, self.clogp, self.mw)
 
-def get_zinc_slice(slicename, subset = '10', cachedir = tempfile.gettempdir(),  keepcache = False):
+def get_zinc_slice(slicename = 'all', subset = '10', cachedir = tempfile.gettempdir(),  keepcache = False):
     """
     returns an iterable list of files from  online ZINC slices
     """
@@ -90,22 +90,30 @@ def get_zinc_slice(slicename, subset = '10', cachedir = tempfile.gettempdir(),  
         #print slicename
         yield len(filelist)
         random.shuffle(filelist)
-        #print filelist
-        #print "Provant si va o no"
         parenturl = scriptcontent[0].split()[1].split('=')[1]
         for file in filelist:
-            #print "treballant amb %s" % file
-
+            dbhandler = urllib2.urlopen(parenturl + file)
             outfilename = os.path.join(cachedir, file)
-            if not (keepcache and os.path.isfile(outfilename)):
-                print 'File not cached or cache disabled; downloading %s' % parenturl + file
-                dbhandler = urllib2.urlopen(parenturl + file)
+            download_needed = True
+            if keepcache:
+                filesize = dbhandler.info().get('Content-Length')
+                if filesize:
+                    filesize = int(filesize)
+
+                if os.path.isfile(outfilename):
+                    localsize = os.path.getsize(outfilename)
+                    download_needed = localsize != filesize
+                    if download_needed:
+                        print "Local file outdated or incomplete"
+
+            if download_needed:
+                print 'Downloading %s' % parenturl + file
                 outfile = open(outfilename, "wb")
                 outfile.write(dbhandler.read())
-                dbhandler.close()
                 outfile.close()
             else:
                 print "Loading cached file: %s" % outfilename
+            dbhandler.close()
             yield str(outfilename)
             #print outfilename
             if not keepcache:
