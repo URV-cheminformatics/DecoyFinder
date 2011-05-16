@@ -50,6 +50,7 @@ class DecoyFinderThread(QThread):
         self.query_files = query_files
         self.db_files = db_files
         self.stopfile = stopfile
+        self.nactive_ligands = 0
         self.settings = QSettings()
         super(DecoyFinderThread, self).__init__(None)
 
@@ -86,8 +87,12 @@ class DecoyFinderThread(QThread):
                             self.filecount = info[1]
                             if self.currentfile != info[2]:
                                 self.currentfile = info[2]
-                                self.info.emit(self.trUtf8("Reading %s") % self.currentfile)
-                            self.progress.emit(self.filecount)
+                                self.info.emit(self.trUtf8("Reading %s, found %s decoys") % (self.currentfile,  self.ndecoys))
+                            if self.filecount:
+                                self.progress.emit(self.filecount)
+                        if info[0] == 'ndecoys':
+                            self.ndecoys = info[1]
+                            self.info.emit(self.trUtf8("Reading %s, found %s decoys" % (self.currentfile,  self.ndecoys)))
                     else:
                         if info[0] == 'ndecoys':
                             if info[1] > self.total_min:
@@ -95,10 +100,8 @@ class DecoyFinderThread(QThread):
                             self.progress.emit(info[1])
                             self.info.emit(self.trUtf8("%s of %s decoy sets completed") % (info[2],  self.nactive_ligands))
                 elif info[0] == 'result':
-                    #print "dict found"
                     outputfile = info[2][0]
                     minreached =  info[2][1]
-                    print 'just before result'
                     result = ( info[1],  outputfile,  minreached)
                 elif info[0] == 'total_min':
                     self.total_min = info[1]
@@ -183,7 +186,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 if ndecoys:
                     answer = QMessageBox.question(None,
                         self.trUtf8("Not enough decoys found"),
-                        self.trUtf8("""Not enough decoys for each ligand were found. Please, try to loosen search constraints in the options tab.\n Found decoys have been added to known decoys list'"""),
+                        self.trUtf8("""Not enough decoys for each ligand were found. Please, try to loosen search constraints in the options tab.\n Found decoys have been added to known decoys list"""),
                         QMessageBox.StandardButtons(\
                             QMessageBox.Abort | \
                             QMessageBox.Retry))
@@ -334,11 +337,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.clearButton.setEnabled(True)
             self.findDecoysButton.setEnabled(True)
         else:
+            self.progressBar.setMaximum(0)
+            self.progressBar.setValue(0)
             if not int(self.settings.value('decoy_min',  36)):
-                if total_files == 1:
-                    self.progressBar.setMaximum(0)
-                    self.progressBar.setValue(0)
-                else:
+                if total_files > 1:
                     self.progressBar.setMaximum(total_files)
             rsg = tempfile._RandomNameSequence()
             self.stopfile = os.path.join(tempfile.gettempdir(),  rsg.next() + rsg.next())
@@ -351,7 +353,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             if int(self.settings.value('decoy_min',  36)):
                 self.progressBar.setFormat('%v of %m decoys found')
             else:
-                self.progressBar.setFormat('%v decoys found')
+                self.progressBar.setFormat('%v of %m files read')
             print "starting thread"
             self.finder.start()
             self.stopButton.setEnabled(True)

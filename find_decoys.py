@@ -250,8 +250,9 @@ def find_decoys(
     complete_ligand_sets = 0
 
     minreached = False
-    total_min = nactive_ligands*min
-    yield ('total_min',  total_min,  nactive_ligands)
+    if min:
+        total_min = nactive_ligands*min
+        yield ('total_min',  total_min,  nactive_ligands)
 
     decoys_can_set = set()
     kdecoys_can_set = set()
@@ -276,7 +277,6 @@ def find_decoys(
     yield ('ndecoys',  len(decoys_set),  complete_ligand_sets)
 
     for db_mol, filecount, db_file in db_entry_gen:
-        #print db_mol.title
         yield ('file',  filecount, db_file)
         if not min or len(decoys_set) < total_min or complete_ligand_sets < nactive_ligands:
             too_similar = False
