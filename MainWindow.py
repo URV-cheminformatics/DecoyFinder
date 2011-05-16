@@ -137,6 +137,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.molwtBox.setValue(int(self.settings.value('MW_t',40)))
         self.rotbBox.setValue(int(self.settings.value('RB_t',0)))
         self.decoyMinSpinBox.setValue(int(self.settings.value('decoy_min',36)))
+        self.decoyMaxSpinBox.setValue(int(self.settings.value('decoy_max',0)))
         self.dTanimotoBox.setValue(float(self.settings.value('tanimoto_d', 0.9)))
         self.cachDirectoryLineEdit.setText(self.settings.value('cachedir',tempfile.gettempdir()))
         self.outputDirectoryLineEdit.setText(self.settings.value('outputfile',os.path.join(os.getcwd(), 'found_decoys.sdf') ))

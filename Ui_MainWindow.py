@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file '/home/ssorgatem/uni/PEI/decoys/MainWindow.ui'
 #
-# Created: Mon May 16 12:26:11 2011
+# Created: Mon May 16 16:31:41 2011
 #      by: pyside-uic 0.2.8 running on PySide 1.0.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -188,6 +188,8 @@ class Ui_MainWindow(object):
         self.resultsTable.setHorizontalHeaderItem(1, item)
         item = QtGui.QTableWidgetItem()
         self.resultsTable.setHorizontalHeaderItem(2, item)
+        self.resultsTable.verticalHeader().setSortIndicatorShown(True)
+        self.resultsTable.verticalHeader().setStretchLastSection(True)
         self.gridLayout.addWidget(self.resultsTable, 0, 0, 1, 1)
         self.tabWidget.addTab(self.tab, "")
         self.tabWidgetPage2 = QtGui.QWidget()
@@ -360,7 +362,7 @@ class Ui_MainWindow(object):
         self.resultsTable.horizontalHeaderItem(1).setText(QtGui.QApplication.translate("MainWindow", "Decoys found", None, QtGui.QApplication.UnicodeUTF8))
         self.resultsTable.horizontalHeaderItem(2).setText(QtGui.QApplication.translate("MainWindow", "Saved to", None, QtGui.QApplication.UnicodeUTF8))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), QtGui.QApplication.translate("MainWindow", "Results", None, QtGui.QApplication.UnicodeUTF8))
-        self.tanimotoCutoffLabel.setText(QtGui.QApplication.translate("MainWindow", "Active ligand <-> decoy Tanimoto <", None, QtGui.QApplication.UnicodeUTF8))
+        self.tanimotoCutoffLabel.setText(QtGui.QApplication.translate("MainWindow", "Active ligand <-> decoy Tanimoto =<", None, QtGui.QApplication.UnicodeUTF8))
         self.hBALabel_2.setText(QtGui.QApplication.translate("MainWindow", "HBA ±", None, QtGui.QApplication.UnicodeUTF8))
         self.hBDLabel.setText(QtGui.QApplication.translate("MainWindow", "HBD ±", None, QtGui.QApplication.UnicodeUTF8))
         self.clogPLabel.setText(QtGui.QApplication.translate("MainWindow", "ClogP ±", None, QtGui.QApplication.UnicodeUTF8))
@@ -369,7 +371,7 @@ class Ui_MainWindow(object):
         self.rtotationalBondsLabel.setText(QtGui.QApplication.translate("MainWindow", "Rotational bonds ±", None, QtGui.QApplication.UnicodeUTF8))
         self.decoyLimitLabel.setText(QtGui.QApplication.translate("MainWindow", "Minimum decoys per active ligand:", None, QtGui.QApplication.UnicodeUTF8))
         self.decoyMinSpinBox.setToolTip(QtGui.QApplication.translate("MainWindow", "Limit how many decoys to find for each ligand. If the limit is 0, there is no limit.", None, QtGui.QApplication.UnicodeUTF8))
-        self.decoyDecoyTanimotoLabel.setText(QtGui.QApplication.translate("MainWindow", "Decoy <-> decoy Tanimoto <", None, QtGui.QApplication.UnicodeUTF8))
+        self.decoyDecoyTanimotoLabel.setText(QtGui.QApplication.translate("MainWindow", "Decoy <-> decoy Tanimoto =<", None, QtGui.QApplication.UnicodeUTF8))
         self.cacheButton.setText(QtGui.QApplication.translate("MainWindow", "Caché directory", None, QtGui.QApplication.UnicodeUTF8))
         self.maximumDecoysPerActiveLigandLabel.setText(QtGui.QApplication.translate("MainWindow", "Maximum decoys per active ligand", None, QtGui.QApplication.UnicodeUTF8))
         self.defaultsButton.setText(QtGui.QApplication.translate("MainWindow", "Load Defaults", None, QtGui.QApplication.UnicodeUTF8))

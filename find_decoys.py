@@ -180,7 +180,7 @@ def isdecoy(
     """
     """
     tanimoto = Decimal(str(db_mol.fp | ligand.fp))
-    if  tanimoto < tanimoto_t \
+    if  tanimoto <= tanimoto_t \
     and ligand.hba - HBA_t <= db_mol.hba <= ligand.hba + HBA_t\
     and ligand.hbd - HBD_t <= db_mol.hbd <= ligand.hbd + HBD_t\
     and ligand.clogp - ClogP_t <= db_mol.clogp <= ligand.clogp + ClogP_t \
@@ -278,11 +278,12 @@ def find_decoys(
             if tanimoto_d < Decimal(1):
                 for decoy in decoys_set:
                     decoy_T = Decimal(str(decoy.fp | db_mol.fp))
-                    if  decoy_T >= tanimoto_d:
+                    if  decoy_T > tanimoto_d:
                         too_similar = True
             if not too_similar:
                 for ligand in ligands_dict.iterkeys():
                     if max and ligands_dict[ligand] >= max:
+                        print "maximum achieved for %s:%s" % (ligand.title,  max)
                         continue
                     if isdecoy(db_mol,ligand,HBA_t,HBD_t,ClogP_t,tanimoto_t,MW_t,RB_t ):
                         ligands_dict[ligand] += 1
@@ -296,6 +297,7 @@ def find_decoys(
                             print 'Decoy set completed for ', ligand.title
                             complete_ligand_sets.add(ligand)
         else:
+            print "finishing"
             break
         if os.path.exists(stopfile):
             os.remove(stopfile)
