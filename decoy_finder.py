@@ -25,7 +25,7 @@ import sys
 from PySide.QtGui import QApplication
 from PySide.QtCore import QTranslator, QLocale
 
-ORGNAME = 'Universitat Rovira i Virgili - Grup de recerca en nutrigenòmica'
+ORGNAME = u'Universitat Rovira i Virgili - Grup de recerca en nutrigenòmica'
 NAME = 'Decoy Finder'
 VERSION = '0.3~alfa'
 
