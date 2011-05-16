@@ -221,14 +221,15 @@ def find_decoys(
                 query_files
                 ,db_files
                 ,outputfile = 'found_decoys'
-                ,HBA_t = 0 #1
-                ,HBD_t = 0#1
-                ,ClogP_t = 1#1.5
-                ,tanimoto_t = 0.9
-                ,tanimoto_d = 0.9
+                ,HBA_t = 0
+                ,HBD_t = 0
+                ,ClogP_t = Decimal(1)
+                ,tanimoto_t = Decimal('0.9')
+                ,tanimoto_d = Decimal('0.9')
                 ,MW_t = 40
                 ,RB_t = 0
                 ,min = 36
+                ,max = 0
                 ,decoy_files = []
                 ,stopfile = ''
                 ):
@@ -277,6 +278,8 @@ def find_decoys(
                         too_similar = True
             if not too_similar:
                 for ligand in ligands_dict.iterkeys():
+                    if max and ligands_dict[ligand] >= max:
+                        continue
                     if isdecoy(db_mol,ligand,HBA_t,HBD_t,ClogP_t,tanimoto_t,MW_t,RB_t ):
                         #print ligands_dict[ligand]
                         ligands_dict[ligand] += 1
@@ -330,6 +333,9 @@ def main(args = sys.argv[1:]):
     decopts.add_argument('-m', '--minimum-decoys-per-set', default=36, type=int
                         , help='Number of decoys to search for each active ligand'
                         , dest='min')
+    decopts.add_argument('-M', '--maximum-decoys-per-set', default=36, type=int
+                        , help='Stop looking for decoys for ligands with at least so many decoys found'
+                        , dest='min')
     decopts.add_argument('-t', '--tanimoto-with-active', default=tanimoto_t, type=float
                         , help='Upper tanimoto threshold between active ligand and decoys'
                         , dest='tanimoto_t')
@@ -365,6 +371,7 @@ def main(args = sys.argv[1:]):
         ,MW_t = ns.MW_t
         ,RB_t = ns.RB_t
         ,min = ns.min
+        ,max = ns.max
         ,tanimoto_d = ns.tanimoto_d
         ,decoy_files = ns.decoy_files
     ):

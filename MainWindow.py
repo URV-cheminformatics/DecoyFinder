@@ -75,6 +75,7 @@ class DecoyFinderThread(QThread):
                         ,MW_t = int(self.settings.value('MW_t',40))
                         ,RB_t = int(self.settings.value('RB_t',0))
                         ,min = int(self.settings.value('decoy_min',36))
+                        ,max = int(self.settings.value('decoy_max',0))
                         ,tanimoto_d = float(self.settings.value('tanimoto_d', 0.9))
                         ,decoy_files = self.decoy_files
                         ,stopfile = self.stopfile
@@ -102,8 +103,6 @@ class DecoyFinderThread(QThread):
                     self.total_min = info[1]
                     self.progLimit.emit(self.total_min)
                     self.nactive_ligands = info[2]
-                #else:
-                    #self.error.emit(self.trUtf8('Unexpected error: %s; %s') % (self.filecount, self.current_file))
 
             if self.filecount:
                 self.progress.emit(self.filecount +1)
@@ -441,7 +440,23 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         """
         Slot documentation goes here.
         """
-        self.settings.setValue('decoy_min', self.decoyMinSpinBox.value())
+        value = self.decoyMinSpinBox.value()
+        self.settings.setValue('decoy_min', value)
+        if self.decoyMaxSpinBox.value() and value > self.decoyMaxSpinBox.value():
+            self.decoyMaxSpinBox.setValue(value)
+            self.decoyMaxSpinBox.editingFinished.emit()
+
+    @Slot("")
+    def on_decoyMaxSpinBox_editingFinished(self):
+        """
+        Slot documentation goes here.
+        """
+        value = self.decoyMaxSpinBox.value()
+        self.settings.setValue('decoy_max', value)
+        if value  and value < self.decoyMinSpinBox.value():
+            self.decoyMinSpinBox.setValue(value)
+            self.decoyMinSpinBox.editingFinished.emit()
+
 
     @Slot("")
     def on_dTanimotoBox_editingFinished(self):
@@ -489,9 +504,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.molwtBox.setValue(40)
         self.rotbBox.setValue(0)
         self.decoyMinSpinBox.setValue(36)
+        self.decoyMaxSpinBox.setValue(0)
         self.dTanimotoBox.setValue(0.9)
         self.cachDirectoryLineEdit.setText(tempfile.gettempdir())
-        for field in (self.hbaBox, self.hbdBox, self.clogpBox, self.tanimotoBox, self.molwtBox, self.rotbBox,  self.decoyMinSpinBox, self.dTanimotoBox, self.cachDirectoryLineEdit):
+        for field in (self.hbaBox, self.hbdBox, self.clogpBox, self.tanimotoBox, self.molwtBox, self.rotbBox,  self.decoyMinSpinBox, self.decoyMaxSpinBox, self.dTanimotoBox, self.cachDirectoryLineEdit):
             field.editingFinished.emit()
 
     #################################

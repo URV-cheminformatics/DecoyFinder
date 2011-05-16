@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file '/home/ssorgatem/uni/PEI/decoys/MainWindow.ui'
 #
-# Created: Mon May 16 03:44:41 2011
+# Created: Mon May 16 12:26:11 2011
 #      by: pyside-uic 0.2.8 running on PySide 1.0.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -248,15 +248,15 @@ class Ui_MainWindow(object):
         self._3.setWidget(6, QtGui.QFormLayout.FieldRole, self.decoyMinSpinBox)
         self.decoyDecoyTanimotoLabel = QtGui.QLabel(self.tabWidgetPage2)
         self.decoyDecoyTanimotoLabel.setObjectName("decoyDecoyTanimotoLabel")
-        self._3.setWidget(7, QtGui.QFormLayout.LabelRole, self.decoyDecoyTanimotoLabel)
+        self._3.setWidget(8, QtGui.QFormLayout.LabelRole, self.decoyDecoyTanimotoLabel)
         self.dTanimotoBox = QtGui.QDoubleSpinBox(self.tabWidgetPage2)
         self.dTanimotoBox.setMaximum(1.0)
         self.dTanimotoBox.setSingleStep(0.1)
         self.dTanimotoBox.setObjectName("dTanimotoBox")
-        self._3.setWidget(7, QtGui.QFormLayout.FieldRole, self.dTanimotoBox)
+        self._3.setWidget(8, QtGui.QFormLayout.FieldRole, self.dTanimotoBox)
         self.cacheButton = QtGui.QPushButton(self.tabWidgetPage2)
         self.cacheButton.setObjectName("cacheButton")
-        self._3.setWidget(8, QtGui.QFormLayout.LabelRole, self.cacheButton)
+        self._3.setWidget(9, QtGui.QFormLayout.LabelRole, self.cacheButton)
         self.cachDirectoryLineEdit = QtGui.QLineEdit(self.tabWidgetPage2)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
@@ -264,7 +264,14 @@ class Ui_MainWindow(object):
         sizePolicy.setHeightForWidth(self.cachDirectoryLineEdit.sizePolicy().hasHeightForWidth())
         self.cachDirectoryLineEdit.setSizePolicy(sizePolicy)
         self.cachDirectoryLineEdit.setObjectName("cachDirectoryLineEdit")
-        self._3.setWidget(8, QtGui.QFormLayout.FieldRole, self.cachDirectoryLineEdit)
+        self._3.setWidget(9, QtGui.QFormLayout.FieldRole, self.cachDirectoryLineEdit)
+        self.maximumDecoysPerActiveLigandLabel = QtGui.QLabel(self.tabWidgetPage2)
+        self.maximumDecoysPerActiveLigandLabel.setObjectName("maximumDecoysPerActiveLigandLabel")
+        self._3.setWidget(7, QtGui.QFormLayout.LabelRole, self.maximumDecoysPerActiveLigandLabel)
+        self.decoyMaxSpinBox = QtGui.QSpinBox(self.tabWidgetPage2)
+        self.decoyMaxSpinBox.setMaximum(99999)
+        self.decoyMaxSpinBox.setObjectName("decoyMaxSpinBox")
+        self._3.setWidget(7, QtGui.QFormLayout.FieldRole, self.decoyMaxSpinBox)
         self.verticalLayout_3.addLayout(self._3)
         self.horizontalLayout_7 = QtGui.QHBoxLayout()
         self.horizontalLayout_7.setObjectName("horizontalLayout_7")
@@ -360,10 +367,11 @@ class Ui_MainWindow(object):
         self.molecularWeightLabel.setText(QtGui.QApplication.translate("MainWindow", "Molecular weight ±", None, QtGui.QApplication.UnicodeUTF8))
         self.molwtBox.setSuffix(QtGui.QApplication.translate("MainWindow", " Da", None, QtGui.QApplication.UnicodeUTF8))
         self.rtotationalBondsLabel.setText(QtGui.QApplication.translate("MainWindow", "Rotational bonds ±", None, QtGui.QApplication.UnicodeUTF8))
-        self.decoyLimitLabel.setText(QtGui.QApplication.translate("MainWindow", "Decoy per active ligand limit:", None, QtGui.QApplication.UnicodeUTF8))
+        self.decoyLimitLabel.setText(QtGui.QApplication.translate("MainWindow", "Minimum decoys per active ligand:", None, QtGui.QApplication.UnicodeUTF8))
         self.decoyMinSpinBox.setToolTip(QtGui.QApplication.translate("MainWindow", "Limit how many decoys to find for each ligand. If the limit is 0, there is no limit.", None, QtGui.QApplication.UnicodeUTF8))
         self.decoyDecoyTanimotoLabel.setText(QtGui.QApplication.translate("MainWindow", "Decoy <-> decoy Tanimoto <", None, QtGui.QApplication.UnicodeUTF8))
         self.cacheButton.setText(QtGui.QApplication.translate("MainWindow", "Caché directory", None, QtGui.QApplication.UnicodeUTF8))
+        self.maximumDecoysPerActiveLigandLabel.setText(QtGui.QApplication.translate("MainWindow", "Maximum decoys per active ligand", None, QtGui.QApplication.UnicodeUTF8))
         self.defaultsButton.setText(QtGui.QApplication.translate("MainWindow", "Load Defaults", None, QtGui.QApplication.UnicodeUTF8))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tabWidgetPage2), QtGui.QApplication.translate("MainWindow", "Options", None, QtGui.QApplication.UnicodeUTF8))
         self.clearButton.setText(QtGui.QApplication.translate("MainWindow", "Clear all", None, QtGui.QApplication.UnicodeUTF8))
