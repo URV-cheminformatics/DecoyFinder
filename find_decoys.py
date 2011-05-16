@@ -248,7 +248,7 @@ def find_decoys(
 
     limitreached = False
     total_limit = nactive_ligands*limit
-    yield ('total_limit',  total_limit)
+    yield ('total_limit',  total_limit,  nactive_ligands)
 
     if decoy_files:
         yield ('file', 0, 'known decoy files...')

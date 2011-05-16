@@ -79,7 +79,7 @@ class DecoyFinderThread(QThread):
                         ,stopfile = self.stopfile
                         ):
                 if info[0] in ('file',  'ndecoys'):
-                    if not(limit):
+                    if not limit:
                         if info[0] == 'file':
                             self.filecount = info[1]
                             if self.currentfile != info[2]:
@@ -88,15 +88,19 @@ class DecoyFinderThread(QThread):
                             self.progress.emit(self.filecount)
                     else:
                         if info[0] == 'ndecoys':
+                            if info[1] > self.total_limit:
+                                self.progLimit.emit(info[1])
                             self.progress.emit(info[1])
-                            self.info.emit(self.trUtf8("%s decoy sets completed") % info[2])
+                            self.info.emit(self.trUtf8("%s of %s decoy sets completed") % (info[2],  self.nactive_ligands))
                 elif info[0] == 'result':
                     #print "dict found"
                     outputfile = info[2][0]
                     limitreached =  info[2][1]
                     result = ( info[1],  outputfile,  limitreached)
                 elif info[0] == 'total_limit':
-                    self.progLimit.emit(info[1])
+                    self.total_limit = info[1]
+                    self.progLimit.emit(self.total_limit)
+                    self.nactive_ligands = info[2]
                 #else:
                     #self.error.emit(self.trUtf8('Unexpected error: %s; %s') % (self.filecount, self.current_file))
 
@@ -339,6 +343,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.finder.finished.connect(self.on_finder_finished)
             self.finder.error.connect(self.on_error)
             self.finder.progLimit.connect(self.progressBar.setMaximum)
+            if int(self.settings.value('decoy_limit')):
+                self.progressBar.setFormat('%v of %m decoys found')
+            else:
+                self.progressBar.setFormat('%v decoys found')
             print "starting thread"
             self.finder.start()
             self.stopButton.setEnabled(True)

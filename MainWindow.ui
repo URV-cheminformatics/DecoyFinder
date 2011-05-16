@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>597</width>
-    <height>443</height>
+    <width>632</width>
+    <height>466</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -96,6 +96,22 @@
                <spacer name="horizontalSpacer_7">
                 <property name="orientation">
                  <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_8">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeType">
+                 <enum>QSizePolicy::Fixed</enum>
                 </property>
                 <property name="sizeHint" stdset="0">
                  <size>
@@ -201,13 +217,32 @@
                 </widget>
                </item>
                <item>
-                <spacer name="horizontalSpacer_14">
+                <spacer name="horizontalSpacer_6">
                  <property name="orientation">
                   <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeType">
+                  <enum>QSizePolicy::Fixed</enum>
                  </property>
                  <property name="sizeHint" stdset="0">
                   <size>
                    <width>40</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item>
+                <spacer name="horizontalSpacer_14">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeType">
+                  <enum>QSizePolicy::Expanding</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>52</width>
                    <height>20</height>
                   </size>
                  </property>
@@ -277,6 +312,33 @@
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_3">
               <item>
+               <spacer name="horizontalSpacer_9">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item>
+               <widget class="QCheckBox" name="cacheCheckBox">
+                <property name="text">
+                 <string>Use caché</string>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_8">
+              <item>
                <widget class="QComboBox" name="dbComboBox">
                 <item>
                  <property name="text">
@@ -305,30 +367,6 @@
                 </item>
                </widget>
               </item>
-              <item>
-               <widget class="QCheckBox" name="cacheCheckBox">
-                <property name="text">
-                 <string>Use caché</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <spacer name="horizontalSpacer_9">
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>40</width>
-                  <height>20</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-             </layout>
-            </item>
-            <item>
-             <layout class="QHBoxLayout" name="horizontalLayout_8">
               <item>
                <widget class="QPushButton" name="addDButton">
                 <property name="text">
@@ -675,9 +713,6 @@
     </item>
     <item>
      <widget class="QProgressBar" name="progressBar">
-      <property name="value">
-       <number>0</number>
-      </property>
       <property name="alignment">
        <set>Qt::AlignCenter</set>
       </property>
@@ -696,7 +731,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>597</width>
+     <width>632</width>
      <height>23</height>
     </rect>
    </property>
