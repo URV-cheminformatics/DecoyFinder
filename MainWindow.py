@@ -67,7 +67,7 @@ class DecoyFinderThread(QThread):
             #for filecount, current_file in find_decoys(
                         query_files = self.query_files
                         ,db_files = self.db_files
-                        ,outputfile =  self.settings.value('outputfile')
+                        ,outputfile =  str(self.settings.value('outputfile', 'found'))
                         ,HBA_t = int(self.settings.value('HBA_t', 0))
                         ,HBD_t = int(self.settings.value('HBD_t', 0))
                         ,ClogP_t = float(self.settings.value('ClogP_t', 1))
@@ -98,11 +98,14 @@ class DecoyFinderThread(QThread):
                     #print "dict found"
                     outputfile = info[2][0]
                     minreached =  info[2][1]
+                    print 'just before result'
                     result = ( info[1],  outputfile,  minreached)
                 elif info[0] == 'total_min':
                     self.total_min = info[1]
                     self.progLimit.emit(self.total_min)
                     self.nactive_ligands = info[2]
+                else:
+                    print "Something is going wrong"
 
             if self.filecount:
                 self.progress.emit(self.filecount +1)
