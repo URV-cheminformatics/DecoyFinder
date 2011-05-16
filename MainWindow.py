@@ -28,7 +28,8 @@ import os, itertools, random, tempfile
 from PySide.QtGui import QMainWindow, QFileDialog, QTableWidgetItem, QMessageBox
 from PySide.QtCore import QSettings, QThread, Signal, Qt, Slot
 
-from find_decoys import get_fileformat, find_decoys, get_zinc_slice,  informats
+import decoy_finder
+from find_decoys import get_fileformat, find_decoys, get_zinc_slice,  informats,  ZINC_subsets
 from Ui_MainWindow import Ui_MainWindow
 
 
@@ -123,10 +124,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.setupUi(self)
         self.settings = QSettings()
         self.kdecoysFrame.setVisible(False)
-        self.cacheCheckBox.setVisible(False)
-        self.cacheCheckBox.setChecked(bool(int(self.settings.value('usecache',  False))))
+        self.cacheCheckBox.setChecked(bool(int(self.settings.value('usecache',  True))))
         self.progressBar.setMinimum(0)
         self.progressBar.setValue(0)
+        for subset in ZINC_subsets:
+            self.zsubComboBox.addItem(subset)
+        self.zsubComboBox.setCurrentIndex(self.zsubComboBox.findText('everything'))
         ######Display current settings########
         self.hbaBox.setValue(int(self.settings.value('HBA_t', 0)))
         self.hbdBox.setValue(int(self.settings.value('HBD_t', 0)))
@@ -307,10 +310,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.progressBar.maximum = 0
         for item in db_items:
             if item.split()[0] == 'ZINC':
-                #TODO download from ZINC
-                #print item.split()[1]
                 usecache = self.cacheCheckBox.isChecked()
-                zinc_file_gen = get_zinc_slice(item.split()[1], self.settings.value('cachedir',tempfile.gettempdir()),  usecache)
+                print self.zsubComboBox.currentText()
+                zinc_file_gen = get_zinc_slice(item.split()[1], ZINC_subsets[self.zsubComboBox.currentText()], self.settings.value('cachedir',tempfile.gettempdir()),  usecache)
                 zfilecount = zinc_file_gen.next()
                 if zfilecount:
                     total_files += zfilecount
@@ -379,7 +381,15 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         """
         Slot documentation goes here.
         """
-        self.cacheCheckBox.setVisible(bool(index))
+        for widget in (self.cacheCheckBox, self.zsubComboBox, self.zinclabel):
+            widget.setEnabled(bool(index))
+
+    @Slot(int)
+    def on_cacheCheckBox_stateChanged(self,  index):
+        """
+        Slot documentation goes here.
+        """
+        self.settings.setValue('usecache',  bool(index))
 
     ############ Options tab  #############
     @Slot("")
@@ -492,6 +502,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         """
         Slot documentation goes here.
         """
-        print "Not implemented yet"
-        # TODO: on_actionAbout_activated
-        #raise NotImplementedError
+        QMessageBox.about(None,
+            self.trUtf8("About %s") % decoy_finder.NAME,
+            self.trUtf8("%s version %s") % (decoy_finder.NAME,  decoy_finder.VERSION))

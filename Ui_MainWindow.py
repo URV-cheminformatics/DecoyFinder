@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file '/home/ssorgatem/uni/PEI/decoys/MainWindow.ui'
 #
-# Created: Mon May 16 02:38:26 2011
+# Created: Mon May 16 03:44:41 2011
 #      by: pyside-uic 0.2.8 running on PySide 1.0.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -12,7 +12,7 @@ from PySide import QtCore, QtGui
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(632, 466)
+        MainWindow.resize(700, 466)
         self.centralwidget = QtGui.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.verticalLayout_4 = QtGui.QVBoxLayout(self.centralwidget)
@@ -120,9 +120,18 @@ class Ui_MainWindow(object):
         self.verticalLayout_2.addLayout(self.horizontalLayout_5)
         self.horizontalLayout_3 = QtGui.QHBoxLayout()
         self.horizontalLayout_3.setObjectName("horizontalLayout_3")
+        self.zinclabel = QtGui.QLabel(self.tabWidgetPage1)
+        self.zinclabel.setEnabled(False)
+        self.zinclabel.setObjectName("zinclabel")
+        self.horizontalLayout_3.addWidget(self.zinclabel)
+        self.zsubComboBox = QtGui.QComboBox(self.tabWidgetPage1)
+        self.zsubComboBox.setEnabled(False)
+        self.zsubComboBox.setObjectName("zsubComboBox")
+        self.horizontalLayout_3.addWidget(self.zsubComboBox)
         spacerItem11 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
         self.horizontalLayout_3.addItem(spacerItem11)
         self.cacheCheckBox = QtGui.QCheckBox(self.tabWidgetPage1)
+        self.cacheCheckBox.setEnabled(False)
         self.cacheCheckBox.setChecked(True)
         self.cacheCheckBox.setObjectName("cacheCheckBox")
         self.horizontalLayout_3.addWidget(self.cacheCheckBox)
@@ -288,12 +297,11 @@ class Ui_MainWindow(object):
         self.verticalLayout_4.addLayout(self._2)
         self.progressBar = QtGui.QProgressBar(self.centralwidget)
         self.progressBar.setAlignment(QtCore.Qt.AlignCenter)
-        self.progressBar.setOrientation(QtCore.Qt.Horizontal)
         self.progressBar.setObjectName("progressBar")
         self.verticalLayout_4.addWidget(self.progressBar)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtGui.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 632, 23))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 700, 23))
         self.menubar.setObjectName("menubar")
         self.menuHelp = QtGui.QMenu(self.menubar)
         self.menuHelp.setObjectName("menuHelp")
@@ -330,6 +338,7 @@ class Ui_MainWindow(object):
         self.addDecoysButton.setText(QtGui.QApplication.translate("MainWindow", "Add", None, QtGui.QApplication.UnicodeUTF8))
         self.pushButton_4.setText(QtGui.QApplication.translate("MainWindow", "Clear", None, QtGui.QApplication.UnicodeUTF8))
         self.label_2.setText(QtGui.QApplication.translate("MainWindow", "Potential decoys", None, QtGui.QApplication.UnicodeUTF8))
+        self.zinclabel.setText(QtGui.QApplication.translate("MainWindow", "ZINC subset:", None, QtGui.QApplication.UnicodeUTF8))
         self.cacheCheckBox.setText(QtGui.QApplication.translate("MainWindow", "Use caché", None, QtGui.QApplication.UnicodeUTF8))
         self.dbComboBox.setItemText(0, QtGui.QApplication.translate("MainWindow", "Select local files...", None, QtGui.QApplication.UnicodeUTF8))
         self.dbComboBox.setItemText(1, QtGui.QApplication.translate("MainWindow", "ZINC single", None, QtGui.QApplication.UnicodeUTF8))

@@ -25,8 +25,6 @@ import sys
 from PySide.QtGui import QApplication
 from PySide.QtCore import QTranslator, QLocale
 
-from MainWindow import MainWindow
-
 ORGNAME = 'Universitat Rovira i Virgili - Grup de recerca en nutrigenòmica'
 NAME = 'Decoy Finder'
 VERSION = '0.3~alfa'
@@ -34,6 +32,8 @@ VERSION = '0.3~alfa'
 def main():
     """
     """
+    from MainWindow import MainWindow
+
     translator = QTranslator() #Build the translator
     translator.load(":/locales/df_%s" % QLocale.system().name())
     qttranslator = QTranslator()#A translator for Qt standard strings

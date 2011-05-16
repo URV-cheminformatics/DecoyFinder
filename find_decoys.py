@@ -59,6 +59,8 @@ RB_t = 0#1
 HBA = pybel.Smarts("[#7,#8]")
 HBD = pybel.Smarts("[#7,#8;!H0]")
 
+ZINC_subsets = {"lead-like":"1","fragment-like":"2","drug-like":"3","all-purchasable":"6","everything":"10","clean-leads":"11","clean-fragments":"12","clean-drug-like":"13","all-clean":"16","leads-now":"21","frags-now":"22","drugs-now":"23","all-now":"26","sarah":"37","Stan":"94"}
+
 class ComparableMol():
     """
     """
@@ -74,12 +76,11 @@ class ComparableMol():
     def __str__(self):
         return "Title: %s; HBA: %s; HBD: %s; CLogP: %s; MW:%s \n" % (self.title, self.hba, self.hbd, self.clogp, self.mw)
 
-def get_zinc_slice(slicename,  cachedir = tempfile.gettempdir(),  keepcache = False):
+def get_zinc_slice(slicename, subset = '10', cachedir = tempfile.gettempdir(),  keepcache = False):
     """
     returns an iterable list of files from  online ZINC slices
     """
     if slicename in ('all', 'single', 'usual', 'metals'):
-        subset = '10' #subset 'everything'
         script = "http://zinc.docking.org/subset1/%s/%s.sdf.csh" % (subset,slicename)
         handler = urllib2.urlopen(script)
         print "Reading ZINC data..."

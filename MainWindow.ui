@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>632</width>
+    <width>700</width>
     <height>466</height>
    </rect>
   </property>
@@ -312,6 +312,23 @@
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_3">
               <item>
+               <widget class="QLabel" name="zinclabel">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="text">
+                 <string>ZINC subset:</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QComboBox" name="zsubComboBox">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
                <spacer name="horizontalSpacer_9">
                 <property name="orientation">
                  <enum>Qt::Horizontal</enum>
@@ -326,6 +343,9 @@
               </item>
               <item>
                <widget class="QCheckBox" name="cacheCheckBox">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
                 <property name="text">
                  <string>Use caché</string>
                 </property>
@@ -716,9 +736,6 @@
       <property name="alignment">
        <set>Qt::AlignCenter</set>
       </property>
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
       <property name="format">
        <string>%v decoys found</string>
       </property>
@@ -731,7 +748,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>632</width>
+     <width>700</width>
      <height>23</height>
     </rect>
    </property>
