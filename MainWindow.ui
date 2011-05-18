@@ -511,7 +511,7 @@
           <item row="0" column="0">
            <widget class="QLabel" name="tanimotoCutoffLabel">
             <property name="text">
-             <string>Active ligand &lt;-&gt; decoy Tanimoto =&lt;</string>
+             <string>Active ligand &lt;-&gt; decoy Tanimoto ≤</string>
             </property>
             <property name="buddy">
              <cstring>kdecoysFrame</cstring>
@@ -609,7 +609,7 @@
           <item row="8" column="0">
            <widget class="QLabel" name="decoyDecoyTanimotoLabel">
             <property name="text">
-             <string>Decoy &lt;-&gt; decoy Tanimoto =&lt;</string>
+             <string>Decoy &lt;-&gt; decoy Tanimoto ≤</string>
             </property>
            </widget>
           </item>
