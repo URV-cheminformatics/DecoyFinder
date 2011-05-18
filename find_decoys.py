@@ -67,12 +67,16 @@ class ComparableMol():
     def __init__(self, mol):
         self.mol = mol
         self.fp = mol.calcfp("MACCS")
-        self.hba = len(HBA.findall(mol))
-        self.hbd = len(HBD.findall(mol))
-        self.clogp = Decimal(str(mol.calcdesc(['logP'])['logP']))
-        self.mw = mol.molwt
-        self.rot = mol.OBMol.NumRotors()
-        self.title = mol.title
+        #self.calcdesc()
+
+    def calcdesc(self):
+        self.hba = len(HBA.findall(self.mol))
+        self.hbd = len(HBD.findall(self.mol))
+        self.clogp = Decimal(str(self.mol.calcdesc(['logP'])['logP']))
+        self.mw = self.mol.molwt
+        self.rot = self.mol.OBMol.NumRotors()
+        self.title = self.mol.title
+
     def __str__(self):
         return "Title: %s; HBA: %s; HBD: %s; CLogP: %s; MW:%s \n" % (self.title, self.hba, self.hbd, self.clogp, self.mw)
 
@@ -160,7 +164,9 @@ def parse_query_files(filelist):
         file = str(file)
         mols = pybel.readfile(get_fileformat(file), file)
         for mol in mols:
-            query_dict[ComparableMol(mol)] = 0
+            cmol = ComparableMol(mol)
+            cmol.calcdesc()
+            query_dict[cmol] = 0
     return query_dict
 
 def parse_decoy_files(decoyfilelist):
@@ -172,6 +178,7 @@ def parse_decoy_files(decoyfilelist):
         mols = pybel.readfile(get_fileformat(decoyfile), decoyfile)
         for mol in mols:
             cmol = ComparableMol(mol)
+            cmol.calcdesc()
             decoy_set.add(cmol)
     return decoy_set
 
@@ -188,7 +195,7 @@ def isdecoy(
     """
     """
     tanimoto = Decimal(str(db_mol.fp | ligand.fp))
-    if  tanimoto <= tanimoto_t \
+    if  tanimoto <= tanimoto_t\
     and ligand.hba - HBA_t <= db_mol.hba <= ligand.hba + HBA_t\
     and ligand.hbd - HBD_t <= db_mol.hbd <= ligand.hbd + HBD_t\
     and ligand.clogp - ClogP_t <= db_mol.clogp <= ligand.clogp + ClogP_t \
@@ -196,8 +203,7 @@ def isdecoy(
     and ligand.rot - RB_t <= db_mol.rot <= ligand.rot + RB_t \
     :
         return True
-    else:
-        return False
+    return False
 
 def save_decoys(decoy_set, outputfile):
     """
@@ -271,6 +277,7 @@ def find_decoys(
         decoys_set = parse_decoy_files(decoy_files)
         ndecoys = len(decoys_set)
         for decoy in decoys_set:
+            decoy.calcdesc()
             can = decoy.mol.write('can')
             for ligand in ligands_dict.keys():
                 if isdecoy(decoy,ligand,HBA_t,HBD_t,ClogP_t,tanimoto_t,MW_t,RB_t ):
@@ -293,10 +300,11 @@ def find_decoys(
                     decoy_T = Decimal(str(decoy.fp | db_mol.fp))
                     if  decoy_T > tanimoto_d:
                         too_similar = True
+                        break
             if not too_similar:
+                db_mol.calcdesc()
                 for ligand in ligands_dict.iterkeys():
                     if max and ligands_dict[ligand] >= max:
-                        #print "maximum achieved for %s:%s" % (ligand.title,  max)
                         continue
                     if isdecoy(db_mol,ligand,HBA_t,HBD_t,ClogP_t,tanimoto_t,MW_t,RB_t ):
                         can = db_mol.mol.write('can')
