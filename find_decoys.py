@@ -267,17 +267,19 @@ def find_decoys(
     if min:
         total_min = nactive_ligands*min
         yield ('total_min',  total_min,  nactive_ligands)
+    else:
+        min = None
 
     decoys_can_set = set()
     kdecoys_can_set = set()
     ndecoys = 0
+    ligands_max = 0
 
     if decoy_files:
         yield ('file', 0, 'known decoy files...')
         decoys_set = parse_decoy_files(decoy_files)
         ndecoys = len(decoys_set)
         for decoy in decoys_set:
-            decoy.calcdesc()
             can = decoy.mol.write('can')
             for ligand in ligands_dict.keys():
                 if isdecoy(decoy,ligand,HBA_t,HBD_t,ClogP_t,tanimoto_t,MW_t,RB_t ):
@@ -293,6 +295,8 @@ def find_decoys(
 
     for db_mol, filecount, db_file in db_entry_gen:
         yield ('file',  filecount, db_file)
+        if max and ligands_max >= nactive_ligands:
+            break
         if not min or len(decoys_set) < total_min or complete_ligand_sets < nactive_ligands:
             too_similar = False
             if tanimoto_d < Decimal(1):
@@ -303,8 +307,10 @@ def find_decoys(
                         break
             if not too_similar:
                 db_mol.calcdesc()
+                ligands_max = 0
                 for ligand in ligands_dict.iterkeys():
                     if max and ligands_dict[ligand] >= max:
+                        ligands_max +=1
                         continue
                     if isdecoy(db_mol,ligand,HBA_t,HBD_t,ClogP_t,tanimoto_t,MW_t,RB_t ):
                         can = db_mol.mol.write('can')
@@ -367,25 +373,25 @@ def main(args = sys.argv[1:]):
     decopts.add_argument('-M', '--maximum-decoys-per-set', default=0, type=int
                         , help='Stop looking for decoys for ligands with at least so many decoys found'
                         , dest='max')
-    decopts.add_argument('-t', '--tanimoto-with-active', default=tanimoto_t, type=float
+    decopts.add_argument('-t', '--tanimoto-with-active', default=tanimoto_t, type=Decimal
                         , help='Upper tanimoto threshold between active ligand and decoys'
                         , dest='tanimoto_t')
-    decopts.add_argument('-i', '--inter-decoy-tanimoto', default=tanimoto_d, type=float
+    decopts.add_argument('-i', '--inter-decoy-tanimoto', default=tanimoto_d, type=Decimal
                         , help='Upper tanimoto threshold between decoys'
                         , dest='tanimoto_d')
-    decopts.add_argument('-c','--clogp-margin', default=ClogP_t, type=float
+    decopts.add_argument('-c','--clogp-margin', default=ClogP_t, type=Decimal
                         , help='Decoy log P value margin'
                         , dest='ClogP_t')
-    decopts.add_argument('-y', '--hba-margin', default=HBA_t, type=float
+    decopts.add_argument('-y', '--hba-margin', default=HBA_t, type=int
                         , help='Decoy hydrogen bond acceptors margin'
                         , dest='HBA_t')
-    decopts.add_argument('-g', '--hbd-margin', default=HBD_t, type=float
+    decopts.add_argument('-g', '--hbd-margin', default=HBD_t, type=Decimal
                         , help='Decoy hydrogen bond donors margin'
                         , dest='HBD_t')
-    decopts.add_argument('-r', '--rotational-bonds-margin', default=RB_t, type=float
+    decopts.add_argument('-r', '--rotational-bonds-margin', default=RB_t, type=int
                         , help='Decoy rotational bonds margin'
                         , dest='RB_t')
-    decopts.add_argument('-w',  '--molecular-weight-margin', default=MW_t, type=float
+    decopts.add_argument('-w',  '--molecular-weight-margin', default=MW_t, type=int
                         , help='Molecular weight margin'
                         , dest='MW_t')
 
