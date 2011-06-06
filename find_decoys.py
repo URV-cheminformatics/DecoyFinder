@@ -188,15 +188,12 @@ def isdecoy(
                 ,HBA_t = 0 #1
                 ,HBD_t = 0#1
                 ,ClogP_t = Decimal(1)#1.5
-                ,tanimoto_t = Decimal('0.9')
                 ,MW_t = 40
                 ,RB_t = 0
                 ):
     """
     """
-    tanimoto = Decimal(str(db_mol.fp | ligand.fp))
-    if  tanimoto <= tanimoto_t\
-    and ligand.hba - HBA_t <= db_mol.hba <= ligand.hba + HBA_t\
+    if  ligand.hba - HBA_t <= db_mol.hba <= ligand.hba + HBA_t\
     and ligand.hbd - HBD_t <= db_mol.hbd <= ligand.hbd + HBD_t\
     and ligand.clogp - ClogP_t <= db_mol.clogp <= ligand.clogp + ClogP_t \
     and ligand.mw - MW_t <= db_mol.mw <= ligand.mw + MW_t \
@@ -258,6 +255,7 @@ def find_decoys(
     db_entry_gen = parse_db_files(db_files)
 
     ligands_dict = parse_query_files(query_files)
+    active_fp_set = set(active.fp for active in ligands_dict)
 
     nactive_ligands = len(ligands_dict)
 
@@ -306,13 +304,20 @@ def find_decoys(
                         too_similar = True
                         break
             if not too_similar:
+                for active_fp in active_fp_set:
+                    active_T = Decimal(str(active_fp | db_mol.fp))
+                    if  active_T > tanimoto_t:
+                        too_similar = True
+                        break
+                if too_similar:
+                    continue
                 db_mol.calcdesc()
                 ligands_max = 0
                 for ligand in ligands_dict.iterkeys():
                     if max and ligands_dict[ligand] >= max:
                         ligands_max +=1
                         continue
-                    if isdecoy(db_mol,ligand,HBA_t,HBD_t,ClogP_t,tanimoto_t,MW_t,RB_t ):
+                    if isdecoy(db_mol,ligand,HBA_t,HBD_t,ClogP_t,MW_t,RB_t ):
                         can = db_mol.mol.write('can')
                         if can not in kdecoys_can_set:
                             ligands_dict[ligand] += 1
