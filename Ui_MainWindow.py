@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file '/home/ssorgatem/uni/PEI/decoys/MainWindow.ui'
 #
-# Created: Mon Jun  6 22:25:04 2011
+# Created: Mon Jun  6 22:38:00 2011
 #      by: pyside-uic 0.2.9 running on PySide 1.0.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -320,7 +320,10 @@ class Ui_MainWindow(object):
         MainWindow.setStatusBar(self.statusbar)
         self.actionAbout = QtGui.QAction(MainWindow)
         self.actionAbout.setObjectName("actionAbout")
+        self.actionHelp = QtGui.QAction(MainWindow)
+        self.actionHelp.setObjectName("actionHelp")
         self.menuHelp.addAction(self.actionAbout)
+        self.menuHelp.addAction(self.actionHelp)
         self.menubar.addAction(self.menuHelp.menuAction())
         self.tanimotoCutoffLabel.setBuddy(self.kdecoysFrame)
 
@@ -363,9 +366,9 @@ class Ui_MainWindow(object):
         self.resultsTable.horizontalHeaderItem(2).setText(QtGui.QApplication.translate("MainWindow", "Saved to", None, QtGui.QApplication.UnicodeUTF8))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), QtGui.QApplication.translate("MainWindow", "Results", None, QtGui.QApplication.UnicodeUTF8))
         self.tanimotoCutoffLabel.setText(QtGui.QApplication.translate("MainWindow", "Active ligand <-> decoy Tanimoto ≤", None, QtGui.QApplication.UnicodeUTF8))
-        self.hBALabel_2.setText(QtGui.QApplication.translate("MainWindow", "HBA ±", None, QtGui.QApplication.UnicodeUTF8))
-        self.hBDLabel.setText(QtGui.QApplication.translate("MainWindow", "HBD ±", None, QtGui.QApplication.UnicodeUTF8))
-        self.clogPLabel.setText(QtGui.QApplication.translate("MainWindow", "ClogP ±", None, QtGui.QApplication.UnicodeUTF8))
+        self.hBALabel_2.setText(QtGui.QApplication.translate("MainWindow", "Hydrogen Bond Acceptors ±", None, QtGui.QApplication.UnicodeUTF8))
+        self.hBDLabel.setText(QtGui.QApplication.translate("MainWindow", "Hydrogen Bond Donors ±", None, QtGui.QApplication.UnicodeUTF8))
+        self.clogPLabel.setText(QtGui.QApplication.translate("MainWindow", "Octanol-water partition coefficient (logP) ±", None, QtGui.QApplication.UnicodeUTF8))
         self.molecularWeightLabel.setText(QtGui.QApplication.translate("MainWindow", "Molecular weight ±", None, QtGui.QApplication.UnicodeUTF8))
         self.molwtBox.setSuffix(QtGui.QApplication.translate("MainWindow", " Da", None, QtGui.QApplication.UnicodeUTF8))
         self.rtotationalBondsLabel.setText(QtGui.QApplication.translate("MainWindow", "Rotational bonds ±", None, QtGui.QApplication.UnicodeUTF8))
@@ -382,6 +385,7 @@ class Ui_MainWindow(object):
         self.progressBar.setFormat(QtGui.QApplication.translate("MainWindow", "%v decoys found", None, QtGui.QApplication.UnicodeUTF8))
         self.menuHelp.setTitle(QtGui.QApplication.translate("MainWindow", "Help", None, QtGui.QApplication.UnicodeUTF8))
         self.actionAbout.setText(QtGui.QApplication.translate("MainWindow", "About", None, QtGui.QApplication.UnicodeUTF8))
+        self.actionHelp.setText(QtGui.QApplication.translate("MainWindow", "Help", None, QtGui.QApplication.UnicodeUTF8))
 
 import resources_rc
 

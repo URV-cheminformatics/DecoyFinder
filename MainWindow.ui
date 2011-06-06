@@ -531,7 +531,7 @@
           <item row="1" column="0">
            <widget class="QLabel" name="hBALabel_2">
             <property name="text">
-             <string>HBA ±</string>
+             <string>Hydrogen Bond Acceptors ±</string>
             </property>
            </widget>
           </item>
@@ -541,7 +541,7 @@
           <item row="2" column="0">
            <widget class="QLabel" name="hBDLabel">
             <property name="text">
-             <string>HBD ±</string>
+             <string>Hydrogen Bond Donors ±</string>
             </property>
            </widget>
           </item>
@@ -551,7 +551,7 @@
           <item row="3" column="0">
            <widget class="QLabel" name="clogPLabel">
             <property name="text">
-             <string>ClogP ±</string>
+             <string>Octanol-water partition coefficient (logP) ±</string>
             </property>
            </widget>
           </item>
@@ -777,6 +777,7 @@
      <string>Help</string>
     </property>
     <addaction name="actionAbout"/>
+    <addaction name="actionHelp"/>
    </widget>
    <addaction name="menuHelp"/>
   </widget>
@@ -784,6 +785,11 @@
   <action name="actionAbout">
    <property name="text">
     <string>About</string>
+   </property>
+  </action>
+  <action name="actionHelp">
+   <property name="text">
+    <string>Help</string>
    </property>
   </action>
  </widget>

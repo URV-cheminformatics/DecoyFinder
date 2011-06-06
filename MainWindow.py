@@ -32,6 +32,9 @@ import decoy_finder
 from find_decoys import get_fileformat, find_decoys, get_zinc_slice,  informats,  ZINC_subsets
 from Ui_MainWindow import Ui_MainWindow
 
+if not QIcon.themeName():
+    from icons_rc import *
+
 
 class DecoyFinderThread(QThread):
     """
@@ -136,6 +139,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.zsubComboBox.addItem(subset)
         self.zsubComboBox.setCurrentIndex(self.zsubComboBox.findText('everything'))
         ###Load icons###
+        QIcon.setThemeName('iconset')
         addIcon = QIcon.fromTheme('list-add', QIcon())
         clearIcon = QIcon.fromTheme('edit-clear', QIcon())
         outIcon = QIcon.fromTheme('document-save-as', QIcon())
@@ -143,6 +147,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         stopIcon = QIcon.fromTheme('process-stop', QIcon())
         cachedirIcon = QIcon.fromTheme('folder-open', QIcon())
         defaultsIcon = QIcon.fromTheme('view-refresh', QIcon())
+        helpIcon = QIcon.fromTheme('internet-web-browser', QIcon())
+        aboutIcon = QIcon.fromTheme('help-browser', QIcon())
 
         self.addQueryButton.setIcon(addIcon)
         self.addDecoysButton.setIcon(addIcon)
@@ -159,6 +165,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.cacheButton.setIcon(cachedirIcon)
         self.defaultsButton.setIcon(defaultsIcon)
+
+        self.actionAbout.setIcon(aboutIcon)
+        self.actionHelp.setIcon(helpIcon)
         ############
 
         ######Display current settings########
