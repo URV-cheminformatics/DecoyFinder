@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Decoy Finder</string>
+   <string>DecoyFinder</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -50,7 +50,7 @@
               <item>
                <widget class="QLabel" name="label">
                 <property name="text">
-                 <string>Query Molecules:</string>
+                 <string>Active Ligands</string>
                 </property>
                </widget>
               </item>
@@ -122,7 +122,7 @@
                </spacer>
               </item>
               <item>
-               <widget class="QPushButton" name="pushButton">
+               <widget class="QPushButton" name="clearActives">
                 <property name="text">
                  <string>Clear</string>
                 </property>
@@ -162,7 +162,7 @@
                <item>
                 <widget class="QLabel" name="label_3">
                  <property name="text">
-                  <string>Known decoys</string>
+                  <string>Known Decoys</string>
                  </property>
                 </widget>
                </item>
@@ -249,7 +249,7 @@
                 </spacer>
                </item>
                <item>
-                <widget class="QPushButton" name="pushButton_4">
+                <widget class="QPushButton" name="clearDecoys">
                  <property name="text">
                   <string>Clear</string>
                  </property>
@@ -290,7 +290,7 @@
               <item>
                <widget class="QLabel" name="label_2">
                 <property name="text">
-                 <string>Potential decoys</string>
+                 <string>Potential Decoys</string>
                 </property>
                </widget>
               </item>
@@ -408,7 +408,7 @@
                </spacer>
               </item>
               <item>
-               <widget class="QPushButton" name="pushButton_2">
+               <widget class="QPushButton" name="clearDB">
                 <property name="text">
                  <string>Clear</string>
                 </property>
@@ -824,7 +824,7 @@
    </hints>
   </connection>
   <connection>
-   <sender>pushButton_4</sender>
+   <sender>clearDecoys</sender>
    <signal>clicked()</signal>
    <receiver>decoyList</receiver>
    <slot>clear()</slot>
@@ -872,7 +872,7 @@
    </hints>
   </connection>
   <connection>
-   <sender>pushButton_2</sender>
+   <sender>clearDB</sender>
    <signal>clicked()</signal>
    <receiver>dbListWidget</receiver>
    <slot>clear()</slot>
@@ -904,7 +904,7 @@
    </hints>
   </connection>
   <connection>
-   <sender>pushButton</sender>
+   <sender>clearActives</sender>
    <signal>clicked()</signal>
    <receiver>queryList</receiver>
    <slot>clear()</slot>

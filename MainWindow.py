@@ -25,7 +25,7 @@ Module implementing MainWindow.
 
 import os, itertools, random, tempfile
 
-from PySide.QtGui import QMainWindow, QFileDialog, QTableWidgetItem, QMessageBox
+from PySide.QtGui import QMainWindow, QFileDialog, QTableWidgetItem, QMessageBox,  QIcon
 from PySide.QtCore import QSettings, QThread, Signal, Qt, Slot
 
 import decoy_finder
@@ -135,6 +135,32 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         for subset in ZINC_subsets:
             self.zsubComboBox.addItem(subset)
         self.zsubComboBox.setCurrentIndex(self.zsubComboBox.findText('everything'))
+        ###Load icons###
+        addIcon = QIcon.fromTheme('list-add', QIcon())
+        clearIcon = QIcon.fromTheme('edit-clear', QIcon())
+        outIcon = QIcon.fromTheme('document-save-as', QIcon())
+        finddIcon = QIcon.fromTheme('media-playback-start', QIcon())
+        stopIcon = QIcon.fromTheme('process-stop', QIcon())
+        cachedirIcon = QIcon.fromTheme('folder-open', QIcon())
+        defaultsIcon = QIcon.fromTheme('view-refresh', QIcon())
+
+        self.addQueryButton.setIcon(addIcon)
+        self.addDecoysButton.setIcon(addIcon)
+        self.addDButton.setIcon(addIcon)
+
+        self.clearActives.setIcon(clearIcon)
+        self.clearDecoys.setIcon(clearIcon)
+        self.clearDB.setIcon(clearIcon)
+        self.clearButton.setIcon(clearIcon)
+
+        self.outDirButton.setIcon(outIcon)
+        self.findDecoysButton.setIcon(finddIcon)
+        self.stopButton.setIcon(stopIcon)
+
+        self.cacheButton.setIcon(cachedirIcon)
+        self.defaultsButton.setIcon(defaultsIcon)
+        ############
+
         ######Display current settings########
         self.hbaBox.setValue(int(self.settings.value('HBA_t', 0)))
         self.hbdBox.setValue(int(self.settings.value('HBD_t', 0)))
