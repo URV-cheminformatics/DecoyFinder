@@ -28,7 +28,7 @@
 # - Molecular weight +/-40 Da
 # - exact same number of rotational bonds
 
-import pybel, os, urllib2, tempfile, random,  sys
+import pybel, os, urllib2, tempfile, random,  sys,  gzip
 from decimal import Decimal
 #Decimal() serveix per fer operacions exactes amb decimals, ja que el built-in float és imprecís
 
@@ -118,7 +118,20 @@ def get_zinc_slice(slicename = 'all', subset = '10', cachedir = tempfile.gettemp
             else:
                 print "Loading cached file: %s" % outfilename
             dbhandler.close()
-            yield str(outfilename)
+            #### Workaround for a bug in OpenBabel <= 2.3 ####
+            if os.name == 'nt':
+                gzipfile = gzip.open(outfilename,  'rb')
+                gunzippedoutfilename = outfilename.replace('.sdf.gz', '.sdf')
+                out = open(gunzippedoutfilename, 'wb')
+                out.write(gzipfile.read())
+                gzipfile.close()
+                out.close()
+                yield str(gunzippedoutfilename)
+                os.remove(gunzippedoutfilename)
+            ###################################
+            else:
+                yield str(outfilename)
+
             #print outfilename
             if not keepcache:
                 try:
