@@ -59,7 +59,23 @@ RB_t = 0#1
 HBA = pybel.Smarts("[#7,#8]")
 HBD = pybel.Smarts("[#7,#8;!H0]")
 
-ZINC_subsets = {"lead-like":"1","fragment-like":"2","drug-like":"3","all-purchasable":"6","everything":"10","clean-leads":"11","clean-fragments":"12","clean-drug-like":"13","all-clean":"16","leads-now":"21","frags-now":"22","drugs-now":"23","all-now":"26","sarah":"37","Stan":"94"}
+ZINC_subsets = {
+    "lead-like":"1"
+    ,"fragment-like":"2"
+    ,"drug-like":"3"
+    ,"all-purchasable":"6"
+    ,"everything":"10"
+    ,"clean-leads":"11"
+    ,"clean-fragments":"12"
+    ,"clean-drug-like":"13"
+    ,"all-clean":"16"
+    ,"leads-now":"21"
+    ,"frags-now":"22"
+    ,"drugs-now":"23"
+    ,"all-now":"26"
+    ,"sarah":"37"
+    ,"Stan":"94"
+    }
 
 class ComparableMol():
     """
@@ -87,7 +103,7 @@ def get_zinc_slice(slicename = 'all', subset = '10', cachedir = tempfile.gettemp
     if slicename in ('all', 'single', 'usual', 'metals'):
         script = "http://zinc.docking.org/subset1/%s/%s.sdf.csh" % (subset,slicename)
         handler = urllib2.urlopen(script)
-        print "Reading ZINC data..."
+        print("Reading ZINC data...")
         scriptcontent = handler.read().split('\n')
         handler.close()
         filelist = scriptcontent[1:-2]
@@ -108,15 +124,15 @@ def get_zinc_slice(slicename = 'all', subset = '10', cachedir = tempfile.gettemp
                     localsize = os.path.getsize(outfilename)
                     download_needed = localsize != filesize
                     if download_needed:
-                        print "Local file outdated or incomplete"
+                        print("Local file outdated or incomplete")
 
             if download_needed:
-                print 'Downloading %s' % parenturl + file
+                print('Downloading %s' % parenturl + file)
                 outfile = open(outfilename, "wb")
                 outfile.write(dbhandler.read())
                 outfile.close()
             else:
-                print "Loading cached file: %s" % outfilename
+                print("Loading cached file: %s" % outfilename)
             dbhandler.close()
             #### Workaround for a bug in OpenBabel <= 2.3 ####
             if os.name == 'nt':
@@ -137,8 +153,8 @@ def get_zinc_slice(slicename = 'all', subset = '10', cachedir = tempfile.gettemp
                 try:
                     os.remove(outfilename)
                 except Exception,  e:
-                    print "Unable to remove %s" % (outfilename)
-                    print unicode(e)
+                    print("Unable to remove %s" % (outfilename))
+                    print(unicode(e))
     else:
         raise Exception,  u"Unknown slice"
 
@@ -154,7 +170,7 @@ def get_fileformat(file):
         #print ext
         return ext
     else:
-       print "%s: unknown format"  % file
+       print("%s: unknown format"  % file)
        raise ValueError
 
 def parse_db_files(filelist):
@@ -218,7 +234,7 @@ def isdecoy(
 def save_decoys(decoy_set, outputfile):
     """
     """
-    print 'saving %s decoys...' % len(decoy_set),
+    print('saving %s decoys...' % len(decoy_set))
     if len(decoy_set):
         fileexists = 0
         if os.path.splitext(outputfile)[1].lower()[1:] not in pybel.outformats:
@@ -237,7 +253,7 @@ def save_decoys(decoy_set, outputfile):
         for decoy in decoy_set:
             decoyfile.write(decoy.mol)
         decoyfile.close()
-        print 'saved'
+        print('saved')
         return outputfile
     else:
         return 'No decoys found'
@@ -263,7 +279,7 @@ def find_decoys(
     tanimoto_t = Decimal(str(tanimoto_t))
     tanimoto_d = Decimal(str(tanimoto_d))
     ClogP_t = Decimal(str(ClogP_t))
-    print "Looking for decoys!"
+    print("Looking for decoys!")
 
     db_entry_gen = parse_db_files(db_files)
 
@@ -338,27 +354,27 @@ def find_decoys(
                                 decoys_set.add(db_mol)
                                 decoys_can_set.add(can)
                                 ndecoys = len(decoys_set)
-                                print '%s decoys found' % ndecoys
+                                print('%s decoys found' % ndecoys)
                                 yield ('ndecoys',  ndecoys, complete_ligand_sets)
                             if ligands_dict[ligand] ==  min:
-                                print 'Decoy set completed for ', ligand.title
+                                print('Decoy set completed for ', ligand.title)
                                 complete_ligand_sets += 1
                                 yield ('ndecoys',  ndecoys, complete_ligand_sets)
         else:
-            print "finishing"
+            print("finishing")
             break
         if os.path.exists(stopfile):
             os.remove(stopfile)
-            print 'stopping by user request'
+            print('stopping by user request')
             break
 
     if min:
-        print 'Completed %s of %s decoy sets' % (complete_ligand_sets, nactive_ligands )
+        print('Completed %s of %s decoy sets' % (complete_ligand_sets, nactive_ligands ))
         minreached = complete_ligand_sets >= nactive_ligands
     if minreached and total_min <= len(decoys_set):
-        print "Found all wanted decoys"
+        print("Found all wanted decoys")
     else:
-        print "Not all wanted decoys found"
+        print("Not all wanted decoys found")
     #Last, special yield:
     yield ('result',  ligands_dict,  (save_decoys(decoys_set, outputfile), minreached))
 
