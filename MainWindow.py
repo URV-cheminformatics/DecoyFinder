@@ -23,7 +23,7 @@
 Module implementing MainWindow.
 """
 
-import os, itertools, random, tempfile
+import os, itertools, random, tempfile, time
 
 from PySide.QtGui import QMainWindow, QFileDialog, QTableWidgetItem, QMessageBox,  QIcon
 from PySide.QtCore import QSettings, QThread, Signal, Qt, Slot
@@ -31,10 +31,6 @@ from PySide.QtCore import QSettings, QThread, Signal, Qt, Slot
 import decoy_finder
 from find_decoys import get_fileformat, find_decoys, get_zinc_slice,  informats,  ZINC_subsets
 from Ui_MainWindow import Ui_MainWindow
-
-if not QIcon.themeName():
-    from icons_rc import *
-
 
 class DecoyFinderThread(QThread):
     """
@@ -139,7 +135,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.zsubComboBox.addItem(subset)
         self.zsubComboBox.setCurrentIndex(self.zsubComboBox.findText('everything'))
         ###Load icons###
-        QIcon.setThemeName('iconset')
+        if not QIcon.themeName():
+            print "No icon theme set, using default: Tango"
+            import icons_rc
+            QIcon.setThemeName('iconset')
         addIcon = QIcon.fromTheme('list-add', QIcon())
         clearIcon = QIcon.fromTheme('edit-clear', QIcon())
         outIcon = QIcon.fromTheme('document-save-as', QIcon())
@@ -404,7 +403,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             stopfile = open(self.stopfile,  'wb')
             stopfile.close()
             while os.path.isfile(self.stopfile):
-                pass #Wait until the finder thread stops
+                time.sleep(0.5) #Wait until the finder thread stops
             self.stopfile = ''
 
     @Slot("")
