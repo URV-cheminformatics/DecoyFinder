@@ -50,6 +50,7 @@ class DecoyFinderThread(QThread):
         self.db_files = db_files
         self.stopfile = stopfile
         self.nactive_ligands = 0
+        self.ndecoys = 0
         self.settings = QSettings()
         super(DecoyFinderThread, self).__init__(None)
 

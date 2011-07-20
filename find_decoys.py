@@ -309,7 +309,7 @@ def find_decoys(
         for decoy in decoys_set:
             can = decoy.mol.write('can')
             for ligand in ligands_dict.keys():
-                if isdecoy(decoy,ligand,HBA_t,HBD_t,ClogP_t,tanimoto_t,MW_t,RB_t ):
+                if isdecoy(decoy,ligand,HBA_t,HBD_t,ClogP_t,MW_t,RB_t ):
                     ligands_dict[ligand] +=1
                     kdecoys_can_set.add(can)
                     if min and ligands_dict[ligand] == min:
