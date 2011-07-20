@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Decoy Finder</string>
+   <string>DecoyFinder</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -50,7 +50,7 @@
               <item>
                <widget class="QLabel" name="label">
                 <property name="text">
-                 <string>Query Molecules:</string>
+                 <string>Active Ligands</string>
                 </property>
                </widget>
               </item>
@@ -122,7 +122,7 @@
                </spacer>
               </item>
               <item>
-               <widget class="QPushButton" name="pushButton">
+               <widget class="QPushButton" name="clearActives">
                 <property name="text">
                  <string>Clear</string>
                 </property>
@@ -162,7 +162,7 @@
                <item>
                 <widget class="QLabel" name="label_3">
                  <property name="text">
-                  <string>Known decoys</string>
+                  <string>Known Decoys</string>
                  </property>
                 </widget>
                </item>
@@ -249,7 +249,7 @@
                 </spacer>
                </item>
                <item>
-                <widget class="QPushButton" name="pushButton_4">
+                <widget class="QPushButton" name="clearDecoys">
                  <property name="text">
                   <string>Clear</string>
                  </property>
@@ -290,7 +290,7 @@
               <item>
                <widget class="QLabel" name="label_2">
                 <property name="text">
-                 <string>Potential decoys</string>
+                 <string>Potential Decoys</string>
                 </property>
                </widget>
               </item>
@@ -408,7 +408,7 @@
                </spacer>
               </item>
               <item>
-               <widget class="QPushButton" name="pushButton_2">
+               <widget class="QPushButton" name="clearDB">
                 <property name="text">
                  <string>Clear</string>
                 </property>
@@ -531,7 +531,7 @@
           <item row="1" column="0">
            <widget class="QLabel" name="hBALabel_2">
             <property name="text">
-             <string>HBA ±</string>
+             <string>Hydrogen Bond Acceptors ±</string>
             </property>
            </widget>
           </item>
@@ -541,7 +541,7 @@
           <item row="2" column="0">
            <widget class="QLabel" name="hBDLabel">
             <property name="text">
-             <string>HBD ±</string>
+             <string>Hydrogen Bond Donors ±</string>
             </property>
            </widget>
           </item>
@@ -551,7 +551,7 @@
           <item row="3" column="0">
            <widget class="QLabel" name="clogPLabel">
             <property name="text">
-             <string>ClogP ±</string>
+             <string>Octanol-water partition coefficient (logP) ±</string>
             </property>
            </widget>
           </item>
@@ -777,6 +777,7 @@
      <string>Help</string>
     </property>
     <addaction name="actionAbout"/>
+    <addaction name="actionHelp"/>
    </widget>
    <addaction name="menuHelp"/>
   </widget>
@@ -784,6 +785,11 @@
   <action name="actionAbout">
    <property name="text">
     <string>About</string>
+   </property>
+  </action>
+  <action name="actionHelp">
+   <property name="text">
+    <string>Help</string>
    </property>
   </action>
  </widget>
@@ -824,7 +830,7 @@
    </hints>
   </connection>
   <connection>
-   <sender>pushButton_4</sender>
+   <sender>clearDecoys</sender>
    <signal>clicked()</signal>
    <receiver>decoyList</receiver>
    <slot>clear()</slot>
@@ -872,7 +878,7 @@
    </hints>
   </connection>
   <connection>
-   <sender>pushButton_2</sender>
+   <sender>clearDB</sender>
    <signal>clicked()</signal>
    <receiver>dbListWidget</receiver>
    <slot>clear()</slot>
@@ -904,7 +910,7 @@
    </hints>
   </connection>
   <connection>
-   <sender>pushButton</sender>
+   <sender>clearActives</sender>
    <signal>clicked()</signal>
    <receiver>queryList</receiver>
    <slot>clear()</slot>

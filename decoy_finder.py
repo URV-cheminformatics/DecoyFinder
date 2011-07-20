@@ -28,9 +28,9 @@ sip.setapi('QVariant', 2)
 from PyQt4.QtGui import QApplication
 from PyQt4.QtCore import QTranslator, QLocale
 
-ORGNAME = u'Universitat Rovira i Virgili - Grup de recerca en nutrigenòmica'
-NAME = 'Decoy Finder'
-VERSION = '0.3~alfa'
+ORGNAME = u'Universitat Rovira i Virgili - Grup de Recerca en Nutrigenòmica'
+NAME = 'DecoyFinder'
+VERSION = '1.0'
 
 def main():
     """

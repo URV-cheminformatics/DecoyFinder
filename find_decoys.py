@@ -28,7 +28,7 @@
 # - Molecular weight +/-40 Da
 # - exact same number of rotational bonds
 
-import pybel, os, urllib2, tempfile, random,  sys
+import pybel, os, urllib2, tempfile, random,  sys,  gzip
 from decimal import Decimal
 #Decimal() serveix per fer operacions exactes amb decimals, ja que el built-in float és imprecís
 
@@ -59,7 +59,23 @@ RB_t = 0#1
 HBA = pybel.Smarts("[#7,#8]")
 HBD = pybel.Smarts("[#7,#8;!H0]")
 
-ZINC_subsets = {"lead-like":"1","fragment-like":"2","drug-like":"3","all-purchasable":"6","everything":"10","clean-leads":"11","clean-fragments":"12","clean-drug-like":"13","all-clean":"16","leads-now":"21","frags-now":"22","drugs-now":"23","all-now":"26","sarah":"37","Stan":"94"}
+ZINC_subsets = {
+    "lead-like":"1"
+    ,"fragment-like":"2"
+    ,"drug-like":"3"
+    ,"all-purchasable":"6"
+    ,"everything":"10"
+    ,"clean-leads":"11"
+    ,"clean-fragments":"12"
+    ,"clean-drug-like":"13"
+    ,"all-clean":"16"
+    ,"leads-now":"21"
+    ,"frags-now":"22"
+    ,"drugs-now":"23"
+    ,"all-now":"26"
+    ,"sarah":"37"
+    ,"Stan":"94"
+    }
 
 class ComparableMol():
     """
@@ -87,7 +103,7 @@ def get_zinc_slice(slicename = 'all', subset = '10', cachedir = tempfile.gettemp
     if slicename in ('all', 'single', 'usual', 'metals'):
         script = "http://zinc.docking.org/subset1/%s/%s.sdf.csh" % (subset,slicename)
         handler = urllib2.urlopen(script)
-        print "Reading ZINC data..."
+        print("Reading ZINC data...")
         scriptcontent = handler.read().split('\n')
         handler.close()
         filelist = scriptcontent[1:-2]
@@ -108,24 +124,37 @@ def get_zinc_slice(slicename = 'all', subset = '10', cachedir = tempfile.gettemp
                     localsize = os.path.getsize(outfilename)
                     download_needed = localsize != filesize
                     if download_needed:
-                        print "Local file outdated or incomplete"
+                        print("Local file outdated or incomplete")
 
             if download_needed:
-                print 'Downloading %s' % parenturl + file
+                print('Downloading %s' % parenturl + file)
                 outfile = open(outfilename, "wb")
                 outfile.write(dbhandler.read())
                 outfile.close()
             else:
-                print "Loading cached file: %s" % outfilename
+                print("Loading cached file: %s" % outfilename)
             dbhandler.close()
-            yield str(outfilename)
+            #### Workaround for a bug in OpenBabel <= 2.3 ####
+            if os.name == 'nt':
+                gzipfile = gzip.open(outfilename,  'rb')
+                gunzippedoutfilename = outfilename.replace('.sdf.gz', '.sdf')
+                out = open(gunzippedoutfilename, 'wb')
+                out.write(gzipfile.read())
+                gzipfile.close()
+                out.close()
+                yield str(gunzippedoutfilename)
+                os.remove(gunzippedoutfilename)
+            ###################################
+            else:
+                yield str(outfilename)
+
             #print outfilename
             if not keepcache:
                 try:
                     os.remove(outfilename)
                 except Exception,  e:
-                    print "Unable to remove %s" % (outfilename)
-                    print unicode(e)
+                    print("Unable to remove %s" % (outfilename))
+                    print(unicode(e))
     else:
         raise Exception,  u"Unknown slice"
 
@@ -141,7 +170,7 @@ def get_fileformat(file):
         #print ext
         return ext
     else:
-       print "%s: unknown format"  % file
+       print("%s: unknown format"  % file)
        raise ValueError
 
 def parse_db_files(filelist):
@@ -188,15 +217,12 @@ def isdecoy(
                 ,HBA_t = 0 #1
                 ,HBD_t = 0#1
                 ,ClogP_t = Decimal(1)#1.5
-                ,tanimoto_t = Decimal('0.9')
                 ,MW_t = 40
                 ,RB_t = 0
                 ):
     """
     """
-    tanimoto = Decimal(str(db_mol.fp | ligand.fp))
-    if  tanimoto <= tanimoto_t\
-    and ligand.hba - HBA_t <= db_mol.hba <= ligand.hba + HBA_t\
+    if  ligand.hba - HBA_t <= db_mol.hba <= ligand.hba + HBA_t\
     and ligand.hbd - HBD_t <= db_mol.hbd <= ligand.hbd + HBD_t\
     and ligand.clogp - ClogP_t <= db_mol.clogp <= ligand.clogp + ClogP_t \
     and ligand.mw - MW_t <= db_mol.mw <= ligand.mw + MW_t \
@@ -208,7 +234,7 @@ def isdecoy(
 def save_decoys(decoy_set, outputfile):
     """
     """
-    print 'saving %s decoys...' % len(decoy_set),
+    print('saving %s decoys...' % len(decoy_set))
     if len(decoy_set):
         fileexists = 0
         if os.path.splitext(outputfile)[1].lower()[1:] not in pybel.outformats:
@@ -227,7 +253,7 @@ def save_decoys(decoy_set, outputfile):
         for decoy in decoy_set:
             decoyfile.write(decoy.mol)
         decoyfile.close()
-        print 'saved'
+        print('saved')
         return outputfile
     else:
         return 'No decoys found'
@@ -253,11 +279,12 @@ def find_decoys(
     tanimoto_t = Decimal(str(tanimoto_t))
     tanimoto_d = Decimal(str(tanimoto_d))
     ClogP_t = Decimal(str(ClogP_t))
-    print "Looking for decoys!"
+    print("Looking for decoys!")
 
     db_entry_gen = parse_db_files(db_files)
 
     ligands_dict = parse_query_files(query_files)
+    active_fp_set = set(active.fp for active in ligands_dict)
 
     nactive_ligands = len(ligands_dict)
 
@@ -267,20 +294,22 @@ def find_decoys(
     if min:
         total_min = nactive_ligands*min
         yield ('total_min',  total_min,  nactive_ligands)
+    else:
+        min = None
 
     decoys_can_set = set()
     kdecoys_can_set = set()
     ndecoys = 0
+    ligands_max = 0
 
     if decoy_files:
         yield ('file', 0, 'known decoy files...')
         decoys_set = parse_decoy_files(decoy_files)
         ndecoys = len(decoys_set)
         for decoy in decoys_set:
-            decoy.calcdesc()
             can = decoy.mol.write('can')
             for ligand in ligands_dict.keys():
-                if isdecoy(decoy,ligand,HBA_t,HBD_t,ClogP_t,tanimoto_t,MW_t,RB_t ):
+                if isdecoy(decoy,ligand,HBA_t,HBD_t,ClogP_t,MW_t,RB_t ):
                     ligands_dict[ligand] +=1
                     kdecoys_can_set.add(can)
                     if min and ligands_dict[ligand] == min:
@@ -293,6 +322,8 @@ def find_decoys(
 
     for db_mol, filecount, db_file in db_entry_gen:
         yield ('file',  filecount, db_file)
+        if max and ligands_max >= nactive_ligands:
+            break
         if not min or len(decoys_set) < total_min or complete_ligand_sets < nactive_ligands:
             too_similar = False
             if tanimoto_d < Decimal(1):
@@ -302,11 +333,20 @@ def find_decoys(
                         too_similar = True
                         break
             if not too_similar:
+                for active_fp in active_fp_set:
+                    active_T = Decimal(str(active_fp | db_mol.fp))
+                    if  active_T > tanimoto_t:
+                        too_similar = True
+                        break
+                if too_similar:
+                    continue
                 db_mol.calcdesc()
+                ligands_max = 0
                 for ligand in ligands_dict.iterkeys():
                     if max and ligands_dict[ligand] >= max:
+                        ligands_max +=1
                         continue
-                    if isdecoy(db_mol,ligand,HBA_t,HBD_t,ClogP_t,tanimoto_t,MW_t,RB_t ):
+                    if isdecoy(db_mol,ligand,HBA_t,HBD_t,ClogP_t,MW_t,RB_t ):
                         can = db_mol.mol.write('can')
                         if can not in kdecoys_can_set:
                             ligands_dict[ligand] += 1
@@ -314,27 +354,27 @@ def find_decoys(
                                 decoys_set.add(db_mol)
                                 decoys_can_set.add(can)
                                 ndecoys = len(decoys_set)
-                                print '%s decoys found' % ndecoys
+                                print('%s decoys found' % ndecoys)
                                 yield ('ndecoys',  ndecoys, complete_ligand_sets)
                             if ligands_dict[ligand] ==  min:
-                                print 'Decoy set completed for ', ligand.title
+                                print('Decoy set completed for ', ligand.title)
                                 complete_ligand_sets += 1
                                 yield ('ndecoys',  ndecoys, complete_ligand_sets)
         else:
-            print "finishing"
+            print("finishing")
             break
         if os.path.exists(stopfile):
             os.remove(stopfile)
-            print 'stopping by user request'
+            print('stopping by user request')
             break
 
     if min:
-        print 'Completed %s of %s decoy sets' % (complete_ligand_sets, nactive_ligands )
+        print('Completed %s of %s decoy sets' % (complete_ligand_sets, nactive_ligands ))
         minreached = complete_ligand_sets >= nactive_ligands
     if minreached and total_min <= len(decoys_set):
-        print "Found all wanted decoys"
+        print("Found all wanted decoys")
     else:
-        print "Not all wanted decoys found"
+        print("Not all wanted decoys found")
     #Last, special yield:
     yield ('result',  ligands_dict,  (save_decoys(decoys_set, outputfile), minreached))
 
@@ -367,25 +407,25 @@ def main(args = sys.argv[1:]):
     decopts.add_argument('-M', '--maximum-decoys-per-set', default=0, type=int
                         , help='Stop looking for decoys for ligands with at least so many decoys found'
                         , dest='max')
-    decopts.add_argument('-t', '--tanimoto-with-active', default=tanimoto_t, type=float
+    decopts.add_argument('-t', '--tanimoto-with-active', default=tanimoto_t, type=Decimal
                         , help='Upper tanimoto threshold between active ligand and decoys'
                         , dest='tanimoto_t')
-    decopts.add_argument('-i', '--inter-decoy-tanimoto', default=tanimoto_d, type=float
+    decopts.add_argument('-i', '--inter-decoy-tanimoto', default=tanimoto_d, type=Decimal
                         , help='Upper tanimoto threshold between decoys'
                         , dest='tanimoto_d')
-    decopts.add_argument('-c','--clogp-margin', default=ClogP_t, type=float
+    decopts.add_argument('-c','--clogp-margin', default=ClogP_t, type=Decimal
                         , help='Decoy log P value margin'
                         , dest='ClogP_t')
-    decopts.add_argument('-y', '--hba-margin', default=HBA_t, type=float
+    decopts.add_argument('-y', '--hba-margin', default=HBA_t, type=int
                         , help='Decoy hydrogen bond acceptors margin'
                         , dest='HBA_t')
-    decopts.add_argument('-g', '--hbd-margin', default=HBD_t, type=float
+    decopts.add_argument('-g', '--hbd-margin', default=HBD_t, type=Decimal
                         , help='Decoy hydrogen bond donors margin'
                         , dest='HBD_t')
-    decopts.add_argument('-r', '--rotational-bonds-margin', default=RB_t, type=float
+    decopts.add_argument('-r', '--rotational-bonds-margin', default=RB_t, type=int
                         , help='Decoy rotational bonds margin'
                         , dest='RB_t')
-    decopts.add_argument('-w',  '--molecular-weight-margin', default=MW_t, type=float
+    decopts.add_argument('-w',  '--molecular-weight-margin', default=MW_t, type=int
                         , help='Molecular weight margin'
                         , dest='MW_t')
 

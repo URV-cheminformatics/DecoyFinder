@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE Project SYSTEM "Project-4.6.dtd">
 <!-- eric4 project file for project df -->
-<!-- Saved: 2011-05-02, 23:44:34 -->
+<!-- Saved: 2011-06-07, 03:41:47 -->
 <!-- Copyright (C) 2011 Adrià Cereto-Massagué, adrian.cereto@gmail.com -->
 <Project version="4.6">
   <Language>ca</Language>
@@ -19,6 +19,7 @@
     <Source>MainWindow.py</Source>
     <Source>decoy_finder.py</Source>
     <Source>resources_rc.py</Source>
+    <Source>icons_rc.py</Source>
   </Sources>
   <Forms>
     <Form>MainWindow.ui</Form>
@@ -31,11 +32,12 @@
   </Translations>
   <Resources>
     <Resource>resources.qrc</Resource>
+    <Resource>icons.qrc</Resource>
   </Resources>
   <Interfaces>
   </Interfaces>
   <Others>
-    <Other>README</Other>
+    <Other>README.txt</Other>
   </Others>
   <Vcs>
     <VcsType>None</VcsType>

@@ -2,8 +2,8 @@
 
 # Form implementation generated from reading ui file '/home/ssorgatem/uni/PEI/decoys/MainWindow.ui'
 #
-# Created: Wed May 18 18:53:09 2011
-#      by: pyside-uic 0.2.8 running on PySide 1.0.2
+# Created: Mon Jun  6 22:38:00 2011
+#      by: pyside-uic 0.2.9 running on PySide 1.0.3
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -57,9 +57,9 @@ class Ui_MainWindow(object):
         self.horizontalLayout_6.addItem(spacerItem2)
         spacerItem3 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Minimum)
         self.horizontalLayout_6.addItem(spacerItem3)
-        self.pushButton = QtGui.QPushButton(self.tabWidgetPage1)
-        self.pushButton.setObjectName("pushButton")
-        self.horizontalLayout_6.addWidget(self.pushButton)
+        self.clearActives = QtGui.QPushButton(self.tabWidgetPage1)
+        self.clearActives.setObjectName("clearActives")
+        self.horizontalLayout_6.addWidget(self.clearActives)
         self.verticalLayout.addLayout(self.horizontalLayout_6)
         self.queryList = QtGui.QListWidget(self.tabWidgetPage1)
         self.queryList.setObjectName("queryList")
@@ -96,9 +96,9 @@ class Ui_MainWindow(object):
         self.horizontalLayout_9.addItem(spacerItem7)
         spacerItem8 = QtGui.QSpacerItem(52, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
         self.horizontalLayout_9.addItem(spacerItem8)
-        self.pushButton_4 = QtGui.QPushButton(self.kdecoysFrame)
-        self.pushButton_4.setObjectName("pushButton_4")
-        self.horizontalLayout_9.addWidget(self.pushButton_4)
+        self.clearDecoys = QtGui.QPushButton(self.kdecoysFrame)
+        self.clearDecoys.setObjectName("clearDecoys")
+        self.horizontalLayout_9.addWidget(self.clearDecoys)
         self.verticalLayout_6.addLayout(self.horizontalLayout_9)
         self.decoyList = QtGui.QListWidget(self.kdecoysFrame)
         self.decoyList.setObjectName("decoyList")
@@ -154,9 +154,9 @@ class Ui_MainWindow(object):
         self.horizontalLayout_8.addWidget(self.addDButton)
         spacerItem12 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
         self.horizontalLayout_8.addItem(spacerItem12)
-        self.pushButton_2 = QtGui.QPushButton(self.tabWidgetPage1)
-        self.pushButton_2.setObjectName("pushButton_2")
-        self.horizontalLayout_8.addWidget(self.pushButton_2)
+        self.clearDB = QtGui.QPushButton(self.tabWidgetPage1)
+        self.clearDB.setObjectName("clearDB")
+        self.horizontalLayout_8.addWidget(self.clearDB)
         self.verticalLayout_2.addLayout(self.horizontalLayout_8)
         self.dbListWidget = QtGui.QListWidget(self.tabWidgetPage1)
         self.dbListWidget.setObjectName("dbListWidget")
@@ -323,7 +323,10 @@ class Ui_MainWindow(object):
         MainWindow.setStatusBar(self.statusbar)
         self.actionAbout = QtGui.QAction(MainWindow)
         self.actionAbout.setObjectName("actionAbout")
+        self.actionHelp = QtGui.QAction(MainWindow)
+        self.actionHelp.setObjectName("actionHelp")
         self.menuHelp.addAction(self.actionAbout)
+        self.menuHelp.addAction(self.actionHelp)
         self.menubar.addAction(self.menuHelp.menuAction())
         self.tanimotoCutoffLabel.setBuddy(self.kdecoysFrame)
 
@@ -331,25 +334,25 @@ class Ui_MainWindow(object):
         self.tabWidget.setCurrentIndex(0)
         QtCore.QObject.connect(self.clearButton, QtCore.SIGNAL("clicked()"), self.progressBar.reset)
         QtCore.QObject.connect(self.clearButton, QtCore.SIGNAL("clicked()"), self.statusbar.clearMessage)
-        QtCore.QObject.connect(self.pushButton_4, QtCore.SIGNAL("clicked()"), self.decoyList.clear)
+        QtCore.QObject.connect(self.clearDecoys, QtCore.SIGNAL("clicked()"), self.decoyList.clear)
         QtCore.QObject.connect(self.clearButton, QtCore.SIGNAL("clicked()"), self.decoyList.clear)
         QtCore.QObject.connect(self.clearButton, QtCore.SIGNAL("clicked()"), self.dbListWidget.clear)
-        QtCore.QObject.connect(self.pushButton_2, QtCore.SIGNAL("clicked()"), self.dbListWidget.clear)
+        QtCore.QObject.connect(self.clearDB, QtCore.SIGNAL("clicked()"), self.dbListWidget.clear)
         QtCore.QObject.connect(self.clearButton, QtCore.SIGNAL("clicked()"), self.queryList.clear)
-        QtCore.QObject.connect(self.pushButton, QtCore.SIGNAL("clicked()"), self.queryList.clear)
+        QtCore.QObject.connect(self.clearActives, QtCore.SIGNAL("clicked()"), self.queryList.clear)
         QtCore.QObject.connect(self.kdecoysCheckBox, QtCore.SIGNAL("toggled(bool)"), self.kdecoysFrame.setVisible)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
-        MainWindow.setWindowTitle(QtGui.QApplication.translate("MainWindow", "Decoy Finder", None, QtGui.QApplication.UnicodeUTF8))
-        self.label.setText(QtGui.QApplication.translate("MainWindow", "Query Molecules:", None, QtGui.QApplication.UnicodeUTF8))
+        MainWindow.setWindowTitle(QtGui.QApplication.translate("MainWindow", "DecoyFinder", None, QtGui.QApplication.UnicodeUTF8))
+        self.label.setText(QtGui.QApplication.translate("MainWindow", "Active Ligands", None, QtGui.QApplication.UnicodeUTF8))
         self.kdecoysCheckBox.setText(QtGui.QApplication.translate("MainWindow", "Use  known decoys", None, QtGui.QApplication.UnicodeUTF8))
         self.addQueryButton.setText(QtGui.QApplication.translate("MainWindow", "Add", None, QtGui.QApplication.UnicodeUTF8))
-        self.pushButton.setText(QtGui.QApplication.translate("MainWindow", "Clear", None, QtGui.QApplication.UnicodeUTF8))
-        self.label_3.setText(QtGui.QApplication.translate("MainWindow", "Known decoys", None, QtGui.QApplication.UnicodeUTF8))
+        self.clearActives.setText(QtGui.QApplication.translate("MainWindow", "Clear", None, QtGui.QApplication.UnicodeUTF8))
+        self.label_3.setText(QtGui.QApplication.translate("MainWindow", "Known Decoys", None, QtGui.QApplication.UnicodeUTF8))
         self.addDecoysButton.setText(QtGui.QApplication.translate("MainWindow", "Add", None, QtGui.QApplication.UnicodeUTF8))
-        self.pushButton_4.setText(QtGui.QApplication.translate("MainWindow", "Clear", None, QtGui.QApplication.UnicodeUTF8))
-        self.label_2.setText(QtGui.QApplication.translate("MainWindow", "Potential decoys", None, QtGui.QApplication.UnicodeUTF8))
+        self.clearDecoys.setText(QtGui.QApplication.translate("MainWindow", "Clear", None, QtGui.QApplication.UnicodeUTF8))
+        self.label_2.setText(QtGui.QApplication.translate("MainWindow", "Potential Decoys", None, QtGui.QApplication.UnicodeUTF8))
         self.zinclabel.setText(QtGui.QApplication.translate("MainWindow", "ZINC subset:", None, QtGui.QApplication.UnicodeUTF8))
         self.cacheCheckBox.setText(QtGui.QApplication.translate("MainWindow", "Use caché", None, QtGui.QApplication.UnicodeUTF8))
         self.dbComboBox.setItemText(0, QtGui.QApplication.translate("MainWindow", "Select local files...", None, QtGui.QApplication.UnicodeUTF8))
@@ -358,7 +361,7 @@ class Ui_MainWindow(object):
         self.dbComboBox.setItemText(3, QtGui.QApplication.translate("MainWindow", "ZINC usual", None, QtGui.QApplication.UnicodeUTF8))
         self.dbComboBox.setItemText(4, QtGui.QApplication.translate("MainWindow", "ZINC all", None, QtGui.QApplication.UnicodeUTF8))
         self.addDButton.setText(QtGui.QApplication.translate("MainWindow", "Add", None, QtGui.QApplication.UnicodeUTF8))
-        self.pushButton_2.setText(QtGui.QApplication.translate("MainWindow", "Clear", None, QtGui.QApplication.UnicodeUTF8))
+        self.clearDB.setText(QtGui.QApplication.translate("MainWindow", "Clear", None, QtGui.QApplication.UnicodeUTF8))
         self.outDirButton.setText(QtGui.QApplication.translate("MainWindow", "Output file", None, QtGui.QApplication.UnicodeUTF8))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tabWidgetPage1), QtGui.QApplication.translate("MainWindow", "Query", None, QtGui.QApplication.UnicodeUTF8))
         self.resultsTable.horizontalHeaderItem(0).setText(QtGui.QApplication.translate("MainWindow", "Ligand", None, QtGui.QApplication.UnicodeUTF8))
@@ -366,9 +369,9 @@ class Ui_MainWindow(object):
         self.resultsTable.horizontalHeaderItem(2).setText(QtGui.QApplication.translate("MainWindow", "Saved to", None, QtGui.QApplication.UnicodeUTF8))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), QtGui.QApplication.translate("MainWindow", "Results", None, QtGui.QApplication.UnicodeUTF8))
         self.tanimotoCutoffLabel.setText(QtGui.QApplication.translate("MainWindow", "Active ligand <-> decoy Tanimoto ≤", None, QtGui.QApplication.UnicodeUTF8))
-        self.hBALabel_2.setText(QtGui.QApplication.translate("MainWindow", "HBA ±", None, QtGui.QApplication.UnicodeUTF8))
-        self.hBDLabel.setText(QtGui.QApplication.translate("MainWindow", "HBD ±", None, QtGui.QApplication.UnicodeUTF8))
-        self.clogPLabel.setText(QtGui.QApplication.translate("MainWindow", "ClogP ±", None, QtGui.QApplication.UnicodeUTF8))
+        self.hBALabel_2.setText(QtGui.QApplication.translate("MainWindow", "Hydrogen Bond Acceptors ±", None, QtGui.QApplication.UnicodeUTF8))
+        self.hBDLabel.setText(QtGui.QApplication.translate("MainWindow", "Hydrogen Bond Donors ±", None, QtGui.QApplication.UnicodeUTF8))
+        self.clogPLabel.setText(QtGui.QApplication.translate("MainWindow", "Octanol-water partition coefficient (logP) ±", None, QtGui.QApplication.UnicodeUTF8))
         self.molecularWeightLabel.setText(QtGui.QApplication.translate("MainWindow", "Molecular weight ±", None, QtGui.QApplication.UnicodeUTF8))
         self.molwtBox.setSuffix(QtGui.QApplication.translate("MainWindow", " Da", None, QtGui.QApplication.UnicodeUTF8))
         self.rtotationalBondsLabel.setText(QtGui.QApplication.translate("MainWindow", "Rotational bonds ±", None, QtGui.QApplication.UnicodeUTF8))
@@ -385,6 +388,7 @@ class Ui_MainWindow(object):
         self.progressBar.setFormat(QtGui.QApplication.translate("MainWindow", "%v decoys found", None, QtGui.QApplication.UnicodeUTF8))
         self.menuHelp.setTitle(QtGui.QApplication.translate("MainWindow", "Help", None, QtGui.QApplication.UnicodeUTF8))
         self.actionAbout.setText(QtGui.QApplication.translate("MainWindow", "About", None, QtGui.QApplication.UnicodeUTF8))
+        self.actionHelp.setText(QtGui.QApplication.translate("MainWindow", "Help", None, QtGui.QApplication.UnicodeUTF8))
 
 import resources_rc
 

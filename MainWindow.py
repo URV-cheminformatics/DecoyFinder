@@ -23,7 +23,8 @@
 Module implementing MainWindow.
 """
 
-import os, itertools, random, tempfile
+import os, itertools, random, tempfile, time
+
 
 from PyQt4.QtGui import QMainWindow, QFileDialog, QTableWidgetItem, QMessageBox
 from PyQt4.QtCore import QSettings, QThread, Qt
@@ -31,9 +32,8 @@ from PyQt4.QtCore import pyqtSignal as Signal
 from PyQt4.QtCore import pyqtSignature as Slot
 
 import decoy_finder
-from find_decoys import get_fileformat, find_decoys, get_zinc_slice,  informats,  ZINC_subsets
+from find_decoys import *
 from Ui_MainWindow import Ui_MainWindow
-
 
 class DecoyFinderThread(QThread):
     """
@@ -53,6 +53,7 @@ class DecoyFinderThread(QThread):
         self.db_files = db_files
         self.stopfile = stopfile
         self.nactive_ligands = 0
+        self.ndecoys = 0
         self.settings = QSettings()
         super(DecoyFinderThread, self).__init__(None)
 
@@ -110,7 +111,7 @@ class DecoyFinderThread(QThread):
                     self.progLimit.emit(self.total_min)
                     self.nactive_ligands = info[2]
                 else:
-                    print "Something is going wrong"
+                    print("Something is going wrong")
 
             if self.filecount:
                 self.progress.emit(self.filecount +1)
@@ -137,6 +138,41 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         for subset in ZINC_subsets:
             self.zsubComboBox.addItem(subset)
         self.zsubComboBox.setCurrentIndex(self.zsubComboBox.findText('everything'))
+        ###Load icons###
+        if not QIcon.themeName():
+            print("No icon theme set, using default: Tango")
+            import icons_rc
+            QIcon.setThemeName('iconset')
+        addIcon = QIcon.fromTheme('list-add', QIcon())
+        clearIcon = QIcon.fromTheme('edit-clear', QIcon())
+        outIcon = QIcon.fromTheme('document-save-as', QIcon())
+        finddIcon = QIcon.fromTheme('media-playback-start', QIcon())
+        stopIcon = QIcon.fromTheme('process-stop', QIcon())
+        cachedirIcon = QIcon.fromTheme('folder-open', QIcon())
+        defaultsIcon = QIcon.fromTheme('view-refresh', QIcon())
+        helpIcon = QIcon.fromTheme('internet-web-browser', QIcon())
+        aboutIcon = QIcon.fromTheme('help-browser', QIcon())
+
+        self.addQueryButton.setIcon(addIcon)
+        self.addDecoysButton.setIcon(addIcon)
+        self.addDButton.setIcon(addIcon)
+
+        self.clearActives.setIcon(clearIcon)
+        self.clearDecoys.setIcon(clearIcon)
+        self.clearDB.setIcon(clearIcon)
+        self.clearButton.setIcon(clearIcon)
+
+        self.outDirButton.setIcon(outIcon)
+        self.findDecoysButton.setIcon(finddIcon)
+        self.stopButton.setIcon(stopIcon)
+
+        self.cacheButton.setIcon(cachedirIcon)
+        self.defaultsButton.setIcon(defaultsIcon)
+
+        self.actionAbout.setIcon(aboutIcon)
+        self.actionHelp.setIcon(helpIcon)
+        ############
+
         ######Display current settings########
         self.hbaBox.setValue(int(self.settings.value('HBA_t', 0)))
         self.hbdBox.setValue(int(self.settings.value('HBD_t', 0)))
@@ -206,7 +242,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def on_error(self, error):
         """
         """
-        print error
+        print(error)
         QMessageBox.critical(None,
             self.trUtf8("Error"),
             self.trUtf8(error),
@@ -319,7 +355,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         for item in db_items:
             if item.split()[0] == 'ZINC':
                 usecache = self.cacheCheckBox.isChecked()
-                print self.zsubComboBox.currentText()
                 zinc_file_gen = get_zinc_slice(item.split()[1], ZINC_subsets[self.zsubComboBox.currentText()], self.settings.value('cachedir',tempfile.gettempdir()),  usecache)
                 zfilecount = zinc_file_gen.next()
                 if zfilecount:
@@ -356,10 +391,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 self.progressBar.setFormat('%v of %m decoys found')
             else:
                 self.progressBar.setFormat('%v of %m files read')
-            print "starting thread"
+            print("starting thread")
             self.finder.start()
             self.stopButton.setEnabled(True)
-            print "started"
+            print("started")
 
     @Slot("")
     def on_stopButton_clicked(self):
@@ -371,7 +406,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             stopfile = open(self.stopfile,  'wb')
             stopfile.close()
             while os.path.isfile(self.stopfile):
-                pass #Wait until the finder thread stops
+                time.sleep(0.5) #Wait until the finder thread stops
             self.stopfile = ''
 
     @Slot("")
@@ -505,15 +540,15 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         """
         Slot documentation goes here.
         """
-        self.hbaBox.setValue(0)
-        self.hbdBox.setValue(0)
-        self.clogpBox.setValue(1)
-        self.tanimotoBox.setValue(0.9)
-        self.molwtBox.setValue(40)
-        self.rotbBox.setValue(0)
+        self.hbaBox.setValue(HBA_t)
+        self.hbdBox.setValue(HBD_t)
+        self.clogpBox.setValue(int(ClogP_t))
+        self.tanimotoBox.setValue(float(tanimoto_t))
+        self.molwtBox.setValue(MW_t)
+        self.rotbBox.setValue(RB_t)
         self.decoyMinSpinBox.setValue(36)
         self.decoyMaxSpinBox.setValue(0)
-        self.dTanimotoBox.setValue(0.9)
+        self.dTanimotoBox.setValue(float(tanimoto_d))
         self.cachDirectoryLineEdit.setText(tempfile.gettempdir())
         for field in (self.hbaBox, self.hbdBox, self.clogpBox, self.tanimotoBox, self.molwtBox, self.rotbBox,  self.decoyMinSpinBox, self.decoyMaxSpinBox, self.dTanimotoBox, self.cachDirectoryLineEdit):
             field.editingFinished.emit()
