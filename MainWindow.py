@@ -26,7 +26,7 @@ Module implementing MainWindow.
 import os, itertools, random, tempfile, time
 
 
-from PyQt4.QtGui import QMainWindow, QFileDialog, QTableWidgetItem, QMessageBox
+from PyQt4.QtGui import QMainWindow, QFileDialog, QTableWidgetItem, QMessageBox, QIcon
 from PyQt4.QtCore import QSettings, QThread, Qt
 from PyQt4.QtCore import pyqtSignal as Signal
 from PyQt4.QtCore import pyqtSignature as Slot
