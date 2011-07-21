@@ -183,7 +183,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.cachDirectoryLineEdit.setText(self.settings.value('cachedir',tempfile.gettempdir()))
         self.outputDirectoryLineEdit.setText(self.settings.value('outputfile',os.path.join(os.getcwd(), 'found_decoys.sdf') ))
         ########################
-        self.supported_files = self.tr('Molecule files') + ' (' + informats + ')'
+        self.supported_files = self.tr('OpenBabel accepted formats') + ' (' + informats + ')'
         ########################
         self.stopfile = '' #File to stop iteration
 
@@ -221,7 +221,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 if ndecoys:
                     answer = QMessageBox.question(None,
                         self.trUtf8("Not enough decoys found"),
-                        self.trUtf8("""Not enough decoys for each ligand were found. Please, try to loosen search constraints in the options tab.\n Found decoys have been added to known decoys list"""),
+                        self.trUtf8(""" Not enough decoys for each active ligand have been found. Please, try either to loosen the search constraints at the options tab or to use new decoy sources.\n Found decoys have been added to known decoys list"""),
                         QMessageBox.StandardButtons(\
                             QMessageBox.Abort | \
                             QMessageBox.Retry))
