@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file '/home/ssorgatem/uni/PEI/decoys/MainWindow.ui'
+# Form implementation generated from reading ui file '/home/ssorgatem/Documents/uni/PEI/decoys/MainWindow.ui'
 #
-# Created: Mon Jun  6 22:38:00 2011
-#      by: pyside-uic 0.2.9 running on PySide 1.0.3
+# Created: Thu Jul 21 12:05:32 2011
+#      by: pyside-uic 0.2.11 running on PySide 1.0.4
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -15,7 +15,7 @@ from PyQt4 import QtCore, QtGui
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(700, 497)
+        MainWindow.resize(700, 535)
         self.centralwidget = QtGui.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.verticalLayout_4 = QtGui.QVBoxLayout(self.centralwidget)
@@ -27,6 +27,9 @@ class Ui_MainWindow(object):
         self.tabWidgetPage1.setObjectName("tabWidgetPage1")
         self.verticalLayout_5 = QtGui.QVBoxLayout(self.tabWidgetPage1)
         self.verticalLayout_5.setObjectName("verticalLayout_5")
+        self.kdecoysCheckBox = QtGui.QCheckBox(self.tabWidgetPage1)
+        self.kdecoysCheckBox.setObjectName("kdecoysCheckBox")
+        self.verticalLayout_5.addWidget(self.kdecoysCheckBox)
         self.horizontalLayout = QtGui.QHBoxLayout()
         self.horizontalLayout.setObjectName("horizontalLayout")
         self.verticalLayout = QtGui.QVBoxLayout()
@@ -41,13 +44,10 @@ class Ui_MainWindow(object):
         spacerItem1 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
         self.horizontalLayout_4.addItem(spacerItem1)
         self.verticalLayout.addLayout(self.horizontalLayout_4)
-        self.gridLayout_2 = QtGui.QGridLayout()
-        self.gridLayout_2.setContentsMargins(-1, -1, -1, 4)
-        self.gridLayout_2.setObjectName("gridLayout_2")
-        self.kdecoysCheckBox = QtGui.QCheckBox(self.tabWidgetPage1)
-        self.kdecoysCheckBox.setObjectName("kdecoysCheckBox")
-        self.gridLayout_2.addWidget(self.kdecoysCheckBox, 0, 0, 1, 1)
-        self.verticalLayout.addLayout(self.gridLayout_2)
+        self.verticalLayout_8 = QtGui.QVBoxLayout()
+        self.verticalLayout_8.setContentsMargins(-1, 14, -1, 14)
+        self.verticalLayout_8.setObjectName("verticalLayout_8")
+        self.verticalLayout.addLayout(self.verticalLayout_8)
         self.horizontalLayout_6 = QtGui.QHBoxLayout()
         self.horizontalLayout_6.setObjectName("horizontalLayout_6")
         self.addQueryButton = QtGui.QPushButton(self.tabWidgetPage1)
@@ -193,7 +193,17 @@ class Ui_MainWindow(object):
         self.resultsTable.setHorizontalHeaderItem(2, item)
         self.resultsTable.verticalHeader().setSortIndicatorShown(True)
         self.resultsTable.verticalHeader().setStretchLastSection(True)
-        self.gridLayout.addWidget(self.resultsTable, 0, 0, 1, 1)
+        self.gridLayout.addWidget(self.resultsTable, 1, 0, 1, 1)
+        self.formLayout = QtGui.QFormLayout()
+        self.formLayout.setObjectName("formLayout")
+        self.informationSavedToLabel = QtGui.QLabel(self.tab)
+        self.informationSavedToLabel.setObjectName("informationSavedToLabel")
+        self.formLayout.setWidget(0, QtGui.QFormLayout.LabelRole, self.informationSavedToLabel)
+        self.informationSavedToLineEdit = QtGui.QLineEdit(self.tab)
+        self.informationSavedToLineEdit.setReadOnly(True)
+        self.informationSavedToLineEdit.setObjectName("informationSavedToLineEdit")
+        self.formLayout.setWidget(0, QtGui.QFormLayout.FieldRole, self.informationSavedToLineEdit)
+        self.gridLayout.addLayout(self.formLayout, 0, 0, 1, 1)
         self.tabWidget.addTab(self.tab, "")
         self.tabWidgetPage2 = QtGui.QWidget()
         self.tabWidgetPage2.setObjectName("tabWidgetPage2")
@@ -331,7 +341,7 @@ class Ui_MainWindow(object):
         self.tanimotoCutoffLabel.setBuddy(self.kdecoysFrame)
 
         self.retranslateUi(MainWindow)
-        self.tabWidget.setCurrentIndex(0)
+        self.tabWidget.setCurrentIndex(1)
         QtCore.QObject.connect(self.clearButton, QtCore.SIGNAL("clicked()"), self.progressBar.reset)
         QtCore.QObject.connect(self.clearButton, QtCore.SIGNAL("clicked()"), self.statusbar.clearMessage)
         QtCore.QObject.connect(self.clearDecoys, QtCore.SIGNAL("clicked()"), self.decoyList.clear)
@@ -345,14 +355,15 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(QtGui.QApplication.translate("MainWindow", "DecoyFinder", None, QtGui.QApplication.UnicodeUTF8))
-        self.label.setText(QtGui.QApplication.translate("MainWindow", "Active Ligands", None, QtGui.QApplication.UnicodeUTF8))
-        self.kdecoysCheckBox.setText(QtGui.QApplication.translate("MainWindow", "Use  known decoys", None, QtGui.QApplication.UnicodeUTF8))
+        self.kdecoysCheckBox.setToolTip(QtGui.QApplication.translate("MainWindow", "Add new decoys to an existing decoy set", None, QtGui.QApplication.UnicodeUTF8))
+        self.kdecoysCheckBox.setText(QtGui.QApplication.translate("MainWindow", "  Add new decoys", None, QtGui.QApplication.UnicodeUTF8))
+        self.label.setText(QtGui.QApplication.translate("MainWindow", "Known Active Ligands", None, QtGui.QApplication.UnicodeUTF8))
         self.addQueryButton.setText(QtGui.QApplication.translate("MainWindow", "Add", None, QtGui.QApplication.UnicodeUTF8))
         self.clearActives.setText(QtGui.QApplication.translate("MainWindow", "Clear", None, QtGui.QApplication.UnicodeUTF8))
-        self.label_3.setText(QtGui.QApplication.translate("MainWindow", "Known Decoys", None, QtGui.QApplication.UnicodeUTF8))
+        self.label_3.setText(QtGui.QApplication.translate("MainWindow", "Existing Decoy files", None, QtGui.QApplication.UnicodeUTF8))
         self.addDecoysButton.setText(QtGui.QApplication.translate("MainWindow", "Add", None, QtGui.QApplication.UnicodeUTF8))
         self.clearDecoys.setText(QtGui.QApplication.translate("MainWindow", "Clear", None, QtGui.QApplication.UnicodeUTF8))
-        self.label_2.setText(QtGui.QApplication.translate("MainWindow", "Potential Decoys", None, QtGui.QApplication.UnicodeUTF8))
+        self.label_2.setText(QtGui.QApplication.translate("MainWindow", "Sources of new Decoys", None, QtGui.QApplication.UnicodeUTF8))
         self.zinclabel.setText(QtGui.QApplication.translate("MainWindow", "ZINC subset:", None, QtGui.QApplication.UnicodeUTF8))
         self.cacheCheckBox.setText(QtGui.QApplication.translate("MainWindow", "Use caché", None, QtGui.QApplication.UnicodeUTF8))
         self.dbComboBox.setItemText(0, QtGui.QApplication.translate("MainWindow", "Select local files...", None, QtGui.QApplication.UnicodeUTF8))
@@ -364,10 +375,11 @@ class Ui_MainWindow(object):
         self.clearDB.setText(QtGui.QApplication.translate("MainWindow", "Clear", None, QtGui.QApplication.UnicodeUTF8))
         self.outDirButton.setText(QtGui.QApplication.translate("MainWindow", "Output file", None, QtGui.QApplication.UnicodeUTF8))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tabWidgetPage1), QtGui.QApplication.translate("MainWindow", "Query", None, QtGui.QApplication.UnicodeUTF8))
-        self.resultsTable.horizontalHeaderItem(0).setText(QtGui.QApplication.translate("MainWindow", "Ligand", None, QtGui.QApplication.UnicodeUTF8))
+        self.resultsTable.horizontalHeaderItem(0).setText(QtGui.QApplication.translate("MainWindow", "Active", None, QtGui.QApplication.UnicodeUTF8))
         self.resultsTable.horizontalHeaderItem(1).setText(QtGui.QApplication.translate("MainWindow", "Decoys found", None, QtGui.QApplication.UnicodeUTF8))
         self.resultsTable.horizontalHeaderItem(2).setText(QtGui.QApplication.translate("MainWindow", "Saved to", None, QtGui.QApplication.UnicodeUTF8))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), QtGui.QApplication.translate("MainWindow", "Results", None, QtGui.QApplication.UnicodeUTF8))
+        self.informationSavedToLabel.setText(QtGui.QApplication.translate("MainWindow", "This information can be found at", None, QtGui.QApplication.UnicodeUTF8))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), QtGui.QApplication.translate("MainWindow", "Run Statistics", None, QtGui.QApplication.UnicodeUTF8))
         self.tanimotoCutoffLabel.setText(QtGui.QApplication.translate("MainWindow", "Active ligand <-> decoy Tanimoto ≤", None, QtGui.QApplication.UnicodeUTF8))
         self.hBALabel_2.setText(QtGui.QApplication.translate("MainWindow", "Hydrogen Bond Acceptors ±", None, QtGui.QApplication.UnicodeUTF8))
         self.hBDLabel.setText(QtGui.QApplication.translate("MainWindow", "Hydrogen Bond Donors ±", None, QtGui.QApplication.UnicodeUTF8))
@@ -388,7 +400,7 @@ class Ui_MainWindow(object):
         self.progressBar.setFormat(QtGui.QApplication.translate("MainWindow", "%v decoys found", None, QtGui.QApplication.UnicodeUTF8))
         self.menuHelp.setTitle(QtGui.QApplication.translate("MainWindow", "Help", None, QtGui.QApplication.UnicodeUTF8))
         self.actionAbout.setText(QtGui.QApplication.translate("MainWindow", "About", None, QtGui.QApplication.UnicodeUTF8))
-        self.actionHelp.setText(QtGui.QApplication.translate("MainWindow", "Help", None, QtGui.QApplication.UnicodeUTF8))
+        self.actionHelp.setText(QtGui.QApplication.translate("MainWindow", "Homepage", None, QtGui.QApplication.UnicodeUTF8))
 
 import resources_rc
 
