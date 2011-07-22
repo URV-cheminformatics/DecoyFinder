@@ -76,7 +76,7 @@ class DecoyFinderThread(QThread):
                         ,MW_t = int(self.settings.value('MW_t',40))
                         ,RB_t = int(self.settings.value('RB_t',0))
                         ,min = int(self.settings.value('decoy_min',36))
-                        ,max = int(self.settings.value('decoy_max',0))
+                        ,max = int(self.settings.value('decoy_max',36))
                         ,tanimoto_d = float(self.settings.value('tanimoto_d', 0.9))
                         ,decoy_files = self.decoy_files
                         ,stopfile = self.stopfile
@@ -178,7 +178,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.molwtBox.setValue(int(self.settings.value('MW_t',40)))
         self.rotbBox.setValue(int(self.settings.value('RB_t',0)))
         self.decoyMinSpinBox.setValue(int(self.settings.value('decoy_min',36)))
-        self.decoyMaxSpinBox.setValue(int(self.settings.value('decoy_max',0)))
+        self.decoyMaxSpinBox.setValue(int(self.settings.value('decoy_max',36)))
         self.dTanimotoBox.setValue(float(self.settings.value('tanimoto_d', 0.9)))
         self.cachDirectoryLineEdit.setText(self.settings.value('cachedir',tempfile.gettempdir()))
         self.outputDirectoryLineEdit.setText(self.settings.value('outputfile',os.path.join(os.getcwd(), 'found_decoys.sdf') ))
@@ -544,7 +544,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.molwtBox.setValue(MW_t)
         self.rotbBox.setValue(RB_t)
         self.decoyMinSpinBox.setValue(36)
-        self.decoyMaxSpinBox.setValue(0)
+        self.decoyMaxSpinBox.setValue(36)
         self.dTanimotoBox.setValue(float(tanimoto_d))
         self.cachDirectoryLineEdit.setText(tempfile.gettempdir())
         for field in (self.hbaBox, self.hbdBox, self.clogpBox, self.tanimotoBox, self.molwtBox, self.rotbBox,  self.decoyMinSpinBox, self.decoyMaxSpinBox, self.dTanimotoBox, self.cachDirectoryLineEdit):

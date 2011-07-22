@@ -270,7 +270,7 @@ def find_decoys(
                 ,MW_t = 40
                 ,RB_t = 0
                 ,min = 36
-                ,max = 0
+                ,max = 36
                 ,decoy_files = []
                 ,stopfile = ''
                 ):
@@ -404,7 +404,7 @@ def main(args = sys.argv[1:]):
     decopts.add_argument('-m', '--minimum-decoys-per-set', default=36, type=int
                         , help='Number of decoys to search for each active ligand'
                         , dest='min')
-    decopts.add_argument('-M', '--maximum-decoys-per-set', default=0, type=int
+    decopts.add_argument('-M', '--maximum-decoys-per-set', default=36, type=int
                         , help='Stop looking for decoys for ligands with at least so many decoys found'
                         , dest='max')
     decopts.add_argument('-t', '--tanimoto-with-active', default=tanimoto_t, type=Decimal
