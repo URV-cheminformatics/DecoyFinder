@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file '/home/ssorgatem/uni/PEI/decoys/MainWindow.ui'
 #
-# Created: Sat Jul 23 19:18:46 2011
+# Created: Sat Jul 23 20:18:33 2011
 #      by: pyside-uic 0.2.11 running on PySide 1.0.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -448,6 +448,7 @@ class Ui_MainWindow(object):
         self.resultsTable.horizontalHeaderItem(5).setText(QtGui.QApplication.translate("MainWindow", "M. weight", None, QtGui.QApplication.UnicodeUTF8))
         self.resultsTable.horizontalHeaderItem(6).setText(QtGui.QApplication.translate("MainWindow", "Rot. bonds", None, QtGui.QApplication.UnicodeUTF8))
         self.informationSavedToLabel.setText(QtGui.QApplication.translate("MainWindow", "This information can be found at", None, QtGui.QApplication.UnicodeUTF8))
+        self.informationSavedToLineEdit.setToolTip(QtGui.QApplication.translate("MainWindow", "This file is intended to be open as a spreadsheet, preferably with Calc, Excel, Gnumeric or a similar application.", None, QtGui.QApplication.UnicodeUTF8))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), QtGui.QApplication.translate("MainWindow", "Run Statistics", None, QtGui.QApplication.UnicodeUTF8))
         self.tanimotoCutoffLabel.setToolTip(QtGui.QApplication.translate("MainWindow", "Here you can set the maximum Tanimoto value between a decoy molecule and its respective active ligand. The lower the value, the more chemically different will be the accepted decoys.", None, QtGui.QApplication.UnicodeUTF8))
         self.tanimotoCutoffLabel.setWhatsThis(QtGui.QApplication.translate("MainWindow", "Here you can set the maximum Tanimoto value between a decoy molecule and its respective active ligand. The lower the value, the more chemically different will be the accepted decoys.", None, QtGui.QApplication.UnicodeUTF8))

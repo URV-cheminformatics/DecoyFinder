@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file '/home/ssorgatem/uni/PEI/decoys/AboutDiag.ui'
 #
-# Created: Sat Jul 23 20:04:25 2011
+# Created: Sat Jul 23 20:18:38 2011
 #      by: pyside-uic 0.2.11 running on PySide 1.0.4
 #
 # WARNING! All changes made in this file will be lost!
