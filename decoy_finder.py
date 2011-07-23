@@ -31,6 +31,7 @@ from PyQt4.QtCore import QTranslator, QLocale
 ORGNAME = u'Universitat Rovira i Virgili - Grup de Recerca en Nutrigenòmica'
 NAME = 'DecoyFinder'
 VERSION = '1.0'
+URL = 'http://www.ctns.cat/DecoyFinder'
 
 def main():
     """
@@ -45,9 +46,10 @@ def main():
     App.setOrganizationName(ORGNAME) #Setting organization and application's
     App.setApplicationName(NAME)#name. It's only useful for QSettings
     App.setApplicationVersion(VERSION)
+    App.setOrganizationDomain(URL)
     App.installTranslator(translator)#Install translators into the application.
     App.installTranslator(qttranslator)
-    mw = MainWindow() #Now it's time to instantiate the main window
+    mw = MainWindow(App) #Now it's time to instantiate the main window
     mw.show() #And show it
     sys.exit(App.exec_()) #When the app finishes, exit.
 

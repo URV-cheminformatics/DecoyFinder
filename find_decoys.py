@@ -28,7 +28,7 @@
 # - Molecular weight +/-40 Da
 # - exact same number of rotational bonds
 
-import pybel, os, urllib2, tempfile, random,  sys,  gzip
+import pybel, os, urllib2, tempfile, random,  sys,  gzip,  datetime
 from decimal import Decimal
 #Decimal() serveix per fer operacions exactes amb decimals, ja que el built-in float és imprecís
 
@@ -231,23 +231,29 @@ def isdecoy(
         return True
     return False
 
+
+def checkoutputfile(outputfile):
+    """
+    """
+    fileexists = 0
+    if os.path.splitext(outputfile)[1].lower()[1:] not in pybel.outformats:
+        outputfile += "_decoys.sdf"
+    while os.path.isfile(outputfile):
+        fileexists += 1
+        filename,  extension = os.path.splitext(outputfile)
+        if filename.endswith("_%s" % (fileexists -1)):
+            filename = '_'.join(filename.split('_')[:-1]) +"_%s" % fileexists
+        else:
+            filename += "_%s" % fileexists
+        outputfile = filename + extension
+    return outputfile
+
 def save_decoys(decoy_set, outputfile):
     """
     """
     print('saving %s decoys...' % len(decoy_set))
     if len(decoy_set):
-        fileexists = 0
-        if os.path.splitext(outputfile)[1].lower()[1:] not in pybel.outformats:
-            outputfile += "_decoys.sdf"
-        while os.path.isfile(outputfile):
-            fileexists += 1
-            filename,  extension = os.path.splitext(outputfile)
-            if filename.endswith("_%s" % (fileexists -1)):
-                filename = '_'.join(filename.split('_')[:-1]) +"_%s" % fileexists
-            else:
-                filename += "_%s" % fileexists
-            outputfile = filename + extension
-
+        outputfile = checkoutputfile(outputfile)
         format = str(os.path.splitext(outputfile)[1][1:].lower())
         decoyfile = pybel.Outputfile(format, str(outputfile))
         for decoy in decoy_set:
@@ -270,18 +276,21 @@ def find_decoys(
                 ,MW_t = 40
                 ,RB_t = 0
                 ,min = 36
-                ,max = 0
+                ,max = 36
                 ,decoy_files = []
                 ,stopfile = ''
                 ):
     """
     """
+    outputfile = checkoutputfile(outputfile)
     tanimoto_t = Decimal(str(tanimoto_t))
     tanimoto_d = Decimal(str(tanimoto_d))
     ClogP_t = Decimal(str(ClogP_t))
     print("Looking for decoys!")
 
     db_entry_gen = parse_db_files(db_files)
+
+    used_db_files = set()
 
     ligands_dict = parse_query_files(query_files)
     active_fp_set = set(active.fp for active in ligands_dict)
@@ -321,6 +330,7 @@ def find_decoys(
     yield ('ndecoys',  len(decoys_set),  complete_ligand_sets)
 
     for db_mol, filecount, db_file in db_entry_gen:
+        used_db_files.add(db_file)
         yield ('file',  filecount, db_file)
         if max and ligands_max >= nactive_ligands:
             break
@@ -375,6 +385,39 @@ def find_decoys(
         print("Found all wanted decoys")
     else:
         print("Not all wanted decoys found")
+    #Generate logfile
+    log = '"DecoyFinder 1.0 log file generated on %s\n"' % datetime.datetime.now()
+    log += "\n"
+    log += '"Output file:","%s"\n' % outputfile
+    log += "\n"
+    log += '"Active ligand files:"\n'
+    for file in query_files:
+        log += '"%s"\n' % str(file)
+    log += "\n"
+    log += '"Decoy sources:"\n'
+    for file in used_db_files:
+        log += '"%s"\n' % str(file)
+    log += "\n"
+    log += '"Search settings:"\n'
+    log += '"Active ligand vs decoy tanimoto threshold","%s"\n' % str(tanimoto_t)
+    log += '"Decoy vs decoy tanimoto threshold","%s"\n' % str(tanimoto_d)
+    log += '"Hydrogen bond acceptors range","%s"\n' % str(HBA_t)
+    log += '"Hydrogen bond donors range","%s"\n' % str(HBD_t)
+    log += '"LogP range","%s"\n' % str(ClogP_t)
+    log += '"Molecular weight range","%s"\n' % str(MW_t)
+    log += '"Rotational bonds range","%s"\n' % str(RB_t)
+    log += '"Minimum nº of decoys per active ligand","%s"\n' % str(min)
+    log += '"Maximum nº of decoys per active ligand","%s"\n' % str(max)
+    log += "\n"
+    log += '"Avtive ligand","HBA","HBD","logP","MW","RB","nº of Decoys found"\n'
+    for active in ligands_dict:
+        log += '"%s","%s","%s","%s","%s","%s","%s"\n' % (active.title,  active.hba,  active.hbd,  active.clogp,  active.mw,  active.rot,  ligands_dict[active])
+    log += "\n"
+
+    logfile = open('%s_log.csv' % outputfile,  'wb')
+    logfile.write(log)
+    logfile.close()
+
     #Last, special yield:
     yield ('result',  ligands_dict,  (save_decoys(decoys_set, outputfile), minreached))
 
@@ -404,7 +447,7 @@ def main(args = sys.argv[1:]):
     decopts.add_argument('-m', '--minimum-decoys-per-set', default=36, type=int
                         , help='Number of decoys to search for each active ligand'
                         , dest='min')
-    decopts.add_argument('-M', '--maximum-decoys-per-set', default=0, type=int
+    decopts.add_argument('-M', '--maximum-decoys-per-set', default=36, type=int
                         , help='Stop looking for decoys for ligands with at least so many decoys found'
                         , dest='max')
     decopts.add_argument('-t', '--tanimoto-with-active', default=tanimoto_t, type=Decimal

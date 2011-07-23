@@ -23,17 +23,16 @@
 Module implementing MainWindow.
 """
 
-import os, itertools, random, tempfile, time
+import os, itertools, random, tempfile, time,  webbrowser
 
-
-from PyQt4.QtGui import QMainWindow, QFileDialog, QTableWidgetItem, QMessageBox, QIcon
+from PyQt4.QtGui import QMainWindow, QFileDialog, QTableWidgetItem, QMessageBox, QIcon, QApplication
 from PyQt4.QtCore import QSettings, QThread, Qt
 from PyQt4.QtCore import pyqtSignal as Signal
 from PyQt4.QtCore import pyqtSignature as Slot
 
-import decoy_finder
 from find_decoys import *
 from Ui_MainWindow import Ui_MainWindow
+from AboutDiag import AboutDialog
 
 class DecoyFinderThread(QThread):
     """
@@ -79,7 +78,7 @@ class DecoyFinderThread(QThread):
                         ,MW_t = int(self.settings.value('MW_t',40))
                         ,RB_t = int(self.settings.value('RB_t',0))
                         ,min = int(self.settings.value('decoy_min',36))
-                        ,max = int(self.settings.value('decoy_max',0))
+                        ,max = int(self.settings.value('decoy_max',36))
                         ,tanimoto_d = float(self.settings.value('tanimoto_d', 0.9))
                         ,decoy_files = self.decoy_files
                         ,stopfile = self.stopfile
@@ -105,32 +104,36 @@ class DecoyFinderThread(QThread):
                 elif info[0] == 'result':
                     outputfile = info[2][0]
                     minreached =  info[2][1]
-                    result = ( info[1],  outputfile,  minreached)
+                    result = ( info[1],outputfile, minreached)
                 elif info[0] == 'total_min':
                     self.total_min = info[1]
                     self.progLimit.emit(self.total_min)
                     self.nactive_ligands = info[2]
                 else:
-                    print("Something is going wrong")
+                    print("Something very wrong")
 
             if self.filecount:
                 self.progress.emit(self.filecount +1)
         except Exception, e:
             err = unicode(e)
             self.error.emit(self.trUtf8("Error: %s" % err))
+        self.info.emit("Decoys saved to " + outputfile)
         self.finished.emit(result)
 
 class MainWindow(QMainWindow, Ui_MainWindow):
     """
     Class documentation goes here.
     """
-    def __init__(self, parent = None):
+    def __init__(self, app, parent = None):
         """
         Constructor
         """
+        self.App = app
         QMainWindow.__init__(self, parent)
         self.setupUi(self)
         self.settings = QSettings()
+        self.setWindowFlags (Qt.WindowContextHelpButtonHint)
+        self.setWindowTitle("%s %s" % (self.App.applicationName(),  self.App.applicationVersion()))
         self.kdecoysFrame.setVisible(False)
         self.cacheCheckBox.setChecked(bool(int(self.settings.value('usecache',  True))))
         self.progressBar.setMinimum(0)
@@ -173,6 +176,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.actionHelp.setIcon(helpIcon)
         ############
 
+        self.toolBar.addAction(self.actionAbout)
+        self.toolBar.addAction(self.actionHelp)
+
         ######Display current settings########
         self.hbaBox.setValue(int(self.settings.value('HBA_t', 0)))
         self.hbdBox.setValue(int(self.settings.value('HBD_t', 0)))
@@ -181,10 +187,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.molwtBox.setValue(int(self.settings.value('MW_t',40)))
         self.rotbBox.setValue(int(self.settings.value('RB_t',0)))
         self.decoyMinSpinBox.setValue(int(self.settings.value('decoy_min',36)))
-        self.decoyMaxSpinBox.setValue(int(self.settings.value('decoy_max',0)))
+        self.decoyMaxSpinBox.setValue(int(self.settings.value('decoy_max',36)))
         self.dTanimotoBox.setValue(float(self.settings.value('tanimoto_d', 0.9)))
         self.cachDirectoryLineEdit.setText(self.settings.value('cachedir',tempfile.gettempdir()))
-        self.outputDirectoryLineEdit.setText(self.settings.value('outputfile',os.path.join(os.getcwd(), 'found_decoys.sdf') ))
+        self.outputDirectoryLineEdit.setText(checkoutputfile(self.settings.value('outputfile',os.path.join(os.getcwd(), 'found_decoys.sdf'))))
         ########################
         self.supported_files = self.tr('OpenBabel accepted formats') + ' (' + informats + ')'
         ########################
@@ -207,15 +213,21 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.stopButton.setEnabled(False)
         self.findDecoysButton.setEnabled(True)
         self.clearButton.setEnabled(True)
-        resultdict,  outfile,  minreached = resulttuple
+        resultdict, outputfile,  minreached = resulttuple
         if len(resultdict):
-            ndecoys = 0
+            self.clearResultsTable()
+            ndecoys = 0 #Possible comportament inconsistent -> poc prioritari
             self.tabWidget.setCurrentIndex(1)
+            self.informationSavedToLineEdit.setText('%s_log.csv' % outputfile)
             for ligand in resultdict.iterkeys():
                 self.resultsTable.insertRow(0)
                 self.resultsTable.setItem(0, 0,  QTableWidgetItem(ligand.title))
                 self.resultsTable.setItem(0, 1,  QTableWidgetItem(str(resultdict[ligand])))
-                self.resultsTable.setItem(0, 2,  QTableWidgetItem(outfile))
+                self.resultsTable.setItem(0, 2,  QTableWidgetItem(str(ligand.hba)))
+                self.resultsTable.setItem(0, 3,  QTableWidgetItem(str(ligand.hbd)))
+                self.resultsTable.setItem(0, 4,  QTableWidgetItem(str(ligand.clogp)))
+                self.resultsTable.setItem(0, 5,  QTableWidgetItem(str(ligand.mw)))
+                self.resultsTable.setItem(0, 6,  QTableWidgetItem(str(ligand.rot)))
                 ndecoys += resultdict[ligand]
             self.resultsTable.sortByColumn(1, Qt.DescendingOrder)
             self.resultsTable.resizeColumnToContents(0)
@@ -233,7 +245,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                         self.decoyList.addItem(outfile)
                         self.kdecoysCheckBox.setChecked(True)
                 else:
-                    self.on_error(self.tr('No decoys found. Try to set lower requirements in the options tab.'))
+                    self.on_error(self.tr('No decoys found. Try either to set lower requirements in the options tab or a different decoy source.'))
         else:
             self.on_error(self.tr('No active ligands found. Check your query files.'))
         self.statusbar.showMessage(self.tr("Done."))
@@ -249,7 +261,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             QMessageBox.StandardButtons(QMessageBox.Ok)
             )
 
-
+    def clearResultsTable(self):
+        """
+        """
+        while  self.resultsTable.rowCount():
+            self.resultsTable.removeRow(0)
 
     @Slot("")
     def on_addQueryButton_clicked(self):
@@ -329,7 +345,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         dialog.setDirectory(self.settings.value('lastdir',os.path.expanduser('~')))
         #dialog.setOption(QFileDialog.DontUseNativeDialog)
         if dialog.exec_():
-            file = dialog.selectedFiles()[0]
+            file = checkoutputfile(dialog.selectedFiles()[0])
             self.outputDirectoryLineEdit.setText(file)
             self.settings.setValue('outputfile', file)
             self.settings.setValue('lastdir', os.path.dirname(unicode(file)))
@@ -415,8 +431,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         Slot documentation goes here.
         """
         self.progressBar.setMaximum(1)
-        while  self.resultsTable.rowCount():
-            self.resultsTable.removeRow(0)
+        self.clearResultsTable()
 
     @Slot('int')
     def on_dbComboBox_currentIndexChanged(self,  index):
@@ -547,7 +562,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.molwtBox.setValue(MW_t)
         self.rotbBox.setValue(RB_t)
         self.decoyMinSpinBox.setValue(36)
-        self.decoyMaxSpinBox.setValue(0)
+        self.decoyMaxSpinBox.setValue(36)
         self.dTanimotoBox.setValue(float(tanimoto_d))
         self.cachDirectoryLineEdit.setText(tempfile.gettempdir())
         for field in (self.hbaBox, self.hbdBox, self.clogpBox, self.tanimotoBox, self.molwtBox, self.rotbBox,  self.decoyMinSpinBox, self.decoyMaxSpinBox, self.dTanimotoBox, self.cachDirectoryLineEdit):
@@ -561,6 +576,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         """
         Slot documentation goes here.
         """
-        QMessageBox.about(None,
-            self.trUtf8("About %s") % decoy_finder.NAME,
-            self.trUtf8("%s version %s") % (decoy_finder.NAME,  decoy_finder.VERSION))
+        aboutdiag = AboutDialog()
+        aboutdiag.nameLabel.setText(self.App.applicationName())
+        aboutdiag.versionlabel.setText(self.App.applicationVersion())
+        aboutdiag.exec_()
+
+    @Slot("")
+    def on_actionHelp_activated(self):
+        """
+        Slot documentation goes here.
+        """
+        webbrowser.open_new_tab(self.App.organizationDomain())
