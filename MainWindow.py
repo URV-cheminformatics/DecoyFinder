@@ -23,12 +23,11 @@
 Module implementing MainWindow.
 """
 
-import os, itertools, random, tempfile, time
+import os, itertools, random, tempfile, time,  webbrowser
 
-from PySide.QtGui import QMainWindow, QFileDialog, QTableWidgetItem, QMessageBox,  QIcon
+from PySide.QtGui import QMainWindow, QFileDialog, QTableWidgetItem, QMessageBox, QIcon, QApplication
 from PySide.QtCore import QSettings, QThread, Signal, Qt, Slot
 
-import decoy_finder
 from find_decoys import *
 from Ui_MainWindow import Ui_MainWindow
 
@@ -108,7 +107,7 @@ class DecoyFinderThread(QThread):
                     self.progLimit.emit(self.total_min)
                     self.nactive_ligands = info[2]
                 else:
-                    print("Something is going wrong")
+                    print("Something very wrong")
 
             if self.filecount:
                 self.progress.emit(self.filecount +1)
@@ -122,10 +121,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     """
     Class documentation goes here.
     """
-    def __init__(self, parent = None):
+    def __init__(self, app, parent = None):
         """
         Constructor
         """
+        self.App = app
         QMainWindow.__init__(self, parent)
         self.setupUi(self)
         self.settings = QSettings()
@@ -170,6 +170,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.actionAbout.setIcon(aboutIcon)
         self.actionHelp.setIcon(helpIcon)
         ############
+
+        self.toolBar.addAction(self.actionAbout)
+        self.toolBar.addAction(self.actionHelp)
 
         ######Display current settings########
         self.hbaBox.setValue(int(self.settings.value('HBA_t', 0)))
@@ -569,5 +572,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         Slot documentation goes here.
         """
         QMessageBox.about(None,
-            self.trUtf8("About %s") % decoy_finder.NAME,
-            self.trUtf8("%s version %s") % (decoy_finder.NAME,  decoy_finder.VERSION))
+            self.trUtf8("About %s") % self.App.applicationName(),
+            self.trUtf8("%s version %s") % (self.App.applicationName(),  self.App.applicationVersion()))
+
+    @Slot("")
+    def on_actionHelp_activated(self):
+        """
+        Slot documentation goes here.
+        """
+        webbrowser.open_new_tab(self.App.organizationDomain())
