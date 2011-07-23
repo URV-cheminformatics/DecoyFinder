@@ -129,6 +129,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         QMainWindow.__init__(self, parent)
         self.setupUi(self)
         self.settings = QSettings()
+        self.setWindowFlags (Qt.WindowContextHelpButtonHint)
+        self.setWindowTitle("%s %s" % (self.App.applicationName(),  self.App.applicationVersion()))
         self.kdecoysFrame.setVisible(False)
         self.cacheCheckBox.setChecked(bool(int(self.settings.value('usecache',  True))))
         self.progressBar.setMinimum(0)

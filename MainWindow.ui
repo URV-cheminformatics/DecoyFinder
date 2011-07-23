@@ -13,6 +13,15 @@
   <property name="windowTitle">
    <string>DecoyFinder</string>
   </property>
+  <property name="toolButtonStyle">
+   <enum>Qt::ToolButtonTextUnderIcon</enum>
+  </property>
+  <property name="documentMode">
+   <bool>false</bool>
+  </property>
+  <property name="unifiedTitleAndToolBarOnMac">
+   <bool>true</bool>
+  </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout_4">
     <item>
@@ -111,19 +120,6 @@
                </widget>
               </item>
               <item>
-               <spacer name="horizontalSpacer_7">
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>40</width>
-                  <height>20</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-              <item>
                <spacer name="horizontalSpacer_8">
                 <property name="orientation">
                  <enum>Qt::Horizontal</enum>
@@ -183,7 +179,7 @@
                <item>
                 <widget class="QLabel" name="label_3">
                  <property name="toolTip">
-                  <string>Add here files containing decoy molecules for the chosen active ligands. These molecules will be directly accepted as decoys and will be included in the final output file. This is suitable, for example, to complete a decoy set. Decoy molecules from this list will only be taken into account during the search for decoy vs decoy tanimoto thresholds.</string>
+                  <string>Add here files containing decoy molecules for the chosen active ligands. These molecules will be directly accepted as decoys and will be included in the final output file. This is suitable for example to complete a decoy set. Decoy molecules from this list will only be taken into account during the search for decoy vs decoy tanimoto thresholds.</string>
                  </property>
                  <property name="whatsThis">
                   <string>Add here files containing decoy molecules for the chosen active ligands. These molecules will be directly accepted as decoys and will be included in the final output file. This is suitable, for example, to complete a decoy set. Decoy molecules from this list will only be taken into account during the search for decoy vs decoy tanimoto thresholds.</string>
@@ -257,22 +253,6 @@
                  <property name="sizeHint" stdset="0">
                   <size>
                    <width>40</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                </spacer>
-               </item>
-               <item>
-                <spacer name="horizontalSpacer_14">
-                 <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
-                 </property>
-                 <property name="sizeType">
-                  <enum>QSizePolicy::Expanding</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>52</width>
                    <height>20</height>
                   </size>
                  </property>
@@ -360,7 +340,7 @@
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'DejaVu Sans'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Choose the ZINC subset (by property) to use as source. They are described &lt;a href=&quot;http://zinc.docking.org/subset1/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0057ae;&quot;&gt;here&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Choose the ZINC subset (by property) to use as source. They are described at &lt;a href=&quot;http://zinc.docking.org/subset1/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0057ae;&quot;&gt;http://zinc.docking.org/subset1/&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                 </property>
                 <property name="whatsThis">
                  <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
@@ -660,6 +640,12 @@ p, li { white-space: pre-wrap; }
           </property>
           <item row="0" column="0">
            <widget class="QLabel" name="tanimotoCutoffLabel">
+            <property name="toolTip">
+             <string>Here you can set the maximum Tanimoto value between a decoy molecule and its respective active ligand. The lower the value, the more chemically different will be the accepted decoys.</string>
+            </property>
+            <property name="whatsThis">
+             <string>Here you can set the maximum Tanimoto value between a decoy molecule and its respective active ligand. The lower the value, the more chemically different will be the accepted decoys.</string>
+            </property>
             <property name="text">
              <string>Active ligand vs Decoy Tanimoto threshold</string>
             </property>
@@ -680,6 +666,12 @@ p, li { white-space: pre-wrap; }
           </item>
           <item row="1" column="0">
            <widget class="QLabel" name="decoyDecoyTanimotoLabel">
+            <property name="toolTip">
+             <string>Here you can set the maximum Tanimoto value between decoys. This is useful to get a set of chemically different decoys. The lower the value, the more chemically different will be the accepted decoys. When set to 1.00, decoy vs decoy tanimoto calculation will be skipped.</string>
+            </property>
+            <property name="whatsThis">
+             <string>Here you can set the maximum Tanimoto value between decoys. This is useful to get a set of chemically different decoys. The lower the value, the more chemically different will be the accepted decoys. When set to 1.00, decoy vs decoy tanimoto calculation will be skipped.</string>
+            </property>
             <property name="text">
              <string>Decoy vs Decoy Tanimoto threshold</string>
             </property>
@@ -697,6 +689,12 @@ p, li { white-space: pre-wrap; }
           </item>
           <item row="3" column="0">
            <widget class="QLabel" name="hBALabel_2">
+            <property name="toolTip">
+             <string>Sets the maximum difference between the number of HBA of the active ligand and its respective decoys. When set to 0, decoys must have the exact same number of HBA in order to be accepted.</string>
+            </property>
+            <property name="whatsThis">
+             <string>Sets the maximum difference between the number of HBA of the active ligand and its respective decoys. When set to 0, decoys must have the exact same number of HBA in order to be accepted.</string>
+            </property>
             <property name="text">
              <string>Hydrogen Bond Acceptors ±</string>
             </property>
@@ -707,6 +705,12 @@ p, li { white-space: pre-wrap; }
           </item>
           <item row="4" column="0">
            <widget class="QLabel" name="hBDLabel">
+            <property name="toolTip">
+             <string>Sets the maximum difference between the number of HBD of the active ligand and its respective decoys. When set to 0, decoys must have the exact same number of HBD in order to be accepted.</string>
+            </property>
+            <property name="whatsThis">
+             <string>Sets the maximum difference between the number of HBD of the active ligand and its respective decoys. When set to 0, decoys must have the exact same number of HBD in order to be accepted.</string>
+            </property>
             <property name="text">
              <string>Hydrogen Bond Donors ±</string>
             </property>
@@ -717,6 +721,12 @@ p, li { white-space: pre-wrap; }
           </item>
           <item row="5" column="0">
            <widget class="QLabel" name="molecularWeightLabel">
+            <property name="toolTip">
+             <string>Sets the maximum difference in molecular weight between the active ligand and its respective decoys. When set to 0, decoys must have the exact same molecular weight in order to be accepted.</string>
+            </property>
+            <property name="whatsThis">
+             <string>Sets the maximum difference in molecular weight between the active ligand and its respective decoys. When set to 0, decoys must have the exact same molecular weight in order to be accepted.</string>
+            </property>
             <property name="text">
              <string>Molecular weight ±</string>
             </property>
@@ -734,6 +744,12 @@ p, li { white-space: pre-wrap; }
           </item>
           <item row="6" column="0">
            <widget class="QLabel" name="rtotationalBondsLabel">
+            <property name="toolTip">
+             <string>Sets the maximum difference between the number of rotational bonds of the active ligand and its respective decoys. When set to 0, decoys must have the exact same number of rotational bonds in order to be accepted.</string>
+            </property>
+            <property name="whatsThis">
+             <string>Sets the maximum difference between the number of rotational bonds of the active ligand and its respective decoys. When set to 0, decoys must have the exact same number of rotational bonds in order to be accepted.</string>
+            </property>
             <property name="text">
              <string>Rotational bonds ±</string>
             </property>
@@ -744,6 +760,12 @@ p, li { white-space: pre-wrap; }
           </item>
           <item row="7" column="0">
            <widget class="QLabel" name="clogPLabel">
+            <property name="toolTip">
+             <string>Sets the maximum difference between active ligand's logP value and the logP values of its respective decoys. When set to 0, decoys must have the exact same logP value in order to be accepted.</string>
+            </property>
+            <property name="whatsThis">
+             <string>Sets the maximum difference between active ligand's logP value and the logP values of its respective decoys. When set to 0, decoys must have the exact same logP value in order to be accepted.</string>
+            </property>
             <property name="text">
              <string>Octanol-water partition coefficient (logP) ±</string>
             </property>
@@ -758,6 +780,16 @@ p, li { white-space: pre-wrap; }
           </item>
           <item row="9" column="0">
            <widget class="QLabel" name="maximumDecoysPerActiveLigandLabel">
+            <property name="toolTip">
+             <string>After finding this many decoys for a given active ligand, decoy search for that ligand will stop. 
+
+If set to 0, there is no upper limit in the number of decoys per active ligand to find.</string>
+            </property>
+            <property name="whatsThis">
+             <string>After finding this many decoys for a given active ligand, decoy search for that ligand will stop. 
+
+If set to 0, there is no upper limit in the number of decoys per active ligand to find.</string>
+            </property>
             <property name="text">
              <string>Maximum decoys per active ligand</string>
             </property>
@@ -772,6 +804,16 @@ p, li { white-space: pre-wrap; }
           </item>
           <item row="10" column="0">
            <widget class="QLabel" name="decoyLimitLabel">
+            <property name="toolTip">
+             <string>Decoy search will not stop until this many decoys have been found for each ligand or the decoy sources have been completely parsed.
+
+If set to 0, the search will not stop until the above maximum number of decoys has been found for all active ligands (if the maximum is set to other than 0) or all decoy sources have been completely parsed.</string>
+            </property>
+            <property name="whatsThis">
+             <string>Decoy search will not stop until this many decoys have been found for each ligand or the decoy sources have been completely parsed.
+
+If set to 0, the search will not stop until the above maximum number of decoys has been found for all active ligands (if the maximum is set to other than 0) or all decoy sources have been completely parsed.</string>
+            </property>
             <property name="text">
              <string>Minimum decoys per active ligand:</string>
             </property>
@@ -813,12 +855,50 @@ p, li { white-space: pre-wrap; }
             </property>
            </spacer>
           </item>
+          <item row="2" column="1">
+           <spacer name="verticalSpacer_4">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>40</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item row="8" column="1">
+           <spacer name="verticalSpacer_5">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>40</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
          </layout>
         </item>
         <item>
          <layout class="QFormLayout" name="formLayout_6">
           <item row="0" column="0">
            <widget class="QPushButton" name="cacheButton">
+            <property name="toolTip">
+             <string>This is the directory where temporary ZINC files will be downloaded.
+They will be kept here if the 'Use cache' option is enabled, otherwise they will be removed after they have been parsed.
+
+If the 'Use cache' option is enabled, it is recommended to place the cache directory in a filesystem with 20+ Gb of free space.</string>
+            </property>
+            <property name="whatsThis">
+             <string>This is the directory where temporary ZINC files will be downloaded.
+They will be kept here if the 'Use cache' option is enabled, otherwise they will be removed after they have been parsed.
+
+If the 'Use cache' option is enabled, it is recommended to place the cache directory in a filesystem with 20+ Gb of free space.</string>
+            </property>
             <property name="text">
              <string>Caché directory</string>
             </property>
@@ -853,6 +933,12 @@ p, li { white-space: pre-wrap; }
           </item>
           <item>
            <widget class="QPushButton" name="defaultsButton">
+            <property name="toolTip">
+             <string>Load default values for all options</string>
+            </property>
+            <property name="whatsThis">
+             <string>Load default values for all options</string>
+            </property>
             <property name="text">
              <string>Load Defaults</string>
             </property>

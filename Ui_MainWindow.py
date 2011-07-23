@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file '/home/ssorgatem/uni/PEI/decoys/MainWindow.ui'
 #
-# Created: Sat Jul 23 15:28:19 2011
+# Created: Sat Jul 23 19:18:46 2011
 #      by: pyside-uic 0.2.11 running on PySide 1.0.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -13,6 +13,9 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(700, 535)
+        MainWindow.setToolButtonStyle(QtCore.Qt.ToolButtonTextUnderIcon)
+        MainWindow.setDocumentMode(False)
+        MainWindow.setUnifiedTitleAndToolBarOnMac(True)
         self.centralwidget = QtGui.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.verticalLayout_4 = QtGui.QVBoxLayout(self.centralwidget)
@@ -50,10 +53,8 @@ class Ui_MainWindow(object):
         self.addQueryButton = QtGui.QPushButton(self.tabWidgetPage1)
         self.addQueryButton.setObjectName("addQueryButton")
         self.horizontalLayout_6.addWidget(self.addQueryButton)
-        spacerItem2 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
+        spacerItem2 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Minimum)
         self.horizontalLayout_6.addItem(spacerItem2)
-        spacerItem3 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Minimum)
-        self.horizontalLayout_6.addItem(spacerItem3)
         self.clearActives = QtGui.QPushButton(self.tabWidgetPage1)
         self.clearActives.setObjectName("clearActives")
         self.horizontalLayout_6.addWidget(self.clearActives)
@@ -70,29 +71,27 @@ class Ui_MainWindow(object):
         self.verticalLayout_6.setObjectName("verticalLayout_6")
         self.horizontalLayout_2 = QtGui.QHBoxLayout()
         self.horizontalLayout_2.setObjectName("horizontalLayout_2")
-        spacerItem4 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
-        self.horizontalLayout_2.addItem(spacerItem4)
+        spacerItem3 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
+        self.horizontalLayout_2.addItem(spacerItem3)
         self.label_3 = QtGui.QLabel(self.kdecoysFrame)
         self.label_3.setObjectName("label_3")
         self.horizontalLayout_2.addWidget(self.label_3)
-        spacerItem5 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
-        self.horizontalLayout_2.addItem(spacerItem5)
+        spacerItem4 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
+        self.horizontalLayout_2.addItem(spacerItem4)
         self.verticalLayout_6.addLayout(self.horizontalLayout_2)
         self.verticalLayout_7 = QtGui.QVBoxLayout()
         self.verticalLayout_7.setContentsMargins(-1, 14, -1, 14)
         self.verticalLayout_7.setObjectName("verticalLayout_7")
-        spacerItem6 = QtGui.QSpacerItem(0, 0, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Preferred)
-        self.verticalLayout_7.addItem(spacerItem6)
+        spacerItem5 = QtGui.QSpacerItem(0, 0, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Preferred)
+        self.verticalLayout_7.addItem(spacerItem5)
         self.verticalLayout_6.addLayout(self.verticalLayout_7)
         self.horizontalLayout_9 = QtGui.QHBoxLayout()
         self.horizontalLayout_9.setObjectName("horizontalLayout_9")
         self.addDecoysButton = QtGui.QPushButton(self.kdecoysFrame)
         self.addDecoysButton.setObjectName("addDecoysButton")
         self.horizontalLayout_9.addWidget(self.addDecoysButton)
-        spacerItem7 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Minimum)
-        self.horizontalLayout_9.addItem(spacerItem7)
-        spacerItem8 = QtGui.QSpacerItem(52, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
-        self.horizontalLayout_9.addItem(spacerItem8)
+        spacerItem6 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Minimum)
+        self.horizontalLayout_9.addItem(spacerItem6)
         self.clearDecoys = QtGui.QPushButton(self.kdecoysFrame)
         self.clearDecoys.setObjectName("clearDecoys")
         self.horizontalLayout_9.addWidget(self.clearDecoys)
@@ -110,13 +109,13 @@ class Ui_MainWindow(object):
         self.verticalLayout_2.setObjectName("verticalLayout_2")
         self.horizontalLayout_5 = QtGui.QHBoxLayout()
         self.horizontalLayout_5.setObjectName("horizontalLayout_5")
-        spacerItem9 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
-        self.horizontalLayout_5.addItem(spacerItem9)
+        spacerItem7 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
+        self.horizontalLayout_5.addItem(spacerItem7)
         self.label_2 = QtGui.QLabel(self.tabWidgetPage1)
         self.label_2.setObjectName("label_2")
         self.horizontalLayout_5.addWidget(self.label_2)
-        spacerItem10 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
-        self.horizontalLayout_5.addItem(spacerItem10)
+        spacerItem8 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
+        self.horizontalLayout_5.addItem(spacerItem8)
         self.verticalLayout_2.addLayout(self.horizontalLayout_5)
         self.horizontalLayout_3 = QtGui.QHBoxLayout()
         self.horizontalLayout_3.setObjectName("horizontalLayout_3")
@@ -128,8 +127,8 @@ class Ui_MainWindow(object):
         self.zsubComboBox.setEnabled(False)
         self.zsubComboBox.setObjectName("zsubComboBox")
         self.horizontalLayout_3.addWidget(self.zsubComboBox)
-        spacerItem11 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
-        self.horizontalLayout_3.addItem(spacerItem11)
+        spacerItem9 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
+        self.horizontalLayout_3.addItem(spacerItem9)
         self.cacheCheckBox = QtGui.QCheckBox(self.tabWidgetPage1)
         self.cacheCheckBox.setEnabled(False)
         self.cacheCheckBox.setChecked(True)
@@ -149,8 +148,8 @@ class Ui_MainWindow(object):
         self.addDButton = QtGui.QPushButton(self.tabWidgetPage1)
         self.addDButton.setObjectName("addDButton")
         self.horizontalLayout_8.addWidget(self.addDButton)
-        spacerItem12 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
-        self.horizontalLayout_8.addItem(spacerItem12)
+        spacerItem10 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
+        self.horizontalLayout_8.addItem(spacerItem10)
         self.clearDB = QtGui.QPushButton(self.tabWidgetPage1)
         self.clearDB.setObjectName("clearDB")
         self.horizontalLayout_8.addWidget(self.clearDB)
@@ -281,10 +280,14 @@ class Ui_MainWindow(object):
         self.decoyMinSpinBox.setMaximum(99999)
         self.decoyMinSpinBox.setObjectName("decoyMinSpinBox")
         self._3.setWidget(10, QtGui.QFormLayout.FieldRole, self.decoyMinSpinBox)
+        spacerItem11 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
+        self._3.setItem(2, QtGui.QFormLayout.LabelRole, spacerItem11)
+        spacerItem12 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
+        self._3.setItem(8, QtGui.QFormLayout.LabelRole, spacerItem12)
         spacerItem13 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
-        self._3.setItem(2, QtGui.QFormLayout.LabelRole, spacerItem13)
+        self._3.setItem(2, QtGui.QFormLayout.FieldRole, spacerItem13)
         spacerItem14 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
-        self._3.setItem(8, QtGui.QFormLayout.LabelRole, spacerItem14)
+        self._3.setItem(8, QtGui.QFormLayout.FieldRole, spacerItem14)
         self.verticalLayout_3.addLayout(self._3)
         self.formLayout_6 = QtGui.QFormLayout()
         self.formLayout_6.setObjectName("formLayout_6")
@@ -373,7 +376,7 @@ class Ui_MainWindow(object):
         self.addQueryButton.setText(QtGui.QApplication.translate("MainWindow", "Add", None, QtGui.QApplication.UnicodeUTF8))
         self.clearActives.setToolTip(QtGui.QApplication.translate("MainWindow", "Remove all items from this list", None, QtGui.QApplication.UnicodeUTF8))
         self.clearActives.setText(QtGui.QApplication.translate("MainWindow", "Clear", None, QtGui.QApplication.UnicodeUTF8))
-        self.label_3.setToolTip(QtGui.QApplication.translate("MainWindow", "Add here files containing decoy molecules for the chosen active ligands. These molecules will be directly accepted as decoys and will be included in the final output file. This is suitable, for example, to complete a decoy set. Decoy molecules from this list will only be taken into account during the search for decoy vs decoy tanimoto thresholds.", None, QtGui.QApplication.UnicodeUTF8))
+        self.label_3.setToolTip(QtGui.QApplication.translate("MainWindow", "Add here files containing decoy molecules for the chosen active ligands. These molecules will be directly accepted as decoys and will be included in the final output file. This is suitable for example to complete a decoy set. Decoy molecules from this list will only be taken into account during the search for decoy vs decoy tanimoto thresholds.", None, QtGui.QApplication.UnicodeUTF8))
         self.label_3.setWhatsThis(QtGui.QApplication.translate("MainWindow", "Add here files containing decoy molecules for the chosen active ligands. These molecules will be directly accepted as decoys and will be included in the final output file. This is suitable, for example, to complete a decoy set. Decoy molecules from this list will only be taken into account during the search for decoy vs decoy tanimoto thresholds.", None, QtGui.QApplication.UnicodeUTF8))
         self.label_3.setText(QtGui.QApplication.translate("MainWindow", "Existing Decoy files", None, QtGui.QApplication.UnicodeUTF8))
         self.addDecoysButton.setToolTip(QtGui.QApplication.translate("MainWindow", "Choose one or more files to add to the list", None, QtGui.QApplication.UnicodeUTF8))
@@ -387,7 +390,7 @@ class Ui_MainWindow(object):
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:\'DejaVu Sans\'; font-size:10pt; font-weight:400; font-style:normal;\">\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Choose the ZINC subset (by property) to use as source. They are described <a href=\"http://zinc.docking.org/subset1/\"><span style=\" text-decoration: underline; color:#0057ae;\">here</span></a></p></body></html>", None, QtGui.QApplication.UnicodeUTF8))
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Choose the ZINC subset (by property) to use as source. They are described at <a href=\"http://zinc.docking.org/subset1/\"><span style=\" text-decoration: underline; color:#0057ae;\">http://zinc.docking.org/subset1/</span></a></p></body></html>", None, QtGui.QApplication.UnicodeUTF8))
         self.zinclabel.setWhatsThis(QtGui.QApplication.translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
@@ -446,18 +449,54 @@ class Ui_MainWindow(object):
         self.resultsTable.horizontalHeaderItem(6).setText(QtGui.QApplication.translate("MainWindow", "Rot. bonds", None, QtGui.QApplication.UnicodeUTF8))
         self.informationSavedToLabel.setText(QtGui.QApplication.translate("MainWindow", "This information can be found at", None, QtGui.QApplication.UnicodeUTF8))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), QtGui.QApplication.translate("MainWindow", "Run Statistics", None, QtGui.QApplication.UnicodeUTF8))
+        self.tanimotoCutoffLabel.setToolTip(QtGui.QApplication.translate("MainWindow", "Here you can set the maximum Tanimoto value between a decoy molecule and its respective active ligand. The lower the value, the more chemically different will be the accepted decoys.", None, QtGui.QApplication.UnicodeUTF8))
+        self.tanimotoCutoffLabel.setWhatsThis(QtGui.QApplication.translate("MainWindow", "Here you can set the maximum Tanimoto value between a decoy molecule and its respective active ligand. The lower the value, the more chemically different will be the accepted decoys.", None, QtGui.QApplication.UnicodeUTF8))
         self.tanimotoCutoffLabel.setText(QtGui.QApplication.translate("MainWindow", "Active ligand vs Decoy Tanimoto threshold", None, QtGui.QApplication.UnicodeUTF8))
+        self.decoyDecoyTanimotoLabel.setToolTip(QtGui.QApplication.translate("MainWindow", "Here you can set the maximum Tanimoto value between decoys. This is useful to get a set of chemically different decoys. The lower the value, the more chemically different will be the accepted decoys. When set to 1.00, decoy vs decoy tanimoto calculation will be skipped.", None, QtGui.QApplication.UnicodeUTF8))
+        self.decoyDecoyTanimotoLabel.setWhatsThis(QtGui.QApplication.translate("MainWindow", "Here you can set the maximum Tanimoto value between decoys. This is useful to get a set of chemically different decoys. The lower the value, the more chemically different will be the accepted decoys. When set to 1.00, decoy vs decoy tanimoto calculation will be skipped.", None, QtGui.QApplication.UnicodeUTF8))
         self.decoyDecoyTanimotoLabel.setText(QtGui.QApplication.translate("MainWindow", "Decoy vs Decoy Tanimoto threshold", None, QtGui.QApplication.UnicodeUTF8))
+        self.hBALabel_2.setToolTip(QtGui.QApplication.translate("MainWindow", "Sets the maximum difference between the number of HBA of the active ligand and its respective decoys. When set to 0, decoys must have the exact same number of HBA in order to be accepted.", None, QtGui.QApplication.UnicodeUTF8))
+        self.hBALabel_2.setWhatsThis(QtGui.QApplication.translate("MainWindow", "Sets the maximum difference between the number of HBA of the active ligand and its respective decoys. When set to 0, decoys must have the exact same number of HBA in order to be accepted.", None, QtGui.QApplication.UnicodeUTF8))
         self.hBALabel_2.setText(QtGui.QApplication.translate("MainWindow", "Hydrogen Bond Acceptors ±", None, QtGui.QApplication.UnicodeUTF8))
+        self.hBDLabel.setToolTip(QtGui.QApplication.translate("MainWindow", "Sets the maximum difference between the number of HBD of the active ligand and its respective decoys. When set to 0, decoys must have the exact same number of HBD in order to be accepted.", None, QtGui.QApplication.UnicodeUTF8))
+        self.hBDLabel.setWhatsThis(QtGui.QApplication.translate("MainWindow", "Sets the maximum difference between the number of HBD of the active ligand and its respective decoys. When set to 0, decoys must have the exact same number of HBD in order to be accepted.", None, QtGui.QApplication.UnicodeUTF8))
         self.hBDLabel.setText(QtGui.QApplication.translate("MainWindow", "Hydrogen Bond Donors ±", None, QtGui.QApplication.UnicodeUTF8))
+        self.molecularWeightLabel.setToolTip(QtGui.QApplication.translate("MainWindow", "Sets the maximum difference in molecular weight between the active ligand and its respective decoys. When set to 0, decoys must have the exact same molecular weight in order to be accepted.", None, QtGui.QApplication.UnicodeUTF8))
+        self.molecularWeightLabel.setWhatsThis(QtGui.QApplication.translate("MainWindow", "Sets the maximum difference in molecular weight between the active ligand and its respective decoys. When set to 0, decoys must have the exact same molecular weight in order to be accepted.", None, QtGui.QApplication.UnicodeUTF8))
         self.molecularWeightLabel.setText(QtGui.QApplication.translate("MainWindow", "Molecular weight ±", None, QtGui.QApplication.UnicodeUTF8))
         self.molwtBox.setSuffix(QtGui.QApplication.translate("MainWindow", " Da", None, QtGui.QApplication.UnicodeUTF8))
+        self.rtotationalBondsLabel.setToolTip(QtGui.QApplication.translate("MainWindow", "Sets the maximum difference between the number of rotational bonds of the active ligand and its respective decoys. When set to 0, decoys must have the exact same number of rotational bonds in order to be accepted.", None, QtGui.QApplication.UnicodeUTF8))
+        self.rtotationalBondsLabel.setWhatsThis(QtGui.QApplication.translate("MainWindow", "Sets the maximum difference between the number of rotational bonds of the active ligand and its respective decoys. When set to 0, decoys must have the exact same number of rotational bonds in order to be accepted.", None, QtGui.QApplication.UnicodeUTF8))
         self.rtotationalBondsLabel.setText(QtGui.QApplication.translate("MainWindow", "Rotational bonds ±", None, QtGui.QApplication.UnicodeUTF8))
+        self.clogPLabel.setToolTip(QtGui.QApplication.translate("MainWindow", "Sets the maximum difference between active ligand\'s logP value and the logP values of its respective decoys. When set to 0, decoys must have the exact same logP value in order to be accepted.", None, QtGui.QApplication.UnicodeUTF8))
+        self.clogPLabel.setWhatsThis(QtGui.QApplication.translate("MainWindow", "Sets the maximum difference between active ligand\'s logP value and the logP values of its respective decoys. When set to 0, decoys must have the exact same logP value in order to be accepted.", None, QtGui.QApplication.UnicodeUTF8))
         self.clogPLabel.setText(QtGui.QApplication.translate("MainWindow", "Octanol-water partition coefficient (logP) ±", None, QtGui.QApplication.UnicodeUTF8))
+        self.maximumDecoysPerActiveLigandLabel.setToolTip(QtGui.QApplication.translate("MainWindow", "After finding this many decoys for a given active ligand, decoy search for that ligand will stop. \n"
+"\n"
+"If set to 0, there is no upper limit in the number of decoys per active ligand to find.", None, QtGui.QApplication.UnicodeUTF8))
+        self.maximumDecoysPerActiveLigandLabel.setWhatsThis(QtGui.QApplication.translate("MainWindow", "After finding this many decoys for a given active ligand, decoy search for that ligand will stop. \n"
+"\n"
+"If set to 0, there is no upper limit in the number of decoys per active ligand to find.", None, QtGui.QApplication.UnicodeUTF8))
         self.maximumDecoysPerActiveLigandLabel.setText(QtGui.QApplication.translate("MainWindow", "Maximum decoys per active ligand", None, QtGui.QApplication.UnicodeUTF8))
+        self.decoyLimitLabel.setToolTip(QtGui.QApplication.translate("MainWindow", "Decoy search will not stop until this many decoys have been found for each ligand or the decoy sources have been completely parsed.\n"
+"\n"
+"If set to 0, the search will not stop until the above maximum number of decoys has been found for all active ligands (if the maximum is set to other than 0) or all decoy sources have been completely parsed.", None, QtGui.QApplication.UnicodeUTF8))
+        self.decoyLimitLabel.setWhatsThis(QtGui.QApplication.translate("MainWindow", "Decoy search will not stop until this many decoys have been found for each ligand or the decoy sources have been completely parsed.\n"
+"\n"
+"If set to 0, the search will not stop until the above maximum number of decoys has been found for all active ligands (if the maximum is set to other than 0) or all decoy sources have been completely parsed.", None, QtGui.QApplication.UnicodeUTF8))
         self.decoyLimitLabel.setText(QtGui.QApplication.translate("MainWindow", "Minimum decoys per active ligand:", None, QtGui.QApplication.UnicodeUTF8))
         self.decoyMinSpinBox.setToolTip(QtGui.QApplication.translate("MainWindow", "Limit how many decoys to find for each ligand. If the limit is 0, there is no limit.", None, QtGui.QApplication.UnicodeUTF8))
+        self.cacheButton.setToolTip(QtGui.QApplication.translate("MainWindow", "This is the directory where temporary ZINC files will be downloaded.\n"
+"They will be kept here if the \'Use cache\' option is enabled, otherwise they will be removed after they have been parsed.\n"
+"\n"
+"If the \'Use cache\' option is enabled, it is recommended to place the cache directory in a filesystem with 20+ Gb of free space.", None, QtGui.QApplication.UnicodeUTF8))
+        self.cacheButton.setWhatsThis(QtGui.QApplication.translate("MainWindow", "This is the directory where temporary ZINC files will be downloaded.\n"
+"They will be kept here if the \'Use cache\' option is enabled, otherwise they will be removed after they have been parsed.\n"
+"\n"
+"If the \'Use cache\' option is enabled, it is recommended to place the cache directory in a filesystem with 20+ Gb of free space.", None, QtGui.QApplication.UnicodeUTF8))
         self.cacheButton.setText(QtGui.QApplication.translate("MainWindow", "Caché directory", None, QtGui.QApplication.UnicodeUTF8))
+        self.defaultsButton.setToolTip(QtGui.QApplication.translate("MainWindow", "Load default values for all options", None, QtGui.QApplication.UnicodeUTF8))
+        self.defaultsButton.setWhatsThis(QtGui.QApplication.translate("MainWindow", "Load default values for all options", None, QtGui.QApplication.UnicodeUTF8))
         self.defaultsButton.setText(QtGui.QApplication.translate("MainWindow", "Load Defaults", None, QtGui.QApplication.UnicodeUTF8))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tabWidgetPage2), QtGui.QApplication.translate("MainWindow", "Options", None, QtGui.QApplication.UnicodeUTF8))
         self.clearButton.setToolTip(QtGui.QApplication.translate("MainWindow", "Clears all items from all lists and tables", None, QtGui.QApplication.UnicodeUTF8))
