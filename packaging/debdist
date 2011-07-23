@@ -1,0 +1,7 @@
+#!/bin/sh
+VERSION=1.0
+./distgeneric.sh
+rm deb/opt/*
+cp -r generic deb/opt/DecoyFinder
+
+dpkg --build deb decoyfinder-${VERSION}_all.deb

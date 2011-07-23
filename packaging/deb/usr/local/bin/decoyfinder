@@ -1,0 +1,6 @@
+#!/bin/sh
+# installation directory
+DECOYFINDERDIR=/opt/DecoyFinder
+cd $DECOYFINDERDIR
+python decoy_finder.py
+cd

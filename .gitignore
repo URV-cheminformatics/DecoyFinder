@@ -5,3 +5,6 @@
 *eric*
 *.e4p
 .directory
+*.deb
+*.gz
+*.bz2
