@@ -1,7 +1,17 @@
 #!/bin/sh
 VERSION=1.0
 ./distgeneric.sh
-rm deb/opt/*
+
+rm -r deb/opt/*
 cp -r generic deb/opt/DecoyFinder-pyqt
 
+sudo chown -R root:root deb/*
+sudo chmod -R o+rx-w deb/*
+
 dpkg --build deb decoyfinder-pyqt-${VERSION}_all.deb
+
+sudo chmod 777 *.deb
+
+sudo chmod -R a+rw deb/* 
+
+rm -r deb/opt/*
