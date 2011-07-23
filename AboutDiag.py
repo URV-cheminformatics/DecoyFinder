@@ -9,9 +9,6 @@ from PySide.QtGui import QDialog
 from PySide.QtCore import Slot
 from Ui_AboutDiag import Ui_Dialog
 
-#from PyQt4.QtGui import QDialog
-#from PyQt4.QtCore import pyqtSignature
-
 class AboutDialog(QDialog, Ui_Dialog):
     """
     Class documentation goes here.
