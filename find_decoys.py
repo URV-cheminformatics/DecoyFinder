@@ -231,23 +231,29 @@ def isdecoy(
         return True
     return False
 
+
+def checkoutputfile(outputfile):
+    """
+    """
+    fileexists = 0
+    if os.path.splitext(outputfile)[1].lower()[1:] not in pybel.outformats:
+        outputfile += "_decoys.sdf"
+    while os.path.isfile(outputfile):
+        fileexists += 1
+        filename,  extension = os.path.splitext(outputfile)
+        if filename.endswith("_%s" % (fileexists -1)):
+            filename = '_'.join(filename.split('_')[:-1]) +"_%s" % fileexists
+        else:
+            filename += "_%s" % fileexists
+        outputfile = filename + extension
+    return outputfile
+
 def save_decoys(decoy_set, outputfile):
     """
     """
     print('saving %s decoys...' % len(decoy_set))
     if len(decoy_set):
-        fileexists = 0
-        if os.path.splitext(outputfile)[1].lower()[1:] not in pybel.outformats:
-            outputfile += "_decoys.sdf"
-        while os.path.isfile(outputfile):
-            fileexists += 1
-            filename,  extension = os.path.splitext(outputfile)
-            if filename.endswith("_%s" % (fileexists -1)):
-                filename = '_'.join(filename.split('_')[:-1]) +"_%s" % fileexists
-            else:
-                filename += "_%s" % fileexists
-            outputfile = filename + extension
-
+        outputfile = checkoutputfile(outputfile)
         format = str(os.path.splitext(outputfile)[1][1:].lower())
         decoyfile = pybel.Outputfile(format, str(outputfile))
         for decoy in decoy_set:
@@ -276,6 +282,7 @@ def find_decoys(
                 ):
     """
     """
+    outputfile = checkoutputfile(outputfile)
     tanimoto_t = Decimal(str(tanimoto_t))
     tanimoto_d = Decimal(str(tanimoto_d))
     ClogP_t = Decimal(str(ClogP_t))

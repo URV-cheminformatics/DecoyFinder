@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file '/home/ssorgatem/uni/PEI/decoys/MainWindow.ui'
 #
-# Created: Thu Jul 21 16:02:41 2011
+# Created: Sat Jul 23 01:22:53 2011
 #      by: pyside-uic 0.2.11 running on PySide 1.0.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -180,7 +180,7 @@ class Ui_MainWindow(object):
         self.resultsTable.setAlternatingRowColors(True)
         self.resultsTable.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
         self.resultsTable.setObjectName("resultsTable")
-        self.resultsTable.setColumnCount(3)
+        self.resultsTable.setColumnCount(7)
         self.resultsTable.setRowCount(0)
         item = QtGui.QTableWidgetItem()
         self.resultsTable.setHorizontalHeaderItem(0, item)
@@ -188,6 +188,14 @@ class Ui_MainWindow(object):
         self.resultsTable.setHorizontalHeaderItem(1, item)
         item = QtGui.QTableWidgetItem()
         self.resultsTable.setHorizontalHeaderItem(2, item)
+        item = QtGui.QTableWidgetItem()
+        self.resultsTable.setHorizontalHeaderItem(3, item)
+        item = QtGui.QTableWidgetItem()
+        self.resultsTable.setHorizontalHeaderItem(4, item)
+        item = QtGui.QTableWidgetItem()
+        self.resultsTable.setHorizontalHeaderItem(5, item)
+        item = QtGui.QTableWidgetItem()
+        self.resultsTable.setHorizontalHeaderItem(6, item)
         self.resultsTable.verticalHeader().setSortIndicatorShown(True)
         self.resultsTable.verticalHeader().setStretchLastSection(True)
         self.gridLayout.addWidget(self.resultsTable, 1, 0, 1, 1)
@@ -348,6 +356,7 @@ class Ui_MainWindow(object):
         QtCore.QObject.connect(self.clearButton, QtCore.SIGNAL("clicked()"), self.queryList.clear)
         QtCore.QObject.connect(self.clearActives, QtCore.SIGNAL("clicked()"), self.queryList.clear)
         QtCore.QObject.connect(self.kdecoysCheckBox, QtCore.SIGNAL("toggled(bool)"), self.kdecoysFrame.setVisible)
+        QtCore.QObject.connect(self.clearButton, QtCore.SIGNAL("clicked()"), self.informationSavedToLineEdit.clear)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
@@ -374,7 +383,11 @@ class Ui_MainWindow(object):
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tabWidgetPage1), QtGui.QApplication.translate("MainWindow", "Query", None, QtGui.QApplication.UnicodeUTF8))
         self.resultsTable.horizontalHeaderItem(0).setText(QtGui.QApplication.translate("MainWindow", "Active", None, QtGui.QApplication.UnicodeUTF8))
         self.resultsTable.horizontalHeaderItem(1).setText(QtGui.QApplication.translate("MainWindow", "Decoys found", None, QtGui.QApplication.UnicodeUTF8))
-        self.resultsTable.horizontalHeaderItem(2).setText(QtGui.QApplication.translate("MainWindow", "Saved to", None, QtGui.QApplication.UnicodeUTF8))
+        self.resultsTable.horizontalHeaderItem(2).setText(QtGui.QApplication.translate("MainWindow", "HBA", None, QtGui.QApplication.UnicodeUTF8))
+        self.resultsTable.horizontalHeaderItem(3).setText(QtGui.QApplication.translate("MainWindow", "HBD", None, QtGui.QApplication.UnicodeUTF8))
+        self.resultsTable.horizontalHeaderItem(4).setText(QtGui.QApplication.translate("MainWindow", "logP", None, QtGui.QApplication.UnicodeUTF8))
+        self.resultsTable.horizontalHeaderItem(5).setText(QtGui.QApplication.translate("MainWindow", "M. weight", None, QtGui.QApplication.UnicodeUTF8))
+        self.resultsTable.horizontalHeaderItem(6).setText(QtGui.QApplication.translate("MainWindow", "Rot. bonds", None, QtGui.QApplication.UnicodeUTF8))
         self.informationSavedToLabel.setText(QtGui.QApplication.translate("MainWindow", "This information can be found at", None, QtGui.QApplication.UnicodeUTF8))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), QtGui.QApplication.translate("MainWindow", "Run Statistics", None, QtGui.QApplication.UnicodeUTF8))
         self.tanimotoCutoffLabel.setText(QtGui.QApplication.translate("MainWindow", "Active ligand vs Decoy Tanimoto threshold", None, QtGui.QApplication.UnicodeUTF8))

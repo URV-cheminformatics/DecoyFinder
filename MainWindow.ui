@@ -488,7 +488,39 @@
           </column>
           <column>
            <property name="text">
-            <string>Saved to</string>
+            <string>HBA</string>
+           </property>
+           <property name="textAlignment">
+            <set>AlignHCenter|AlignVCenter|AlignCenter</set>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>HBD</string>
+           </property>
+           <property name="textAlignment">
+            <set>AlignHCenter|AlignVCenter|AlignCenter</set>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>logP</string>
+           </property>
+           <property name="textAlignment">
+            <set>AlignHCenter|AlignVCenter|AlignCenter</set>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>M. weight</string>
+           </property>
+           <property name="textAlignment">
+            <set>AlignHCenter|AlignVCenter|AlignCenter</set>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Rot. bonds</string>
            </property>
            <property name="textAlignment">
             <set>AlignHCenter|AlignVCenter|AlignCenter</set>
@@ -962,6 +994,22 @@
     <hint type="destinationlabel">
      <x>295</x>
      <y>144</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>clearButton</sender>
+   <signal>clicked()</signal>
+   <receiver>informationSavedToLineEdit</receiver>
+   <slot>clear()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>44</x>
+     <y>465</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>458</x>
+     <y>71</y>
     </hint>
    </hints>
   </connection>
