@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE Project SYSTEM "Project-4.6.dtd">
 <!-- eric4 project file for project df -->
-<!-- Saved: 2011-07-22, 18:29:00 -->
+<!-- Saved: 2011-07-23, 19:52:54 -->
 <!-- Copyright (C) 2011 Adrià Cereto-Massagué, adrian.cereto@gmail.com -->
 <Project version="4.6">
   <Language>ca</Language>
@@ -20,9 +20,12 @@
     <Source>decoy_finder.py</Source>
     <Source>resources_rc.py</Source>
     <Source>icons_rc.py</Source>
+    <Source>Ui_AboutDiag.py</Source>
+    <Source>AboutDiag.py</Source>
   </Sources>
   <Forms>
     <Form>MainWindow.ui</Form>
+    <Form>AboutDiag.ui</Form>
   </Forms>
   <Translations>
     <Translation>locales/df_ca.ts</Translation>

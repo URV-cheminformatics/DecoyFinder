@@ -30,6 +30,7 @@ from PySide.QtCore import QSettings, QThread, Signal, Qt, Slot
 
 from find_decoys import *
 from Ui_MainWindow import Ui_MainWindow
+from AboutDiag import AboutDialog
 
 class DecoyFinderThread(QThread):
     """
@@ -573,9 +574,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         """
         Slot documentation goes here.
         """
-        QMessageBox.about(None,
-            self.trUtf8("About %s") % self.App.applicationName(),
-            self.trUtf8("%s version %s") % (self.App.applicationName(),  self.App.applicationVersion()))
+        aboutdiag = AboutDialog()
+        aboutdiag.nameLabel.setText(self.App.applicationName())
+        aboutdiag.versionlabel.setText(self.App.applicationVersion())
+        aboutdiag.exec_()
 
     @Slot("")
     def on_actionHelp_activated(self):
