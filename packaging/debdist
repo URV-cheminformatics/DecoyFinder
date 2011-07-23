@@ -2,6 +2,6 @@
 VERSION=1.0
 ./distgeneric.sh
 rm deb/opt/*
-cp -r generic deb/opt/DecoyFinder
+cp -r generic deb/opt/DecoyFinder-pyqt
 
-dpkg --build deb decoyfinder-${VERSION}_all.deb
+dpkg --build deb decoyfinder-pyqt-${VERSION}_all.deb
