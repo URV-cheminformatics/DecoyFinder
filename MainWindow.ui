@@ -21,16 +21,19 @@
        <bool>true</bool>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="tabWidgetPage1">
        <attribute name="title">
-        <string>Query</string>
+        <string>Find</string>
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_5">
         <item>
          <widget class="QCheckBox" name="kdecoysCheckBox">
           <property name="toolTip">
+           <string>Add new decoys to an existing decoy set</string>
+          </property>
+          <property name="whatsThis">
            <string>Add new decoys to an existing decoy set</string>
           </property>
           <property name="text">
@@ -59,6 +62,12 @@
               </item>
               <item>
                <widget class="QLabel" name="label">
+                <property name="toolTip">
+                 <string>Add here at least one file containing the active ligands you would like to find decoys for</string>
+                </property>
+                <property name="whatsThis">
+                 <string>Add here at least one file containing the active ligands you would like to find decoys for</string>
+                </property>
                 <property name="text">
                  <string>Known Active Ligands</string>
                 </property>
@@ -93,6 +102,9 @@
              <layout class="QHBoxLayout" name="horizontalLayout_6">
               <item>
                <widget class="QPushButton" name="addQueryButton">
+                <property name="toolTip">
+                 <string>Choose one or more files to add to the list</string>
+                </property>
                 <property name="text">
                  <string>Add</string>
                 </property>
@@ -129,6 +141,9 @@
               </item>
               <item>
                <widget class="QPushButton" name="clearActives">
+                <property name="toolTip">
+                 <string>Remove all items from this list</string>
+                </property>
                 <property name="text">
                  <string>Clear</string>
                 </property>
@@ -167,6 +182,12 @@
                </item>
                <item>
                 <widget class="QLabel" name="label_3">
+                 <property name="toolTip">
+                  <string>Add here files containing decoy molecules for the chosen active ligands. These molecules will be directly accepted as decoys and will be included in the final output file. This is suitable, for example, to complete a decoy set. Decoy molecules from this list will only be taken into account during the search for decoy vs decoy tanimoto thresholds.</string>
+                 </property>
+                 <property name="whatsThis">
+                  <string>Add here files containing decoy molecules for the chosen active ligands. These molecules will be directly accepted as decoys and will be included in the final output file. This is suitable, for example, to complete a decoy set. Decoy molecules from this list will only be taken into account during the search for decoy vs decoy tanimoto thresholds.</string>
+                 </property>
                  <property name="text">
                   <string>Existing Decoy files</string>
                  </property>
@@ -217,6 +238,9 @@
               <layout class="QHBoxLayout" name="horizontalLayout_9">
                <item>
                 <widget class="QPushButton" name="addDecoysButton">
+                 <property name="toolTip">
+                  <string>Choose one or more files to add to the list</string>
+                 </property>
                  <property name="text">
                   <string>Add</string>
                  </property>
@@ -256,6 +280,9 @@
                </item>
                <item>
                 <widget class="QPushButton" name="clearDecoys">
+                 <property name="toolTip">
+                  <string>Remove all items from this list</string>
+                 </property>
                  <property name="text">
                   <string>Clear</string>
                  </property>
@@ -295,6 +322,12 @@
               </item>
               <item>
                <widget class="QLabel" name="label_2">
+                <property name="toolTip">
+                 <string>Where you can choose where to look for new decoys</string>
+                </property>
+                <property name="whatsThis">
+                 <string>Where you can choose where to look for new decoys</string>
+                </property>
                 <property name="text">
                  <string>Sources of new Decoys</string>
                 </property>
@@ -321,6 +354,20 @@
                <widget class="QLabel" name="zinclabel">
                 <property name="enabled">
                  <bool>false</bool>
+                </property>
+                <property name="toolTip">
+                 <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'DejaVu Sans'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Choose the ZINC subset (by property) to use as source. They are described &lt;a href=&quot;http://zinc.docking.org/subset1/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0057ae;&quot;&gt;here&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                </property>
+                <property name="whatsThis">
+                 <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'DejaVu Sans'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Choose the ZINC subset (by property) to use as source. They are described &lt;a href=&quot;http://zinc.docking.org/subset1/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0057ae;&quot;&gt;here&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                 </property>
                 <property name="text">
                  <string>ZINC subset:</string>
@@ -352,6 +399,20 @@
                 <property name="enabled">
                  <bool>false</bool>
                 </property>
+                <property name="toolTip">
+                 <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'DejaVu Sans'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;In order to be able to look for decoys through the ZINC database, DecoyFinder needs to download little chunks of it and then remove them. If this option is enabled, DecoyFinder will not remove them and so will not need to download already downloaded files again.&lt;br /&gt;Enable this if you have low bandwith and/or +20 GB of free disk space.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                </property>
+                <property name="whatsThis">
+                 <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'DejaVu Sans'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;In order to be able to look for decoys through the ZINC database, DecoyFinder needs to download little chunks of it and then remove them. If this option is enabled, DecoyFinder will not remove them and so will not need to download already downloaded files again.&lt;br /&gt;Enable this if you have low bandwith and/or +20 GB of free disk space.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                </property>
                 <property name="text">
                  <string>Use caché</string>
                 </property>
@@ -366,6 +427,30 @@
              <layout class="QHBoxLayout" name="horizontalLayout_8">
               <item>
                <widget class="QComboBox" name="dbComboBox">
+                <property name="toolTip">
+                 <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'DejaVu Sans'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Here you can select the kind of source you want to add:&lt;br /&gt;- Local files: files containing molecules located in the filesystem&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;- ZINC subset: use file from ZINC from either of these pH range subsets: &lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt; - usual: usual pH range (5.75-8.25)&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt; - metal: for metalloenzymes (usual + pH 7-9.5)&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt; - single: contains only a single form of each molecule&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt; - all: contains the whole pH range (4.5-9.5)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                </property>
+                <property name="whatsThis">
+                 <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'DejaVu Sans'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Here you can select the kind of source you want to add:&lt;br /&gt;- Local files: files containing molecules located in the filesystem&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;- ZINC subset: use file from ZINC from either of these pH range subsets: &lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt; - usual: usual pH range (5.75-8.25)&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt; - metal: for metalloenzymes (usual + pH 7-9.5)&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt; - single: contains only a single form of each molecule&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt; - all: contains the whole pH range (4.5-9.5)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                </property>
                 <item>
                  <property name="text">
                   <string>Select local files...</string>
@@ -415,6 +500,9 @@
               </item>
               <item>
                <widget class="QPushButton" name="clearDB">
+                <property name="toolTip">
+                 <string>Remove all items from this list</string>
+                </property>
                 <property name="text">
                  <string>Clear</string>
                 </property>
@@ -436,6 +524,12 @@
           </property>
           <item row="0" column="0">
            <widget class="QPushButton" name="outDirButton">
+            <property name="toolTip">
+             <string>Choose the name of the file where found decoys are going to be saved</string>
+            </property>
+            <property name="whatsThis">
+             <string>Choose the name of the file where found decoys are going to be saved</string>
+            </property>
             <property name="text">
              <string>Output file</string>
             </property>
@@ -585,47 +679,50 @@
            </widget>
           </item>
           <item row="1" column="0">
+           <widget class="QLabel" name="decoyDecoyTanimotoLabel">
+            <property name="text">
+             <string>Decoy vs Decoy Tanimoto threshold</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QDoubleSpinBox" name="dTanimotoBox">
+            <property name="maximum">
+             <double>1.000000000000000</double>
+            </property>
+            <property name="singleStep">
+             <double>0.100000000000000</double>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
            <widget class="QLabel" name="hBALabel_2">
             <property name="text">
              <string>Hydrogen Bond Acceptors ±</string>
             </property>
            </widget>
           </item>
-          <item row="1" column="1">
+          <item row="3" column="1">
            <widget class="QSpinBox" name="hbaBox"/>
           </item>
-          <item row="2" column="0">
+          <item row="4" column="0">
            <widget class="QLabel" name="hBDLabel">
             <property name="text">
              <string>Hydrogen Bond Donors ±</string>
             </property>
            </widget>
           </item>
-          <item row="2" column="1">
+          <item row="4" column="1">
            <widget class="QSpinBox" name="hbdBox"/>
           </item>
-          <item row="3" column="0">
-           <widget class="QLabel" name="clogPLabel">
-            <property name="text">
-             <string>Octanol-water partition coefficient (logP) ±</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="1">
-           <widget class="QDoubleSpinBox" name="clogpBox">
-            <property name="singleStep">
-             <double>0.100000000000000</double>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="0">
+          <item row="5" column="0">
            <widget class="QLabel" name="molecularWeightLabel">
             <property name="text">
              <string>Molecular weight ±</string>
             </property>
            </widget>
           </item>
-          <item row="4" column="1">
+          <item row="5" column="1">
            <widget class="QSpinBox" name="molwtBox">
             <property name="suffix">
              <string> Da</string>
@@ -635,24 +732,52 @@
             </property>
            </widget>
           </item>
-          <item row="5" column="0">
+          <item row="6" column="0">
            <widget class="QLabel" name="rtotationalBondsLabel">
             <property name="text">
              <string>Rotational bonds ±</string>
             </property>
            </widget>
           </item>
-          <item row="5" column="1">
+          <item row="6" column="1">
            <widget class="QSpinBox" name="rotbBox"/>
           </item>
-          <item row="6" column="0">
+          <item row="7" column="0">
+           <widget class="QLabel" name="clogPLabel">
+            <property name="text">
+             <string>Octanol-water partition coefficient (logP) ±</string>
+            </property>
+           </widget>
+          </item>
+          <item row="7" column="1">
+           <widget class="QDoubleSpinBox" name="clogpBox">
+            <property name="singleStep">
+             <double>0.100000000000000</double>
+            </property>
+           </widget>
+          </item>
+          <item row="9" column="0">
+           <widget class="QLabel" name="maximumDecoysPerActiveLigandLabel">
+            <property name="text">
+             <string>Maximum decoys per active ligand</string>
+            </property>
+           </widget>
+          </item>
+          <item row="9" column="1">
+           <widget class="QSpinBox" name="decoyMaxSpinBox">
+            <property name="maximum">
+             <number>99999</number>
+            </property>
+           </widget>
+          </item>
+          <item row="10" column="0">
            <widget class="QLabel" name="decoyLimitLabel">
             <property name="text">
              <string>Minimum decoys per active ligand:</string>
             </property>
            </widget>
           </item>
-          <item row="6" column="1">
+          <item row="10" column="1">
            <widget class="QSpinBox" name="decoyMinSpinBox">
             <property name="toolTip">
              <string>Limit how many decoys to find for each ligand. If the limit is 0, there is no limit.</string>
@@ -662,51 +787,50 @@
             </property>
            </widget>
           </item>
-          <item row="7" column="0">
-           <widget class="QLabel" name="maximumDecoysPerActiveLigandLabel">
-            <property name="text">
-             <string>Maximum decoys per active ligand</string>
+          <item row="2" column="0">
+           <spacer name="verticalSpacer_2">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
             </property>
-           </widget>
-          </item>
-          <item row="7" column="1">
-           <widget class="QSpinBox" name="decoyMaxSpinBox">
-            <property name="maximum">
-             <number>99999</number>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>40</height>
+             </size>
             </property>
-           </widget>
+           </spacer>
           </item>
-          <item row="9" column="0">
+          <item row="8" column="0">
+           <spacer name="verticalSpacer_3">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>40</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QFormLayout" name="formLayout_6">
+          <item row="0" column="0">
            <widget class="QPushButton" name="cacheButton">
             <property name="text">
              <string>Caché directory</string>
             </property>
            </widget>
           </item>
-          <item row="9" column="1">
+          <item row="0" column="1">
            <widget class="QLineEdit" name="cachDirectoryLineEdit">
             <property name="sizePolicy">
-             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
-            </property>
-           </widget>
-          </item>
-          <item row="8" column="0">
-           <widget class="QLabel" name="decoyDecoyTanimotoLabel">
-            <property name="text">
-             <string>Decoy vs Decoy Tanimoto threshold</string>
-            </property>
-           </widget>
-          </item>
-          <item row="8" column="1">
-           <widget class="QDoubleSpinBox" name="dTanimotoBox">
-            <property name="maximum">
-             <double>1.000000000000000</double>
-            </property>
-            <property name="singleStep">
-             <double>0.100000000000000</double>
             </property>
            </widget>
           </item>
@@ -757,6 +881,12 @@
      <layout class="QHBoxLayout" name="_2">
       <item>
        <widget class="QPushButton" name="clearButton">
+        <property name="toolTip">
+         <string>Clears all items from all lists and tables</string>
+        </property>
+        <property name="whatsThis">
+         <string>Clears all items from all lists and tables</string>
+        </property>
         <property name="text">
          <string>Clear all</string>
         </property>
@@ -780,6 +910,12 @@
         <property name="enabled">
          <bool>false</bool>
         </property>
+        <property name="toolTip">
+         <string>Interrupt the current search. Decoys found so far will be saved in the output file. The search can be resumed by selecting the same active ligand files and decoy sources, plus enabling the 'Add new decoys option' at the top of this tab and adding the interrupted search output file to the existing decoy files list.</string>
+        </property>
+        <property name="whatsThis">
+         <string>Interrupt the current search. Decoys found so far will be saved in the output file. The search can be resumed by selecting the same active ligand files and decoy sources, plus enabling the 'Add new decoys option' at the top of this tab and adding the interrupted search output file to the existing decoy files list.</string>
+        </property>
         <property name="text">
          <string>Stop</string>
         </property>
@@ -800,6 +936,12 @@
       </item>
       <item>
        <widget class="QPushButton" name="findDecoysButton">
+        <property name="toolTip">
+         <string>Start the search. Depending on the options set and the decoy sources chosen, this can take some time.</string>
+        </property>
+        <property name="whatsThis">
+         <string>Start the search. Depending on the options set and the decoy sources chosen, this can take some time.</string>
+        </property>
         <property name="text">
          <string>Find decoys</string>
         </property>
