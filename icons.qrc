@@ -49,9 +49,10 @@
 <file>iconset/22x22/actions/view-fullscreen.png</file>
 <file>iconset/22x22/actions/view-refresh.png</file>
 <file>iconset/22x22/actions/window-new.png</file>
-<file>iconset/22x22/apps/help-browser.png</file>
 <file>iconset/22x22/apps/internet-web-browser.png</file>
+<file>iconset/22x22/status/dialog-information.png</file>
 <file>iconset/22x22/status/folder-open.png</file>
 <file>iconset/index.theme</file>
+<file>iconset/index.theme~</file>
 </qresource>
 </RCC>

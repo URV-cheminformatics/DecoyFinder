@@ -154,7 +154,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         cachedirIcon = QIcon.fromTheme('folder-open', QIcon())
         defaultsIcon = QIcon.fromTheme('view-refresh', QIcon())
         helpIcon = QIcon.fromTheme('internet-web-browser', QIcon())
-        aboutIcon = QIcon.fromTheme('help-browser', QIcon())
+        aboutIcon = QIcon.fromTheme('dialog-information', QIcon())
 
         self.addQueryButton.setIcon(addIcon)
         self.addDecoysButton.setIcon(addIcon)
@@ -205,9 +205,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def on_finder_finished(self, resulttuple):
         """
         """
-#        if not self.progressBar.maximum:
-#            self.progressBar.setMaximum(1)
-#        self.progressBar.setValue(self.progressBar.maximum)
         self.resultsTable.setSortingEnabled(False)
         self.tabWidget.setEnabled(True)
         self.stopButton.setEnabled(False)

@@ -5,5 +5,8 @@
     <file>locales/df_es.qm</file>
     <file>locales/df_fr.qm</file>
   </qresource>
-  <qresource prefix="images"/>
+  <qresource prefix="images">
+    <file>urv.png</file>
+    <file>icon.png</file>
+  </qresource>
 </RCC>
