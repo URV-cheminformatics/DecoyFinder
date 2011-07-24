@@ -1,0 +1,10 @@
+#!/usr/bin/env xdg-open
+[Desktop Entry]
+Name=DecoyFinder
+Comment=Find decoy molecules for a set of active ligands
+Exec=decoyfinder
+Terminal=false
+Type=Application
+Icon=/opt/DecoyFinder/icon.png
+Categories=Education;Science
+StartupNotify=true
