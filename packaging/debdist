@@ -9,6 +9,7 @@ cp decoyfinder.desktop deb/usr/share/applications/decoyfinder$APPEND.desktop
 
 sudo chown -R root:root deb/*
 sudo chmod -R o+rx-w deb/*
+sudo chmod a-x deb/opt/DecoyFinder$APPEND/*
 
 sudo dpkg --build deb decoyfinder$APPEND-${VERSION}_all.deb
 
