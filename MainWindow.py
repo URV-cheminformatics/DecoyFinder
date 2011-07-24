@@ -188,7 +188,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.decoyMaxSpinBox.setValue(int(self.settings.value('decoy_max',36)))
         self.dTanimotoBox.setValue(float(self.settings.value('tanimoto_d', 0.9)))
         self.cachDirectoryLineEdit.setText(self.settings.value('cachedir',tempfile.gettempdir()))
-        self.outputDirectoryLineEdit.setText(checkoutputfile(self.settings.value('outputfile',os.path.join(os.getcwd(), 'found_decoys.sdf'))))
+        self.outputDirectoryLineEdit.setText(checkoutputfile(self.settings.value('outputfile',os.path.join(os.path.expanduser('~'), 'found_decoys.sdf'))))
         ########################
         self.supported_files = self.tr('OpenBabel accepted formats') + ' (' + informats + ')'
         ########################
@@ -572,6 +572,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         Slot documentation goes here.
         """
         aboutdiag = AboutDialog()
+        aboutdiag.setWindowTitle('About '+self.App.applicationName())
         fixedinfo = aboutdiag.infolabel.text().replace('URL',  self.App.organizationDomain())
         aboutdiag.infolabel.setText(fixedinfo)
         aboutdiag.nameLabel.setText(self.App.applicationName())

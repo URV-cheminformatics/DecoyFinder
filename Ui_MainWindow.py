@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file '/home/ssorgatem/uni/PEI/decoys/MainWindow.ui'
 #
-# Created: Sun Jul 24 01:27:04 2011
+# Created: Sun Jul 24 22:11:41 2011
 #      by: pyside-uic 0.2.11 running on PySide 1.0.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -56,7 +56,7 @@ class Ui_MainWindow(object):
         self.addQueryButton = QtGui.QPushButton(self.tabWidgetPage1)
         self.addQueryButton.setObjectName("addQueryButton")
         self.horizontalLayout_6.addWidget(self.addQueryButton)
-        spacerItem2 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Minimum)
+        spacerItem2 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
         self.horizontalLayout_6.addItem(spacerItem2)
         self.clearActives = QtGui.QPushButton(self.tabWidgetPage1)
         self.clearActives.setObjectName("clearActives")
@@ -93,7 +93,7 @@ class Ui_MainWindow(object):
         self.addDecoysButton = QtGui.QPushButton(self.kdecoysFrame)
         self.addDecoysButton.setObjectName("addDecoysButton")
         self.horizontalLayout_9.addWidget(self.addDecoysButton)
-        spacerItem6 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Minimum)
+        spacerItem6 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
         self.horizontalLayout_9.addItem(spacerItem6)
         self.clearDecoys = QtGui.QPushButton(self.kdecoysFrame)
         self.clearDecoys.setObjectName("clearDecoys")
