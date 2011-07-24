@@ -1,17 +1,20 @@
 #!/bin/sh
 VERSION=1.0
+APPEND=-pyqt
 ./distgeneric.sh
 
-rm -r deb/opt/*
-cp -r generic deb/opt/DecoyFinder-pyqt
+rm -r deb/opt/* deb/usr/share/applications/decoyfinder$APPEND.desktop 2> /dev/null
+cp -r generic deb/opt/DecoyFinder$APPEND
+
+cp decoyfinder.desktop deb/usr/share/applications/decoyfinder$APPEND.desktop
 
 sudo chown -R root:root deb/*
 sudo chmod -R o+rx-w deb/*
 
-dpkg --build deb decoyfinder-pyqt-${VERSION}_all.deb
+sudo dpkg --build deb decoyfinder$APPEND-${VERSION}_all.deb
 
 sudo chmod 777 *.deb
 
 sudo chmod -R a+rw deb/* 
 
-rm -r deb/opt/*
+rm -r deb/opt/* deb/usr/share/applications/decoyfinder$APPEND.desktop

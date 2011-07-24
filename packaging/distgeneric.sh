@@ -1,3 +1,3 @@
 #!/bin/sh
 rm generic/*
-cp  ../*.py ../*.txt ../*.html generic/
+cp  ../*.py ../*.txt ../*.html ../icon.png generic/
