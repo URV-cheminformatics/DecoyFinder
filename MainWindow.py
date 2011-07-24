@@ -574,6 +574,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         Slot documentation goes here.
         """
         aboutdiag = AboutDialog()
+        fixedinfo = aboutdiag.infolabel.text().replace('URL',  self.App.organizationDomain())
+        aboutdiag.infolabel.setText(fixedinfo)
         aboutdiag.nameLabel.setText(self.App.applicationName())
         aboutdiag.versionlabel.setText(self.App.applicationVersion())
         aboutdiag.exec_()
@@ -583,4 +585,4 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         """
         Slot documentation goes here.
         """
-        webbrowser.open_new_tab(self.App.organizationDomain())
+        webbrowser.open_new_tab("http://" + self.App.organizationDomain())
