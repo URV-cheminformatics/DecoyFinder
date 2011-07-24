@@ -1,4 +1,4 @@
-#!/usr/bin/python -OO
+#!/usr/bin/env python
 #-*- coding:utf-8 -*-
 #
 #       decoy_finder.py is part of Decoy Finder
