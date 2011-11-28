@@ -1,9 +1,10 @@
 <!DOCTYPE html>
-<html>
-<head>
-  <meta charset='utf-8'>
+<html><head>
 
-  <title>DecoyFinder</title>
+
+  <meta charset="utf-8"><title>DecoyFinder</title>
+
+  
 
   <style type="text/css">
     body {
@@ -27,59 +28,82 @@
     pre { background: #000; color: #fff; padding: 15px;}
     hr { border: 0; width: 80%; border-bottom: 1px solid #aaa}
     .footer { text-align:center; padding-top:30px; font-style: italic; }
-  </style>
-</head>
-
-<body>
-  <a href="https://github.com/ssorgatem/DecoyFinder"><img style="position: absolute; top: 0; right: 0; border: 0;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub" /></a>
+  </style></head><body>
+  <a href="https://github.com/ssorgatem/DecoyFinder"></a>
 
   <div id="container">
 
     <div class="download">
       <a href="https://github.com/ssorgatem/DecoyFinder/zipball/master">
-        <img border="0" width="90" src="https://github.com/images/modules/download/zip.png"></a>
+        <img src="https://github.com/images/modules/download/zip.png" border="0" width="90"></a>
       <a href="https://github.com/ssorgatem/DecoyFinder/tarball/master">
-        <img border="0" width="90" src="https://github.com/images/modules/download/tar.png"></a>
+        <img src="https://github.com/images/modules/download/tar.png" border="0" width="90"></a>
     </div>
 
-    <h1><a href="https://github.com/ssorgatem/DecoyFinder">DecoyFinder</a></h1>
+    <h1><img style="width: 128px; height: 128px;" alt="" src="icon.png" align="middle"><a href="https://github.com/ssorgatem/DecoyFinder"> DecoyFinder</a></h1>
 
     <div class="description">
       Tool to find decoy molecule sets for given active ligand sets
     </div>
 
     
-      <p>DecoyFinder is a graphical tool which helps finding sets of decoy molecules for a given group of active ligands. It does so by finding molecules which have a similar number of rotational bonds, hydrogen bond acceptors, hydrogen bond donors, logP value and molecular weight, but are chemically different, which is defined by a maximum Tanimoto value threshold between active ligand and decoy molecule MACCS fingerprints. Optionally, a maximum Tanimoto value threshold can be set between decoys in order assure chemical diversity in the decoy set.
+      <p>DecoyFinder
+is a graphical tool which helps finding sets of decoy molecules for a
+given group of active ligands. It does so by finding molecules which
+have a similar number of rotational bonds, hydrogen bond acceptors,
+hydrogen bond donors, logP value and molecular weight, but are
+chemically different, which is defined by a maximum Tanimoto value
+threshold between active ligand and decoy molecule MACCS fingerprints.
+Optionally, a maximum Tanimoto value threshold can be set between
+decoys in order assure chemical diversity in the decoy set.
 </p>
     
 
     
       <h2>Dependencies</h2>
-      <p>Python +2.6, OpenBabel >= 2.3.0 with python bindings, either PySide or PyQt4 Qt bindings for python.</p>
+      
+<ul>
+  <li><a href="http://www.python.org/getit/" target="_blank">Python</a> &gt;= 2.5,&nbsp; &lt; 3</li>
+  <li><a href="http://openbabel.org/wiki/Category:Installation">OpenBabel</a> &gt;= 2.3.0 with python bindings</li>
+  <li>pybel (usually included with OpenBabel python bindings; also part of cinfony)</li>
+  <li><a href="http://www.pyside.org/downloads/" target="_blank">PySide</a> &gt;= 1.0 (or <a href="http://www.riverbankcomputing.co.uk/software/pyqt/download">PyQt4</a> &gt;= 4.6 for PyQt4 version)</li>
+  <li>Qt &gt;= 4.6 (sometimes included with PySide or PyQt)</li>
+</ul>
+
     
 
     
       <h2>Install</h2>
-      <p>* Debian/Ubuntu and derivatives: open and install the .deb packages with a graphical package manager or with dpkg from the command line.
+      
+<ul>
+  <li><span style="font-weight: bold;">Windows users:</span> just use the installer, all needed files are provided.</li>
+  <li><span style="font-weight: bold;">Ubuntu 11.10 and Debian testing users:</span> simply install the provided .deb package, all dependencies will be automatically installed by the package manager</li>
+  <li><span style="font-weight: bold;">Users of older Ubuntu releases</span> shold manually (or using <a href="http://packages.ubuntu.com/search?keywords=openbabel+&amp;searchon=names&amp;suite=all&amp;section=all" target="_blank">a .deb package for a newer Ubuntu release</a>) install OpenBabel =&gt;2.3.0 and install the PyQt4 version of DecoyFinder </li>
+</ul>
+<p><br>
+If you are running an OS for wich there are no DecoyFinder packages
+available, you must make sure you have all the dependencies are
+correctly installed and then it should work from the generic (source)
+package, just executing the following from a command line:</p>
+<pre>$ python PATH/TO/DECOYFINDER/decoy_finder.py</pre>
 
-* Others: No installation is required provided you have installed in your system OpenBabel >= 2.3 with python bindings, Python >= 2.6 and python Qt bindings (PyQt4 or PySide, depending on the version of DecoyFinder you downloaded). Just unpack the tarball and execute decoy_finder.py</p>
     
 
     
       <h2>License</h2>
-      <p>GPLv3: GNU General Public License version 3, wich can be read here: http://www.gnu.org/licenses/gpl-3.0.html </p>
+      <p>GPLv3: GNU General Public License version 3, wich can be read <a href="LICENCE.html" target="_blank">here</a>&nbsp; </p>
     
 
     
       <h2>Authors</h2>
-      <p>Adrià Cereto-Massagué (adrian.cereto@urv.cat)
-<br/>      </p>
+      <p>Adrià Cereto-Massagué (<a href="mailto:adrian.cereto@urv.cat">adrian.cereto at urv .cat</a>)
+      </p>
     
 
     
       <h2>Contact</h2>
-      <p>Adrià Cereto-Massagué (adrian.cereto@urv.cat)
-<br/>      </p>
+      <p>Adrià Cereto-Massagué (<a href="mailto:adrian.cereto@urv.cat">adrian.cereto at urv .cat</a>)
+      </p>
     
 
     <h2>Download</h2>
@@ -87,26 +111,19 @@
       You can download this project in either
       <a href="https://github.com/ssorgatem/DecoyFinder/zipball/master">zip</a> or
       <a href="https://github.com/ssorgatem/DecoyFinder/tarball/master">tar formats.
-    </p>
-    <p>You can also clone the project with <a href="http://git-scm.com">Git</a>
-      by running:
-      <pre>$ git clone git://github.com/ssorgatem/DecoyFinder</pre>
-    </p>
-
-    <div class="footer">
-      get the source code on GitHub : <a href="https://github.com/ssorgatem/DecoyFinder">DecoyFinder</a>
+    </a></p>
+<a href="https://github.com/ssorgatem/DecoyFinder/tarball/master">    </a><div class="footer">get the source code on GitHub : <a href="https://github.com/ssorgatem/DecoyFinder">DecoyFinder</a>
     </div>
 
   </div>
 
-<script type=\"text/javascript\">
+<script type="\&quot;text/javascript\&quot;">
 var gaJsHost = ((\"https:\" == document.location.protocol) ? \"https://ssl.\" : \"http://www.\");
 document.write(unescape(\"%3Cscript src='\" + gaJsHost + \"google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E\"));
 </script>
-<script type=\"text/javascript\">
+<script type="\&quot;text/javascript\&quot;">
 try {
 var pageTracker = _gat._getTracker("UA-27328530-1");
 pageTracker._trackPageview();
-} catch(err) {}</script>"
-</body>
-</html>
+} catch(err) {}</script>
+</body></html>
