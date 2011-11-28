@@ -398,7 +398,7 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;In order to be able to look for decoys through the ZINC database, DecoyFinder needs to download little chunks of it and then remove them. If this option is enabled, DecoyFinder will not remove them and so will not need to download already downloaded files again.&lt;br /&gt;Enable this if you have low bandwith and/or +20 GB of free disk space.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                 </property>
                 <property name="text">
-                 <string>Use caché</string>
+                 <string>Use cache</string>
                 </property>
                 <property name="checked">
                  <bool>true</bool>
@@ -907,7 +907,7 @@ They will be kept here if the 'Use cache' option is enabled, otherwise they will
 If the 'Use cache' option is enabled, it is recommended to place the cache directory in a filesystem with 20+ Gb of free space.</string>
             </property>
             <property name="text">
-             <string>Caché directory</string>
+             <string>Cache directory</string>
             </property>
            </widget>
           </item>
