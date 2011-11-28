@@ -1,3 +1,5 @@
 #!/bin/sh
-rm generic/*
-cp  ../*.py ../*.txt ../*.html ../icon.png generic/
+. ./common.sh
+rm -r ${GENERIC}
+mkdir ${GENERIC}
+cp  ../*.py ../*.txt ../*.html ../icon.png ${GENERIC}/
