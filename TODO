@@ -1,2 +1,5 @@
-Menús contextuals
+* Webpage + correct links
 
+* Move from canonical SMILES to InChI or InChIkey for internal unique representation (Requires OpenBabel 2.3.1)
+
+* MacOSX support?

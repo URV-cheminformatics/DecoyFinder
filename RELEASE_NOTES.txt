@@ -1,10 +1,10 @@
-OpenBabel MACCS fingerprint calculation algorithm has some known bugs which, at the time of this release,
-were still not fixed (OpenBabel 2.3.0). The bug reports can be found here:
+OpenBabel has some known bugs which, at the time of this release,
+were still not fixed (OpenBabel 2.3.1). The bug reports can be found here:
 
     http://sourceforge.net/tracker/index.php?func=detail&aid=3310783&group_id=40728&atid=428740
 
     http://sourceforge.net/tracker/index.php?func=detail&aid=3310779&group_id=40728&atid=428740
 
-Due to their nature, these bugs should not have a big effect on decoy sets produced by DecoyFinder, though.
+Due to their nature, these bugs should not have a big impact on decoy sets produced by DecoyFinder, though.
 
 However it is planned to add a diferent bugfree MACCS backend or different types of fingerprint.
