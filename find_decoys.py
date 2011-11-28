@@ -27,9 +27,8 @@ from decimal import Decimal
 informats = ''
 for format in pybel.informats.iterkeys():
     informats += "*.%s " %format
-    if os.name != 'nt':
-        for compression in ('gz', 'tar',  'bz',  'bz2',  'tar.gz',  'tar.bz',  'tar.bz2'):
-            informats += "*.%s.%s " % (format,  compression)
+    for compression in ('gz', 'tar',  'bz',  'bz2',  'tar.gz',  'tar.bz',  'tar.bz2'):
+        informats += "*.%s.%s " % (format,  compression)
 
 
 #Some default values:
@@ -127,19 +126,7 @@ def get_zinc_slice(slicename = 'all', subset = '10', cachedir = tempfile.gettemp
             else:
                 print("Loading cached file: %s" % outfilename)
             dbhandler.close()
-            #### Workaround for a bug in OpenBabel <= 2.3 ####
-            if os.name == 'nt':
-                gzipfile = gzip.open(outfilename,  'rb')
-                gunzippedoutfilename = outfilename.replace('.sdf.gz', '.sdf')
-                out = open(gunzippedoutfilename, 'wb')
-                out.write(gzipfile.read())
-                gzipfile.close()
-                out.close()
-                yield str(gunzippedoutfilename)
-                os.remove(gunzippedoutfilename)
-            ###################################
-            else:
-                yield str(outfilename)
+            yield str(outfilename)
 
             if not keepcache:
                 try:
