@@ -239,7 +239,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                             QMessageBox.Retry))
                     if answer == QMessageBox.Retry:
                         self.tabWidget.setCurrentIndex(0)
-                        self.decoyList.addItem(outfile)
+                        self.decoyList.addItem(outputfile)
                         self.kdecoysCheckBox.setChecked(True)
                 else:
                     self.on_error(self.tr('No decoys found. Try either to set lower requirements in the options tab or a different decoy source.'))

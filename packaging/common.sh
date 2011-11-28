@@ -1,0 +1,4 @@
+NAME=DecoyFinder
+VERSION=1.0
+APPEND=-pyqt
+GENERIC=${NAME}${APPEND}-${VERSION}

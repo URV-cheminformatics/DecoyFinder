@@ -8,3 +8,11 @@
 *.deb
 *.gz
 *.bz2
+*.exe
+warn*.txt
+*log*.csv
+*.sdf
+*.gz
+*.bz2
+*.log
+build
