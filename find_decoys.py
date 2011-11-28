@@ -20,23 +20,10 @@
 #       Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 #       MA 02110-1301, USA.
 
-#Condicions per al decoy respecte el lligand actiu:
-# - Tanimoto MACCS < 0,9
-# - HBA 0 (+-1)
-# - ClogP  +-1 (+- 1.5)
-# - HBD 0 (+-1)
-# - Molecular weight +/-40 Da
-# - exact same number of rotational bonds
-
 import pybel, os, urllib2, tempfile, random,  sys,  gzip,  datetime
 from decimal import Decimal
-#Decimal() serveix per fer operacions exactes amb decimals, ja que el built-in float és imprecís
+#Decimal() can represent floating point data with higher precission than built-in float
 
-##### Aquesta part és necessària per a poder fer servir MACCS fingerprinting des de pybel en versions antiquades d'openbabel
-if "MACCS" not in pybel.fps:
-    pybel.fps.append("MACCS")
-    pybel._fingerprinters = pybel._getplugins(pybel.ob.OBFingerprint.FindFingerprint, pybel.fps)
-#####
 informats = ''
 for format in pybel.informats.iterkeys():
     informats += "*.%s " %format
@@ -45,7 +32,7 @@ for format in pybel.informats.iterkeys():
             informats += "*.%s.%s " % (format,  compression)
 
 
-#Alguns valors per defecte:
+#Some default values:
 
 HBA_t = 0 #1
 HBD_t = 0#1
@@ -55,10 +42,11 @@ tanimoto_d = Decimal('0.9')
 MW_t = 40
 RB_t = 0#1
 
-#Creem dos filtres per aconseguir els HBD i HBA:
+#SMARTS patterns for HBD and HBA:
 HBA = pybel.Smarts("[#7,#8]")
 HBD = pybel.Smarts("[#7,#8;!H0]")
 
+#Dict of ZINC subsets
 ZINC_subsets = {
     "lead-like":"1"
     ,"fragment-like":"2"
@@ -83,9 +71,11 @@ class ComparableMol():
     def __init__(self, mol):
         self.mol = mol
         self.fp = mol.calcfp("MACCS")
-        #self.calcdesc()
 
     def calcdesc(self):
+        """
+        Calculate all interesting descriptors. Should be  called only when needed
+        """
         self.hba = len(HBA.findall(self.mol))
         self.hbd = len(HBD.findall(self.mol))
         self.clogp = Decimal(str(self.mol.calcdesc(['logP'])['logP']))
@@ -94,6 +84,9 @@ class ComparableMol():
         self.title = self.mol.title
 
     def __str__(self):
+        """
+        For debug purposes
+        """
         return "Title: %s; HBA: %s; HBD: %s; CLogP: %s; MW:%s \n" % (self.title, self.hba, self.hbd, self.clogp, self.mw)
 
 def get_zinc_slice(slicename = 'all', subset = '10', cachedir = tempfile.gettempdir(),  keepcache = False):
@@ -148,7 +141,6 @@ def get_zinc_slice(slicename = 'all', subset = '10', cachedir = tempfile.gettemp
             else:
                 yield str(outfilename)
 
-            #print outfilename
             if not keepcache:
                 try:
                     os.remove(outfilename)
@@ -160,6 +152,7 @@ def get_zinc_slice(slicename = 'all', subset = '10', cachedir = tempfile.gettemp
 
 def get_fileformat(file):
     """
+    Guess the file format from its extension
     """
     index = -1
     ext = file.split(".")[index].lower()
@@ -167,7 +160,6 @@ def get_fileformat(file):
         index -= 1
         ext = file.split(".")[index].lower()
     if ext in pybel.informats.keys():
-        #print ext
         return ext
     else:
        print("%s: unknown format"  % file)
@@ -175,6 +167,7 @@ def get_fileformat(file):
 
 def parse_db_files(filelist):
     """
+    Parses files where to llok for decoys
     """
     filecount = 0
     if type(filelist) == list:
@@ -187,6 +180,7 @@ def parse_db_files(filelist):
 
 def parse_query_files(filelist):
     """
+    Parses files containing active ligands
     """
     query_dict = {}
     for file in filelist:
@@ -200,6 +194,7 @@ def parse_query_files(filelist):
 
 def parse_decoy_files(decoyfilelist):
     """
+    Parses files containing known decoys
     """
     decoy_set = set()
     for decoyfile in decoyfilelist:
@@ -221,6 +216,7 @@ def isdecoy(
                 ,RB_t = 0
                 ):
     """
+    Check if db_mol can be considered a decoy of ligand
     """
     if  ligand.hba - HBA_t <= db_mol.hba <= ligand.hba + HBA_t\
     and ligand.hbd - HBD_t <= db_mol.hbd <= ligand.hbd + HBD_t\
@@ -234,6 +230,7 @@ def isdecoy(
 
 def checkoutputfile(outputfile):
     """
+    Return a safe output filename
     """
     fileexists = 0
     if os.path.splitext(outputfile)[1].lower()[1:] not in pybel.outformats:
@@ -250,6 +247,7 @@ def checkoutputfile(outputfile):
 
 def save_decoys(decoy_set, outputfile):
     """
+    Save found decoys to outputfile
     """
     print('saving %s decoys...' % len(decoy_set))
     if len(decoy_set):
@@ -281,6 +279,7 @@ def find_decoys(
                 ,stopfile = ''
                 ):
     """
+    This is the star of the show
     """
     outputfile = checkoutputfile(outputfile)
     tanimoto_t = Decimal(str(tanimoto_t))
