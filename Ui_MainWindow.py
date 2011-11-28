@@ -2,8 +2,8 @@
 
 # Form implementation generated from reading ui file '/home/ssorgatem/uni/PEI/decoys/MainWindow.ui'
 #
-# Created: Sun Jul 24 22:11:41 2011
-#      by: pyside-uic 0.2.11 running on PySide 1.0.4
+# Created: Mon Nov 28 16:43:11 2011
+#      by: pyside-uic 0.2.13 running on PySide 1.0.8
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -410,7 +410,7 @@ class Ui_MainWindow(object):
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:\'DejaVu Sans\'; font-size:10pt; font-weight:400; font-style:normal;\">\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">In order to be able to look for decoys through the ZINC database, DecoyFinder needs to download little chunks of it and then remove them. If this option is enabled, DecoyFinder will not remove them and so will not need to download already downloaded files again.<br />Enable this if you have low bandwith and/or +20 GB of free disk space.</p></body></html>", None, QtGui.QApplication.UnicodeUTF8))
-        self.cacheCheckBox.setText(QtGui.QApplication.translate("MainWindow", "Use caché", None, QtGui.QApplication.UnicodeUTF8))
+        self.cacheCheckBox.setText(QtGui.QApplication.translate("MainWindow", "Use cache", None, QtGui.QApplication.UnicodeUTF8))
         self.dbComboBox.setToolTip(QtGui.QApplication.translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
@@ -498,7 +498,7 @@ class Ui_MainWindow(object):
 "They will be kept here if the \'Use cache\' option is enabled, otherwise they will be removed after they have been parsed.\n"
 "\n"
 "If the \'Use cache\' option is enabled, it is recommended to place the cache directory in a filesystem with 20+ Gb of free space.", None, QtGui.QApplication.UnicodeUTF8))
-        self.cacheButton.setText(QtGui.QApplication.translate("MainWindow", "Caché directory", None, QtGui.QApplication.UnicodeUTF8))
+        self.cacheButton.setText(QtGui.QApplication.translate("MainWindow", "Cache directory", None, QtGui.QApplication.UnicodeUTF8))
         self.defaultsButton.setToolTip(QtGui.QApplication.translate("MainWindow", "Load default values for all options", None, QtGui.QApplication.UnicodeUTF8))
         self.defaultsButton.setWhatsThis(QtGui.QApplication.translate("MainWindow", "Load default values for all options", None, QtGui.QApplication.UnicodeUTF8))
         self.defaultsButton.setText(QtGui.QApplication.translate("MainWindow", "Load Defaults", None, QtGui.QApplication.UnicodeUTF8))
