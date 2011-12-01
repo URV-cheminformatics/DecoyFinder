@@ -1,4 +1,5 @@
 #!/bin/sh
+exit
 . ./common.sh
 export WINEPREFIX=$HOME/.wine
 export PI=/home/ssorgatem/winbin/pyinstaller-1.5.1/pyinstaller.py

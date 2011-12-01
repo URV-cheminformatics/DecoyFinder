@@ -25,8 +25,10 @@ Module implementing MainWindow.
 
 import os, itertools, random, tempfile, time,  webbrowser
 
-from PySide.QtGui import QMainWindow, QFileDialog, QTableWidgetItem, QMessageBox, QIcon, QApplication
-from PySide.QtCore import QSettings, QThread, Signal, Qt, Slot
+from PyQt4.QtGui import QMainWindow, QFileDialog, QTableWidgetItem, QMessageBox, QIcon, QApplication
+from PyQt4.QtCore import QSettings, QThread, Qt
+from PyQt4.QtCore import pyqtSignal as Signal
+from PyQt4.QtCore import pyqtSignature as Slot
 
 from find_decoys import *
 from Ui_MainWindow import Ui_MainWindow
@@ -429,7 +431,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.progressBar.setMaximum(1)
         self.clearResultsTable()
 
-    @Slot(int)
+    @Slot('int')
     def on_dbComboBox_currentIndexChanged(self,  index):
         """
         Slot documentation goes here.
@@ -437,7 +439,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         for widget in (self.cacheCheckBox, self.zsubComboBox, self.zinclabel):
             widget.setEnabled(bool(index))
 
-    @Slot(int)
+    @Slot('int')
     def on_cacheCheckBox_stateChanged(self,  index):
         """
         Slot documentation goes here.

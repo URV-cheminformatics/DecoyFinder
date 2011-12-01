@@ -5,8 +5,9 @@ Module implementing AboutDialog.
 """
 import webbrowser,  os
 
-from PySide.QtGui import QDialog
-from PySide.QtCore import Slot
+from PyQt4.QtGui import QDialog
+from PyQt4.QtCore import pyqtSignature
+from PyQt4.QtCore import pyqtSignature as Slot
 from Ui_AboutDiag import Ui_Dialog
 
 class AboutDialog(QDialog, Ui_Dialog):
