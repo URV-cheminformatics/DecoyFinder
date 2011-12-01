@@ -20,8 +20,13 @@
 #       Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 #       MA 02110-1301, USA.
 
-import pybel, os, urllib2, tempfile, random,  sys,  gzip,  datetime
+import os, urllib2, tempfile, random,  sys,  gzip,  datetime
 from decimal import Decimal
+rdk = False
+try:
+    from cinfony import pybel, rdk
+except:
+    import pybel
 #Decimal() can represent floating point data with higher precission than built-in float
 
 informats = ''
@@ -40,10 +45,6 @@ tanimoto_t = Decimal('0.9')
 tanimoto_d = Decimal('0.9')
 MW_t = 40
 RB_t = 0#1
-
-#SMARTS patterns for HBD and HBA:
-HBA = pybel.Smarts("[#7,#8]")
-HBD = pybel.Smarts("[#7,#8;!H0]")
 
 #Dict of ZINC subsets
 ZINC_subsets = {
@@ -69,14 +70,17 @@ class ComparableMol():
     """
     def __init__(self, mol):
         self.mol = mol
-        self.fp = mol.calcfp("MACCS")
+        if not rdk:
+            self.fp = mol.calcfp("MACCS")
+        else:
+            self.fp = rdk.Molecule(mol).calcfp('maccs')
 
     def calcdesc(self):
         """
         Calculate all interesting descriptors. Should be  called only when needed
         """
-        self.hba = len(HBA.findall(self.mol))
-        self.hbd = len(HBD.findall(self.mol))
+        self.hba = Decimal(str(self.mol.calcdesc(['HBA1'])['HBA1']))
+        self.hbd = Decimal(str(self.mol.calcdesc(['HBD'])['HBD']))
         self.clogp = Decimal(str(self.mol.calcdesc(['logP'])['logP']))
         self.mw = self.mol.molwt
         self.rot = self.mol.OBMol.NumRotors()
