@@ -248,11 +248,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def on_error(self, error):
         """
+        Display an error dialogue with the error
         """
         print(error)
         QMessageBox.critical(None,
             self.trUtf8("Error"),
-            self.trUtf8(error),
+            self.trUtf8(str(error)),
             QMessageBox.StandardButtons(QMessageBox.Ok)
             )
 
