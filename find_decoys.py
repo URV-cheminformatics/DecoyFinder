@@ -93,7 +93,7 @@ def get_zinc_slice(slicename = 'all', subset = '10', cachedir = tempfile.gettemp
     returns an iterable list of files from  online ZINC slices
     """
     if slicename in ('all', 'single', 'usual', 'metals'):
-        script = "http://zinc.docking.org/subset1/%s/%s.sdf.csh" % (subset,slicename)
+        script = "http://zinc.docking.org/db/bysubset/%s/%s.sdf.csh" % (subset,slicename)
         handler = urllib2.urlopen(script)
         print("Reading ZINC data...")
         scriptcontent = handler.read().split('\n')
