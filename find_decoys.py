@@ -102,11 +102,11 @@ def get_zinc_slice(slicename = 'all', subset = '10', cachedir = tempfile.gettemp
         print("Reading ZINC data...")
         scriptcontent = handler.read().split('\n')
         handler.close()
-        filelist = scriptcontent[1:-2]
+        filelist = scriptcontent[5:-4]
         #print slicename
         yield len(filelist)
         random.shuffle(filelist)
-        parenturl = scriptcontent[0].split()[1].split('=')[1]
+        parenturl = scriptcontent[4].split()[1].split('=')[1]
         for file in filelist:
             dbhandler = urllib2.urlopen(parenturl + file)
             outfilename = os.path.join(cachedir, file)
