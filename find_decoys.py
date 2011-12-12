@@ -376,37 +376,34 @@ def find_decoys(
     else:
         print("Not all wanted decoys found")
     #Generate logfile
-    log = '"DecoyFinder 1.0 log file generated on %s\n"' % datetime.datetime.now()
-    log += "\n"
-    log += '"Output file:","%s"\n' % outputfile
-    log += "\n"
-    log += '"Active ligand files:"\n'
-    for file in query_files:
-        log += '"%s"\n' % str(file)
-    log += "\n"
-    log += '"Decoy sources:"\n'
-    for file in used_db_files:
-        log += '"%s"\n' % str(file)
-    log += "\n"
-    log += '"Search settings:"\n'
-    log += '"Active ligand vs decoy tanimoto threshold","%s"\n' % str(tanimoto_t)
-    log += '"Decoy vs decoy tanimoto threshold","%s"\n' % str(tanimoto_d)
-    log += '"Hydrogen bond acceptors range","%s"\n' % str(HBA_t)
-    log += '"Hydrogen bond donors range","%s"\n' % str(HBD_t)
-    log += '"LogP range","%s"\n' % str(ClogP_t)
-    log += '"Molecular weight range","%s"\n' % str(MW_t)
-    log += '"Rotational bonds range","%s"\n' % str(RB_t)
-    log += '"Minimum nº of decoys per active ligand","%s"\n' % str(min)
-    log += '"Maximum nº of decoys per active ligand","%s"\n' % str(max)
-    log += "\n"
-    log += '"Avtive ligand","HBA","HBD","logP","MW","RB","nº of Decoys found"\n'
-    for active in ligands_dict:
-        log += '"%s","%s","%s","%s","%s","%s","%s"\n' % (active.title,  active.hba,  active.hbd,  active.clogp,  active.mw,  active.rot,  ligands_dict[active])
-    log += "\n"
+    log = open('%s_log.csv' % outputfile,  'wb')
+    log.write('"DecoyFinder 1.0 log file generated on %s\n\n"' % datetime.datetime.now())
 
-    logfile = open('%s_log.csv' % outputfile,  'wb')
-    logfile.write(log)
-    logfile.close()
+    log.write( '"Output file:","%s"\n\n' % outputfile)
+    log.write( '"Active ligand files:"\n')
+    for file in query_files:
+        log.write( '"%s"\n' % str(file))
+    log.write( '\n"Decoy sources:"\n')
+    for file in used_db_files:
+        log.write( '"%s"\n' % str(file))
+    log.write( '\n"Active ligands:","%s"\n' % nactive_ligands)
+    log.write( '"Decoys found:","%s"\n' % ndecoys)
+    log.write( '\n"Search settings:"\n')
+    log.write( '"Active ligand vs decoy tanimoto threshold","%s"\n' % str(tanimoto_t))
+    log.write( '"Decoy vs decoy tanimoto threshold","%s"\n' % str(tanimoto_d))
+    log.write( '"Hydrogen bond acceptors range","%s"\n' % str(HBA_t))
+    log.write( '"Hydrogen bond donors range","%s"\n' % str(HBD_t))
+    log.write( '"LogP range","%s"\n' % str(ClogP_t))
+    log.write( '"Molecular weight range","%s"\n' % str(MW_t))
+    log.write( '"Rotational bonds range","%s"\n' % str(RB_t))
+    log.write( '"Minimum nº of decoys per active ligand","%s"\n' % str(min))
+    log.write( '"Maximum nº of decoys per active ligand","%s"\n' % str(max))
+    log.write( "\n")
+    log.write( '"Avtive ligand","HBA","HBD","logP","MW","RB","nº of Decoys found"\n')
+    for active in ligands_dict:
+        log.write( '"%s","%s","%s","%s","%s","%s","%s"\n' % (active.title,  active.hba,  active.hbd,  active.clogp,  active.mw,  active.rot,  ligands_dict[active]))
+    log.write( "\n")
+    log.close()
 
     #Last, special yield:
     yield ('result',  ligands_dict,  (save_decoys(decoys_set, outputfile), minreached))
