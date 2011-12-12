@@ -166,7 +166,10 @@ def parse_db_files(filelist):
     for dbfile in filelist:
         mols = pybel.readfile(get_fileformat(dbfile), dbfile)
         for mol in mols:
-            yield ComparableMol(mol), filecount, dbfile
+            try:
+                yield ComparableMol(mol), filecount, dbfile
+            except:
+                continue
         filecount += 1
 
 def parse_query_files(filelist):
@@ -178,9 +181,12 @@ def parse_query_files(filelist):
         file = str(file)
         mols = pybel.readfile(get_fileformat(file), file)
         for mol in mols:
-            cmol = ComparableMol(mol)
-            cmol.calcdesc()
-            query_dict[cmol] = 0
+            try:
+                cmol = ComparableMol(mol)
+                cmol.calcdesc()
+                query_dict[cmol] = 0
+            except:
+                continue
     return query_dict
 
 def parse_decoy_files(decoyfilelist):
@@ -192,9 +198,12 @@ def parse_decoy_files(decoyfilelist):
         decoyfile = str(decoyfile)
         mols = pybel.readfile(get_fileformat(decoyfile), decoyfile)
         for mol in mols:
-            cmol = ComparableMol(mol)
-            cmol.calcdesc()
-            decoy_set.add(cmol)
+            try:
+                cmol = ComparableMol(mol)
+                cmol.calcdesc()
+                decoy_set.add(cmol)
+            except:
+                continue
     return decoy_set
 
 def isdecoy(
