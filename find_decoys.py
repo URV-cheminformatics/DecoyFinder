@@ -278,8 +278,8 @@ def find_decoys(
                 ,tanimoto_d = Decimal('0.9')
                 ,MW_t = 40
                 ,RB_t = 0
-                ,min = 36
-                ,max = 36
+                ,mind = 36
+                ,maxd = 36
                 ,decoy_files = []
                 ,stopfile = ''
                 ):
@@ -304,11 +304,11 @@ def find_decoys(
     complete_ligand_sets = 0
 
     minreached = False
-    if min:
-        total_min = nactive_ligands*min
+    if mind:
+        total_min = nactive_ligands*mind
         yield ('total_min',  total_min,  nactive_ligands)
     else:
-        min = None
+        mind = None
 
     decoys_inchikey_set = set()
     kdecoys_inchikey_set = set()
@@ -325,7 +325,7 @@ def find_decoys(
                 if isdecoy(decoy,ligand,HBA_t,HBD_t,ClogP_t,MW_t,RB_t ):
                     ligands_dict[ligand] +=1
                     kdecoys_inchikey_set.add(inchikey)
-                    if min and ligands_dict[ligand] == min:
+                    if mind and ligands_dict[ligand] == mind:
                         complete_ligand_sets += 1
                         yield ('ndecoys',  ndecoys,  complete_ligand_sets)
     else:
@@ -336,9 +336,9 @@ def find_decoys(
     for db_mol, filecount, db_file in db_entry_gen:
         used_db_files.add(db_file)
         yield ('file',  filecount, db_file)
-        if max and ligands_max >= nactive_ligands:
+        if maxd and ligands_max >= nactive_ligands:
             break
-        if not min or len(decoys_set) < total_min or complete_ligand_sets < nactive_ligands:
+        if not mind or len(decoys_set) < total_min or complete_ligand_sets < nactive_ligands:
             too_similar = False
             if tanimoto_d < Decimal(1):
                 for decoy in decoys_set:
@@ -357,7 +357,7 @@ def find_decoys(
                 db_mol.calcdesc()
                 ligands_max = 0
                 for ligand in ligands_dict.iterkeys():
-                    if max and ligands_dict[ligand] >= max:
+                    if maxd and ligands_dict[ligand] >= maxd:
                         ligands_max +=1
                         continue
                     if isdecoy(db_mol,ligand,HBA_t,HBD_t,ClogP_t,MW_t,RB_t ):
@@ -370,7 +370,7 @@ def find_decoys(
                                 ndecoys = len(decoys_set)
                                 print('%s decoys found' % ndecoys)
                                 yield ('ndecoys',  ndecoys, complete_ligand_sets)
-                            if ligands_dict[ligand] ==  min:
+                            if ligands_dict[ligand] ==  mind:
                                 print('Decoy set completed for ', ligand.title)
                                 complete_ligand_sets += 1
                                 yield ('ndecoys',  ndecoys, complete_ligand_sets)
@@ -382,7 +382,7 @@ def find_decoys(
             print('stopping by user request')
             break
 
-    if min:
+    if mind:
         print('Completed %s of %s decoy sets' % (complete_ligand_sets, nactive_ligands ))
         minreached = complete_ligand_sets >= nactive_ligands
     if minreached and total_min <= len(decoys_set):
@@ -410,8 +410,8 @@ def find_decoys(
     log.write( '"LogP range","%s"\n' % str(ClogP_t))
     log.write( '"Molecular weight range","%s"\n' % str(MW_t))
     log.write( '"Rotational bonds range","%s"\n' % str(RB_t))
-    log.write( '"Minimum nº of decoys per active ligand","%s"\n' % str(min))
-    log.write( '"Maximum nº of decoys per active ligand","%s"\n' % str(max))
+    log.write( '"Minimum nº of decoys per active ligand","%s"\n' % str(mind))
+    log.write( '"Maximum nº of decoys per active ligand","%s"\n' % str(maxd))
     log.write( "\n")
     log.write( '"Avtive ligand","HBA","HBD","logP","MW","RB","nº of Decoys found"\n')
     for active in ligands_dict:
@@ -447,10 +447,10 @@ def main(args = sys.argv[1:]):
     decopts = parser.add_argument_group('Decoy finding options')
     decopts.add_argument('-m', '--minimum-decoys-per-set', default=36, type=int
                         , help='Number of decoys to search for each active ligand'
-                        , dest='min')
+                        , dest='mind')
     decopts.add_argument('-M', '--maximum-decoys-per-set', default=36, type=int
                         , help='Stop looking for decoys for ligands with at least so many decoys found'
-                        , dest='max')
+                        , dest='maxd')
     decopts.add_argument('-t', '--tanimoto-with-active', default=tanimoto_t, type=Decimal
                         , help='Upper tanimoto threshold between active ligand and decoys'
                         , dest='tanimoto_t')
@@ -485,8 +485,8 @@ def main(args = sys.argv[1:]):
         ,tanimoto_t = ns.tanimoto_t
         ,MW_t = ns.MW_t
         ,RB_t = ns.RB_t
-        ,min = ns.min
-        ,max = ns.max
+        ,mind = ns.mind
+        ,maxd = ns.maxd
         ,tanimoto_d = ns.tanimoto_d
         ,decoy_files = ns.decoy_files
     ):
