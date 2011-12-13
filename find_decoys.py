@@ -305,8 +305,8 @@ def find_decoys(
     else:
         min = None
 
-    decoys_can_set = set()
-    kdecoys_can_set = set()
+    decoys_inchikey_set = set()
+    kdecoys_inchikey_set = set()
     ndecoys = 0
     ligands_max = 0
 
@@ -315,11 +315,11 @@ def find_decoys(
         decoys_set = parse_decoy_files(decoy_files)
         ndecoys = len(decoys_set)
         for decoy in decoys_set:
-            can = decoy.mol.write('can')
+            inchikey = decoy.mol.write('inchikey')[:-3]
             for ligand in ligands_dict.keys():
                 if isdecoy(decoy,ligand,HBA_t,HBD_t,ClogP_t,MW_t,RB_t ):
                     ligands_dict[ligand] +=1
-                    kdecoys_can_set.add(can)
+                    kdecoys_inchikey_set.add(inchikey)
                     if min and ligands_dict[ligand] == min:
                         complete_ligand_sets += 1
                         yield ('ndecoys',  ndecoys,  complete_ligand_sets)
@@ -356,12 +356,12 @@ def find_decoys(
                         ligands_max +=1
                         continue
                     if isdecoy(db_mol,ligand,HBA_t,HBD_t,ClogP_t,MW_t,RB_t ):
-                        can = db_mol.mol.write('can')
-                        if can not in kdecoys_can_set:
+                        inchikey = db_mol.mol.write('inchikey')[:-3]
+                        if inchikey not in kdecoys_inchikey_set:
                             ligands_dict[ligand] += 1
-                            if can not in decoys_can_set:
+                            if inchikey not in decoys_inchikey_set:
                                 decoys_set.add(db_mol)
-                                decoys_can_set.add(can)
+                                decoys_inchikey_set.add(inchikey)
                                 ndecoys = len(decoys_set)
                                 print('%s decoys found' % ndecoys)
                                 yield ('ndecoys',  ndecoys, complete_ligand_sets)
