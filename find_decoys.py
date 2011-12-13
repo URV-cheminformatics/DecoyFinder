@@ -356,7 +356,7 @@ def find_decoys(
                     continue
                 db_mol.calcdesc()
                 ligands_max = 0
-                for ligand in ligands_dict.iterkeys():
+                for ligand in ligands_dict:
                     if maxd and ligands_dict[ligand] >= maxd:
                         ligands_max +=1
                         continue
