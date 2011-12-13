@@ -158,7 +158,7 @@ def get_fileformat(file):
 
 def parse_db_files(filelist):
     """
-    Parses files where to llok for decoys
+    Parses files where to llook for decoys
     """
     filecount = 0
     if type(filelist) == list:
