@@ -158,7 +158,7 @@ def get_fileformat(file):
 
 def parse_db_files(filelist):
     """
-    Parses files where to llook for decoys
+    Parses files where to look for decoys
     """
     filecount = 0
     if type(filelist) == list:
@@ -168,7 +168,8 @@ def parse_db_files(filelist):
         for mol in mols:
             try:
                 cmol = ComparableMol(mol)
-            except:
+            except Exception,  e:
+                print e
                 cmol = False
             if cmol:
                 yield cmol, filecount, dbfile
@@ -187,7 +188,8 @@ def parse_query_files(filelist):
                 cmol = ComparableMol(mol)
                 cmol.calcdesc()
                 query_dict[cmol] = 0
-            except:
+            except Exception,  e:
+                print e
                 continue
     return query_dict
 
@@ -204,7 +206,8 @@ def parse_decoy_files(decoyfilelist):
                 cmol = ComparableMol(mol)
                 cmol.calcdesc()
                 decoy_set.add(cmol)
-            except:
+            except Exception,  e:
+                print e
                 continue
     return decoy_set
 
