@@ -3,6 +3,7 @@ Version: 1.0
 Section: science
 Maintainer: Adrià Cereto Massagué <adrian.cereto@urv.cat>
 Architecture: all
+Homepage: http://urvnutrigenomica-ctns.github.com/DecoyFinder/
 Depends: python-pyside.qtcore (>= 1.0), python-pyside.qtgui (>= 1.0), python-openbabel (>= 2.3.0)
 Description: Tool to find decoy molecule sets for given active ligand sets 
  DecoyFinder is a graphical tool which helps finding sets of decoy molecules for a given group of active ligands. It does so by finding molecules which have a similar number of rotational bonds, hydrogen bond acceptors, hydrogen bond donors, logP value and molecular weight, but are chemically different, which is defined by a maximum Tanimoto value threshold between active ligand and decoy molecule MACCS fingerprints. Optionally, a maximum Tanimoto value threshold can be set between decoys in order assure chemical diversity in the decoy set.

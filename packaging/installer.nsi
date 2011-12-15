@@ -4,7 +4,7 @@
 !define PRODUCT_NAME "DecoyFinder"
 !define PRODUCT_VERSION "1.0"
 !define PRODUCT_PUBLISHER "Grup de Recerca en Nutrigenòmica - Universitat Rovira i Virgila"
-!define PRODUCT_WEB_SITE "http://urv.ctns.cat/DecoyFinder"
+!define PRODUCT_WEB_SITE "http://urvnutrigenomica-ctns.github.com/DecoyFinder"
 !define PRODUCT_DIR_REGKEY "Software\Microsoft\Windows\CurrentVersion\App Paths\DecoyFinder.exe"
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
 !define PRODUCT_UNINST_ROOT_KEY "HKLM"
