@@ -133,7 +133,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.setWindowFlags (Qt.WindowContextHelpButtonHint)
         self.setWindowTitle("%s %s" % (self.App.applicationName(),  self.App.applicationVersion()))
         self.kdecoysFrame.setVisible(False)
-        self.cacheCheckBox.setChecked(bool(int(self.settings.value('usecache',  True))))
+        self.cacheCheckBox.setChecked('false' != self.settings.value('usecache',  True))
         self.progressBar.setMinimum(0)
         self.progressBar.setValue(0)
         for subset in ZINC_subsets:
