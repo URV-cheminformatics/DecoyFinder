@@ -222,7 +222,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             ndecoys = 0 #Possible comportament inconsistent -> poc prioritari
             self.tabWidget.setCurrentIndex(1)
             self.informationSavedToLineEdit.setText('%s_log.csv' % outputfile)
-            for ligand in resultdict.iterkeys():
+            for ligand in resultdict:
                 self.resultsTable.insertRow(0)
                 self.resultsTable.setItem(0, 0,  QTableWidgetItem(ligand.title))
                 self.resultsTable.setItem(0, 1,  QTableWidgetItem(str(resultdict[ligand])))
@@ -316,7 +316,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         """
         itemlist = self._getListWidgetItemTextList(self.dbListWidget)
         if self.dbComboBox.currentIndex() == 0:
-            #print "select files"
             dialog =  QFileDialog(self)
             dialog.setFileMode(QFileDialog.ExistingFiles)
             dialog.setNameFilter(self.supported_files)
@@ -365,7 +364,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.tabWidget.setEnabled(False)
         self.clearButton.setEnabled(False)
         self.findDecoysButton.setEnabled(False)
-        #print self.settings.value('outdir')
         query_files = self._getListWidgetItemTextList(self.queryList)
 
         decoy_files = self._getListWidgetItemTextList(self.decoyList)
@@ -465,7 +463,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         Slot documentation goes here.
         """
         self.settings.setValue('tanimoto_t', self.tanimotoBox.value())
-        #print "value changed"
 
 
     @Slot("")
