@@ -58,14 +58,14 @@ class DecoyFinderThread(QThread):
         """
         """
         self.info.emit(self.tr("Reading files..."))
-        #result = ()
+        result = None
         minreached = True
         try:
             self.filecount = 0
             self.currentfile = ''
             min = int(self.settings.value('decoy_min', 36))
+            outputfile = None
             for info in find_decoys(
-            #for filecount, current_file in find_decoys(
                         query_files = self.query_files
                         ,db_files = self.db_files
                         ,outputfile =  str(self.settings.value('outputfile', 'found'))
@@ -115,8 +115,14 @@ class DecoyFinderThread(QThread):
         except Exception, e:
             err = unicode(e)
             self.error.emit(self.trUtf8("Error: %s" % err))
-        self.info.emit("Decoys saved to " + outputfile)
-        self.finished.emit(result)
+        if outputfile:
+            self.info.emit("Decoys saved to " + outputfile)
+        else:
+            self.info.emit("No decoys were saved")
+        if result:
+            self.finished.emit(result)
+        else:
+            self.error.emit('Search was interrupted by an error or failure')
 
 class MainWindow(QMainWindow, Ui_MainWindow):
     """
@@ -133,7 +139,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.setWindowFlags (Qt.WindowContextHelpButtonHint)
         self.setWindowTitle("%s %s" % (self.App.applicationName(),  self.App.applicationVersion()))
         self.kdecoysFrame.setVisible(False)
-        self.cacheCheckBox.setChecked(bool(int(self.settings.value('usecache',  True))))
+        self.cacheCheckBox.setChecked('false' != self.settings.value('usecache',  True))
         self.progressBar.setMinimum(0)
         self.progressBar.setValue(0)
         for subset in ZINC_subsets:
@@ -214,7 +220,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             ndecoys = 0 #Possible comportament inconsistent -> poc prioritari
             self.tabWidget.setCurrentIndex(1)
             self.informationSavedToLineEdit.setText('%s_log.csv' % outputfile)
-            for ligand in resultdict.iterkeys():
+            for ligand in resultdict:
                 self.resultsTable.insertRow(0)
                 self.resultsTable.setItem(0, 0,  QTableWidgetItem(ligand.title))
                 self.resultsTable.setItem(0, 1,  QTableWidgetItem(str(resultdict[ligand])))
@@ -250,6 +256,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         """
         Display an error dialogue with the error
         """
+        self.tabWidget.setEnabled(True)
+        self.clearButton.setEnabled(True)
+        self.findDecoysButton.setEnabled(True)
         print(error)
         QMessageBox.critical(None,
             self.trUtf8("Error"),
@@ -305,7 +314,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         """
         itemlist = self._getListWidgetItemTextList(self.dbListWidget)
         if self.dbComboBox.currentIndex() == 0:
-            #print "select files"
             dialog =  QFileDialog(self)
             dialog.setFileMode(QFileDialog.ExistingFiles)
             dialog.setNameFilter(self.supported_files)
@@ -354,7 +362,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.tabWidget.setEnabled(False)
         self.clearButton.setEnabled(False)
         self.findDecoysButton.setEnabled(False)
-        #print self.settings.value('outdir')
         query_files = self._getListWidgetItemTextList(self.queryList)
 
         decoy_files = self._getListWidgetItemTextList(self.decoyList)
@@ -368,12 +375,15 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             if item.split()[0] == 'ZINC':
                 usecache = self.cacheCheckBox.isChecked()
                 zinc_file_gen = get_zinc_slice(item.split()[1], ZINC_subsets[self.zsubComboBox.currentText()], self.settings.value('cachedir',tempfile.gettempdir()),  usecache)
-                zfilecount = zinc_file_gen.next()
-                if zfilecount:
-                    total_files += zfilecount
-                    zinc_iter = itertools.chain(zinc_iter, zinc_file_gen)
-                else:
-                    self.on_error(filecount)
+                try:
+                    zfilecount = zinc_file_gen.next()
+                    if zfilecount:
+                        total_files += zfilecount
+                        zinc_iter = itertools.chain(zinc_iter, zinc_file_gen)
+                    else:
+                        raise
+                except Exception, e:
+                    self.on_error(e)
 
             elif os.path.isfile(item):
                 db_files.append(str(item))
@@ -451,7 +461,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         Slot documentation goes here.
         """
         self.settings.setValue('tanimoto_t', self.tanimotoBox.value())
-        #print "value changed"
 
 
     @Slot("")
