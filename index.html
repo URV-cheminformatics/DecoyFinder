@@ -1,14 +1,11 @@
 <!DOCTYPE html>
 <html><head>
-
-
-
-
-
-  <meta charset="utf-8"><title>DecoyFinder</title>
+  
+  <meta charset="utf-8">
+  <title>DecoyFinder</title>
 
   
-
+  
   <style type="text/css">
     body {
       margin-top: 1.0em;
@@ -31,19 +28,14 @@
     pre { background: #000; color: #fff; padding: 15px;}
     hr { border: 0; width: 80%; border-bottom: 1px solid #aaa}
     .footer { text-align:center; padding-top:30px; font-style: italic; }
-  </style></head><body>
-  <a href="https://github.com/ssorgatem/DecoyFinder"></a>
+  </style>
+</head><body>
 
-  <div style="width: 836px;" id="container"><img style="width: 128px; height: 128px;" alt="" src="icon.png" align="left"><big><big><big><big><big style="color: rgb(181, 253, 107);">&nbsp; <span style="font-weight: bold;">DecoyFinder</span></big> </big></big></big></big><br>
+<div style="width: 836px;" id="container"><img style="width: 128px; height: 128px;" alt="" src="icon.png" align="left"><big><big><big><big><big style="color: rgb(181, 253, 107);">&nbsp; <span style="font-weight: bold;">DecoyFinder</span></big> </big></big></big></big><br>
 <br>
-
-
-    <div style="margin-left: 168px; width: 707px; margin-top: 0px; height: 0px;" class="description">
-      A Tool for finding decoy molecule sets for given active ligand sets
-    </div>
-
-    
-      <p><br>
+<div style="margin-left: 168px; width: 707px; margin-top: 0px; height: 0px;" class="description"> A Tool for finding decoy molecule sets for given
+active ligand sets </div>
+<p><br>
 </p>
 <p>DecoyFinder is a graphical tool which helps finding sets of decoy
 molecules for a given group of active ligands. It does so by finding
@@ -56,30 +48,29 @@ between decoys in order assure chemical diversity in the decoy set.
 </p>
 <h2><span style="font-weight: bold;">Downloads</span><br>
 </h2>
-
-      
 <ul>
-<li><a href="DecoyFinder-1.0_installer.exe"><span style="font-weight: bold;">Windows 32-bit</span></a></li>
-  <li><a href="decoyfinder-1.0_all.deb"><span style="font-weight: bold;">Ubuntu +11.10 and Debian testing</span></a></li>
+  <li><a href="DecoyFinder-1.0_installer.exe"><span style="font-weight: bold;">Windows 32-bit</span></a></li>
+  <li><a href="decoyfinder-1.0_all.deb"><span style="font-weight: bold;">Ubuntu
++11.10 and Debian testing</span></a></li>
   <li><span style="font-weight: bold;"><a href="decoyfinder-pyqt-1.0_all.deb">Ubuntu +10.10 (PyQt4 version)</a><br>
-</span></li>
+    </span></li>
   <li><span style="font-weight: bold;">Others:</span></li>
   <ul>
     <li><a href="DecoyFinder-1.0.tar.bz2"><span style="font-weight: bold;">Source (PySide version)</span></a></li>
     <li><span style="font-weight: bold;"><a href="DecoyFinder-pyqt-1.0.tar.bz2">Source (PyQt4 version)</a><br>
-</span></li>
+      </span></li>
   </ul>
 </ul>
-
-    
-
-    
-      <h2>Install</h2>
-      
+<h2>Install</h2>
 <ul>
-  <li><span style="font-weight: bold;">Windows users:</span> just use the installer, all needed files are provided.</li>
-  <li><span style="font-weight: bold;">Ubuntu 11.10 and Debian testing users:</span> simply install the provided .deb package, all dependencies will be automatically installed by the package manager</li>
-  <li><span style="font-weight: bold;">Users of older Ubuntu releases</span> shold manually (or using <a href="http://packages.ubuntu.com/search?keywords=openbabel+&amp;searchon=names&amp;suite=all&amp;section=all" target="_blank">a .deb package for a newer Ubuntu release</a>) install OpenBabel =&gt;2.3.0 and install the PyQt4 version of DecoyFinder </li>
+  <li><span style="font-weight: bold;">Windows users:</span> just use
+the installer, all needed files are provided.</li>
+  <li><span style="font-weight: bold;">Ubuntu 11.10 and Debian testing
+users:</span> simply install the provided .deb package, all
+dependencies will be automatically installed by the package manager</li>
+  <li><span style="font-weight: bold;">Users of older Ubuntu releases</span>
+shold manually (or using <a href="http://packages.ubuntu.com/search?keywords=openbabel+&amp;searchon=names&amp;suite=all&amp;section=all" target="_blank">a .deb package for a newer Ubuntu release</a>) install
+OpenBabel =&gt;2.3.0 and install the PyQt4 version of DecoyFinder </li>
 </ul>
 <p><br>
 If you are running an OS for wich there are no DecoyFinder packages
@@ -87,53 +78,44 @@ available, you must make sure you have all the dependencies are
 correctly installed and then it should work from the generic (source)
 package, just executing the following from a command line:</p>
 <pre style="margin-left: 71px; width: 476px;">$ python PATH/TO/DECOYFINDER/decoy_finder.py</pre>
-
-    
-
-    
-      
 <h2 style="margin-left: 0px; width: 870px;">Dependencies</h2>
-
-      
 <ul>
-<li><a href="http://www.python.org/getit/" target="_blank">Python</a> &gt;= 2.5,&nbsp; &lt; 3</li><li><a href="http://openbabel.org/wiki/Category:Installation">OpenBabel</a> &gt;= 2.3.0 with python bindings</li><li>pybel (usually included with OpenBabel python bindings; also part of <a href="http://code.google.com/p/cinfony/" target="_blank">cinfony</a>)</li><li><a href="http://www.pyside.org/downloads/" target="_blank">PySide</a> &gt;= 1.0 (or <a href="http://www.riverbankcomputing.co.uk/software/pyqt/download">PyQt4</a> &gt;= 4.6 for PyQt4 version)</li><li>Qt &gt;= 4.6 (sometimes included with PySide or PyQt, depending on your platform)</li>
+  <li><a href="http://www.python.org/getit/" target="_blank">Python</a>
+&gt;= 2.5,&nbsp; &lt; 3</li>
+  <li><a href="http://openbabel.org/wiki/Category:Installation">OpenBabel</a>
+&gt;= 2.3.0 with python bindings</li>
+  <li>pybel (usually included with OpenBabel python bindings; also part
+of <a href="http://code.google.com/p/cinfony/" target="_blank">cinfony</a>)</li>
+  <li><a href="http://www.pyside.org/downloads/" target="_blank">PySide</a>
+&gt;= 1.0 (or <a href="http://www.riverbankcomputing.co.uk/software/pyqt/download">PyQt4</a>
+&gt;= 4.6 for PyQt4 version)</li>
+  <li>Qt &gt;= 4.6 (sometimes included with PySide or PyQt, depending
+on your platform)</li>
 </ul>
-
 <h2>License</h2>
-
-      <p>GPLv3: GNU General Public License version 3, wich can be read <a href="LICENCE.html" target="_blank">here</a>&nbsp; </p>
-    
-
-    
-      <h2>Authors</h2>
-      <p>Adrià Cereto-Massagué (<a href="mailto:adrian.cereto@urv.cat">adrian.cereto at urv .cat</a>), Laura Guasch, Miquel Mulero, Cristina Valls, Santiago García-Vallvé*, Gerard Pujadas</p>
+<p>GPLv3: GNU General Public License version 3, wich can be read <a href="LICENCE.html" target="_blank">here</a>&nbsp; </p>
+<h2>Authors</h2>
+<p>Adrià Cereto-Massagué (<a href="mailto:adrian.cereto@urv.cat">adrian.cereto
+at urv .cat</a>), Laura Guasch, Miquel Mulero, Cristina Valls, Santiago
+García-Vallvé*, Gerard Pujadas</p>
 <p><small><span style="font-style: italic;">Grup de Recerca en
 Nutrigenòmica, Departament de Bioquímica i Biotecnologia, Universitat
 Rovira i Virgili, Campus de Sescelades, C/Marcel.lí Domingo s/n, 43007,
 Tarragona, Catalonia, Spain.</span></small><br>
-
-      </p>
-
-    
-
-    
-      <h2>Contact</h2>
-      <p>Adrià Cereto-Massagué (<a href="mailto:adrian.cereto@urv.cat">adrian.cereto at urv .cat</a>)
-      </p>
-    
-
-    <h2>Documentation</h2>
-    <p>Documentation is available <a href="https://github.com/ssorgatem/DecoyFinder/wiki" target="_blank">here</a><br>
-
-    </p>
-<a href="https://github.com/ssorgatem/DecoyFinder/tarball/master">    </a><div style="width: 873px;" class="footer"><img style="width: 76px; height: 62px;" alt="Universitat Rovira i Virgili" title="Universitat Rovira i Virgili" src="urv.png" align="top"><br>
+</p>
+<h2>Contact</h2>
+<p>Adrià Cereto-Massagué (<a href="mailto:adrian.cereto@urv.cat">adrian.cereto
+at urv .cat</a>) </p>
+<h2>Documentation</h2>
+<p>Documentation is available <a href="https://github.com/URVnutrigenomica-CTNS/DecoyFinder/wiki" target="_blank">here</a><br>
+</p>
+<div style="width: 873px;" class="footer"><img style="width: 76px; height: 62px;" alt="Universitat Rovira i Virgili" title="Universitat Rovira i Virgili" src="urv.png" align="top"><br>
 <span style="font-weight: bold;">Universitat Rovira i Virgili</span><br style="font-weight: bold;">
 <span style="font-weight: bold;">Tarragona, Spain<br>
 <br>
-</span>get the source code on GitHub : <a href="https://github.com/ssorgatem/DecoyFinder">DecoyFinder</a>
-    </div>
-
-  </div>
+</span>get the source code on GitHub : <a href="https://github.com/URVnutrigenomica-CTNS/DecoyFinder">DecoyFinder</a>
+</div>
+</div>
 
 <script type="\&quot;text/javascript\&quot;">
 var gaJsHost = ((\"https:\" == document.location.protocol) ? \"https://ssl.\" : \"http://www.\");
