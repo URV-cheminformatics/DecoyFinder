@@ -19,6 +19,13 @@
 #       along with this program; if not, write to the Free Software
 #       Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 #       MA 02110-1301, USA.
+import os
+if os.name == 'nt' and not os.environ.has_key('BABEL_DATADIR'):
+    if os.path.isdir('obdata'):
+        os.environ['BABEL_DATADIR'] = os.path.abspath('obdata')
+        print 'BABEL_DATADIR set to ', os.environ['BABEL_DATADIR']
+    else:
+        print 'BABEL_DATADIR not set. Some file formats and fingerprints won\'t work!'
 
 import sys
 

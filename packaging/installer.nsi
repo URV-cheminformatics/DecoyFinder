@@ -71,7 +71,7 @@ Section "DecoyFinder" SEC01
   File "..\LICENCE.txt"
   File "..\RELEASE_NOTES.txt"
   SetOutPath "$TEMP"
-  File "..\..\..\..\winbin\OpenBabel2.3.1_Windows_Installer.exe"
+  File "..\..\..\winbin\OpenBabel2.3.1_Windows_Installer.exe"
   ExecWait "$TEMP\OpenBabel2.3.1_Windows_Installer.exe"
   Delete "$TEMP\OpenBabel2.3.1_Windows_Installer.exe"
   SetOutPath "$INSTDIR"
