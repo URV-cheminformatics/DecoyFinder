@@ -3,10 +3,11 @@
 import os, shutil
 # Process the includes and excludes first
 
-cwd = os.getcwd()
+cwd = os.path.abspath(os.getcwd())
+
 obdir = os.path.abspath(os.path.join(os.environ['BABEL_DATADIR'] , '..'))
 
-data_files = [(file,os.path.join(obdir, file),'DATA') for file in os.listdir(obdir) if os.path.splitext(file)[1] == '.obf']
+data_files = [(file,os.path.join(obdir, file),'DATA') for file in os.listdir(obdir) if os.path.splitext(file)[1].lower() == '.obf']
 
 for file in os.listdir(os.environ['BABEL_DATADIR']):
     data_files.append((file, os.path.join(os.environ['BABEL_DATADIR'], file),
@@ -22,6 +23,14 @@ dll_includes = [('QtCore4.dll', 'C:\\Python27\\Lib\\site-packages\\PySide\\QtCor
                 'BINARY'), ('QtGui4.dll', 'C:\\Python27\\Lib\\site-packages\\PySide\\QtGui4.dll',
                 'BINARY')]
 
+for file in os.listdir(obdir):
+    if os.path.splitext(file)[1].lower() == '.dll':
+        if 'csharp' in file.lower() or 'dotnet'in file.lower() or 'java' in file.lower():
+            dll_excludes.append((file, os.path.join(obdir, file),
+                'BINARY'))
+        else:
+            dll_includes.append((file, os.path.join(obdir, file),
+                'BINARY'))
 # Set up the more obscure PyInstaller runtime options
 
 options = [('O', '', 'OPTION')]
@@ -65,11 +74,9 @@ executable = EXE( pyz,
 # to clean up your folders or to do some particular post-compilation
 # actions.
 
-if os.path.isdir('obdata'):
-    shutil.rmtree('obdata')
-shutil.copytree(os.environ['BABEL_DATADIR'],'obdata')
-
-
+vcredist = os.path.join(obdir, 'vcredist_x86.exe')
+if os.path.isfile(vcredist):
+    shutil.copy(vcredist,  cwd)
 
 # And we are done. That's a setup script :-D
 

@@ -21,11 +21,9 @@
 #       MA 02110-1301, USA.
 import os
 if os.name == 'nt' and not os.environ.has_key('BABEL_DATADIR'):
-    if os.path.isdir('obdata'):
-        os.environ['BABEL_DATADIR'] = os.path.abspath('obdata')
-        print 'BABEL_DATADIR set to ', os.environ['BABEL_DATADIR']
-    else:
-        print 'BABEL_DATADIR not set. Some file formats and fingerprints won\'t work!'
+    os.environ['BABEL_DATADIR'] = os.environ.get("_MEIPASS2", os.path.abspath(__file__))
+    os.environ['PATH'] =  os.environ['BABEL_DATADIR'] + ';' + os.environ['PATH']
+    print 'BABEL_DATADIR set to ', os.environ['BABEL_DATADIR']
 
 import sys
 
