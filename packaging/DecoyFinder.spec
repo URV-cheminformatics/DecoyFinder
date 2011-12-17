@@ -3,6 +3,9 @@
 import os, shutil
 # Process the includes and excludes first
 
+cwd = os.getcwd()
+
+
 data_files = [('formats_xml.obf', os.environ['BABEL_DATADIR'] + '\\..\\formats_xml.obf',
               'DATA'), ('plugin_fingerprints.obf', os.environ['BABEL_DATADIR'] + '\\..\\plugin_fingerprints.obf',
               'DATA'), ('formats_cairo.obf', os.environ['BABEL_DATADIR'] + '\\..\\formats_cairo.obf',
@@ -40,9 +43,9 @@ options = [('v', '', 'OPTION'), ('O', '', 'OPTION')]
 # The setup for PyInstaller is different from py2exe. Here I am going to
 # use some common spec file declarations
 
-analysis = Analysis(['Z:\\home\\adria\\winbin\\pyinstaller-1.5.1\\support\\_mountzlib.py',
-           'Z:\\home\\adria\\winbin\\pyinstaller-1.5.1\\support\\useUnicode.py',
-           'Z:\\home\\adria\\Documents\\decoys\\decoy_finder.py'],
+analysis = Analysis([os.path.abspath(os.path.join('Z:\\home\\', os.environ['USER'] ,'winbin\\pyinstaller-1.5.1\\support\\_mountzlib.py')),
+           os.path.abspath(os.path.join('Z:\\home\\', os.environ['USER'] ,'winbin\\pyinstaller-1.5.1\\support\\useUnicode.py')),
+           os.path.abspath(os.path.join(cwd,'../decoy_finder.py'))],
                     pathex=[],
                     hookspath=[],
                     excludes=excludes)
@@ -58,7 +61,7 @@ executable = EXE( pyz,
                  console=False,
                  strip=False,
                  upx=True,
-                 icon=r'Z:\home\adria\Documents\decoys\icon.ico',
+                 icon=os.path.abspath(os.path.join(cwd, '../icon.ico')),
                  version=None)
 
 # This is a place where any post-compile code may go.
