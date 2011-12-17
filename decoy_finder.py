@@ -20,11 +20,12 @@
 #       Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 #       MA 02110-1301, USA.
 import os
-if os.name == 'nt' and os.environ.has_key("_MEIPASS2"):
+if os.environ.has_key("_MEIPASS2"):
     #On Windows it's going to run,most probably, from a frozen pyinstaller package. When this is the case,
     #if there is an OpenBabel version installed on the machine which differs from the packaged one, bad things could happen.
     #So we just ignore any possible openBabel installation and point the environmental variables to the temporal
     #directory where everything is unpacked when DecoyFinder is run
+    #However the following applies presumably on any platform when running from a pyinstaller package:
     os.environ['BABEL_DATADIR'] = os.environ["_MEIPASS2"]
     #%_MEIPASS2% is the directory where the package is decompressed and where all libraries and data are.
     os.environ['PATH'] =  os.environ['_MEIPASS2'] + ';' + os.environ['PATH']
