@@ -3,7 +3,7 @@
 ; HM NIS Edit Wizard helper defines
 !define PRODUCT_NAME "DecoyFinder"
 !define PRODUCT_VERSION "1.0"
-!define PRODUCT_PUBLISHER "Grup de Recerca en Nutrigenòmica - Universitat Rovira i Virgila"
+!define PRODUCT_PUBLISHER "Grup de Recerca en NutrigenÃ²mica - Universitat Rovira i Virgili"
 !define PRODUCT_WEB_SITE "http://urvnutrigenomica-ctns.github.com/DecoyFinder"
 !define PRODUCT_DIR_REGKEY "Software\Microsoft\Windows\CurrentVersion\App Paths\DecoyFinder.exe"
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
@@ -45,7 +45,7 @@ var ICONS_GROUP
 ; Finish page
 
 ; Finish page
-;!define MUI_FINISHPAGE_RUN "$INSTDIR\DecoyFinder.exe"
+!define MUI_FINISHPAGE_RUN "$INSTDIR\DecoyFinder.exe"
 !define MUI_FINISHPAGE_SHOWREADME "$INSTDIR\README.txt"
 !insertmacro MUI_PAGE_FINISH
 ; Language files
@@ -71,9 +71,9 @@ Section "DecoyFinder" SEC01
   File "..\LICENCE.txt"
   File "..\RELEASE_NOTES.txt"
   SetOutPath "$TEMP"
-  File "..\..\..\..\winbin\OpenBabel2.3.1_Windows_Installer.exe"
-  ExecWait "$TEMP\OpenBabel2.3.1_Windows_Installer.exe"
-  Delete "$TEMP\OpenBabel2.3.1_Windows_Installer.exe"
+  File "vcredist_x86.exe"
+  ExecWait "$TEMP\vcredist_x86.exe /q:a"
+  Delete "$TEMP\vcredist_x86.exe"
   SetOutPath "$INSTDIR"
 
 ; Shortcuts
