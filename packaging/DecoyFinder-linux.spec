@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 #-*- coding:utf-8 -*-
-import os, shutil
+import os, shutil, platform
 # Process the includes and excludes first
 
 cwd = os.path.abspath(os.getcwd())
 
-obdir = '/usr/lib/openbabel/2.3.1/'
-datadir = '/usr/share/openbabel/2.3.1/'
+obdir = '/opt/openbabel-2.3.1/lib/openbabel/2.3.1'
+datadir = '/opt/openbabel-2.3.1/share/openbabel/2.3.1'
 
 data_files = [(file,os.path.join(datadir, file),'DATA') for file in os.listdir(datadir)]
 
@@ -52,7 +52,7 @@ pyz = PYZ(analysis.pure, level=9)
 executable = EXE( pyz,
                  analysis.scripts + includes + packages + options,
                  analysis.binaries - dll_excludes + dll_includes + data_files,
-                 name=r"DecoyFinder",
+                 name=r"DecoyFinder_" + platform.architecture()[0],
                  debug=False,
                  console=False,
                  strip=False,
