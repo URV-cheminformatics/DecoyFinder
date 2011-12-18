@@ -27,6 +27,7 @@ if os.environ.has_key("_MEIPASS2"):
     #directory where everything is unpacked when DecoyFinder is run
     #However the following applies presumably on any platform when running from a pyinstaller package:
     os.environ['BABEL_DATADIR'] = os.environ["_MEIPASS2"]
+    os.environ['BABEL_LIBDIR'] = os.environ["_MEIPASS2"]
     #%_MEIPASS2% is the directory where the package is decompressed and where all libraries and data are.
     os.environ['PATH'] =  os.environ['_MEIPASS2'] + ';' + os.environ['PATH']
     print 'BABEL_DATADIR set to ', os.environ['BABEL_DATADIR']
