@@ -3,7 +3,7 @@
 . ./debdist
 
 current_branch=$(git symbolic-ref HEAD 2>/dev/null | cut -d"/" -f 3)
-if [ "$current_branch" == "master" ]; then
+if [[ "$current_branch" = "master" ]]; then
 	new_branch=pyqt
 else
 	new_branch="$current_branch"-pyqt
