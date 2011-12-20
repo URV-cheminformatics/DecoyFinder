@@ -19,7 +19,10 @@ class AboutDialog(QDialog, Ui_Dialog):
         """
         QDialog.__init__(self, parent)
         self.setupUi(self)
-        self.fdir = os.path.dirname(__file__)
+        if "_MEIPASS2" in os.environ:
+            self.fdir = os.environ["_MEIPASS2"]
+        else:
+            self.fdir = os.path.dirname(__file__)
 
     @Slot("")
     def on_licenseButton_clicked(self):

@@ -27,6 +27,10 @@ for file in os.listdir(datadir):
 
 data_files.append(('qt.conf', os.path.join(cwd, 'qt.conf'),
              'DATA'))
+data_files.append(('LICENCE.html', os.path.join(cwd, '..',  'LICENCE.html'),
+             'DATA'))
+data_files.append(('RELEASE_NOTES.txt', os.path.join(cwd, '..',  'RELEASE_NOTES.txt'),
+             'DATA'))
 
 includes = []
 excludes = ['_gtkagg', '_tkagg', 'bsddb', 'curses', 'email', 'pywin.debugger',
