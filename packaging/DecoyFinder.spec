@@ -1,16 +1,31 @@
 #!/usr/bin/env python
 #-*- coding:utf-8 -*-
-import os, shutil
+import os, shutil, platform
 # Process the includes and excludes first
+
+NAME=r"DecoyFinder"
+if os.name == 'nt':
+    NAME += '.exe'
+else:
+    NAME +="_" + platform.architecture()[0]
 
 cwd = os.path.abspath(os.getcwd())
 
-obdir = os.path.abspath(os.path.join(os.environ['BABEL_DATADIR'] , '..'))
+datadir = os.environ['BABEL_DATADIR']
 
-data_files = [(file,os.path.join(obdir, file),'DATA') for file in os.listdir(obdir) if os.path.splitext(file)[1].lower() == '.obf']
+data_files = []
 
-for file in os.listdir(os.environ['BABEL_DATADIR']):
+if os.name == 'nt':
+    obdir = os.path.abspath(os.path.join(datadir , '..'))
+    data_files = [(file,os.path.join(obdir, file),'DATA') for file in os.listdir(obdir) if os.path.splitext(file)[1].lower() == '.obf']
+else:
+    obdir = os.environ['BABEL_LIBDIR'] #'/opt/openbabel-2.3.1/lib/openbabel/2.3.1'
+
+for file in os.listdir(datadir):
     data_files.append((file, os.path.join(os.environ['BABEL_DATADIR'], file),
+             'DATA'))
+
+data_files.append(('qt.conf', os.path.join(cwd, 'qt.conf'),
              'DATA'))
 
 includes = []
@@ -19,12 +34,15 @@ excludes = ['_gtkagg', '_tkagg', 'bsddb', 'curses', 'email', 'pywin.debugger',
             'Tkconstants', 'Tkinter']
 packages = []
 dll_excludes = []
-dll_includes = [('QtCore4.dll', 'C:\\Python27\\Lib\\site-packages\\PySide\\QtCore4.dll',
-                'BINARY'), ('QtGui4.dll', 'C:\\Python27\\Lib\\site-packages\\PySide\\QtGui4.dll',
-                'BINARY')]
+dll_includes = []
+if os.name == 'nt':
+    dll_includes = [('QtCore4.dll', 'C:\\Python27\\Lib\\site-packages\\PySide\\QtCore4.dll',
+                    'BINARY'), ('QtGui4.dll', 'C:\\Python27\\Lib\\site-packages\\PySide\\QtGui4.dll',
+                    'BINARY')]
+
 
 for file in os.listdir(obdir):
-    if os.path.splitext(file)[1].lower() == '.dll':
+    if os.path.splitext(file)[1].lower() in ('.dll', '.so'):
         if 'csharp' in file.lower() or 'dotnet'in file.lower() or 'java' in file.lower():
             dll_excludes.append((file, os.path.join(obdir, file),
                 'BINARY'))
@@ -45,26 +63,31 @@ options = [('O', '', 'OPTION')]
 
 # The setup for PyInstaller is different from py2exe. Here I am going to
 # use some common spec file declarations
+if os.name == 'nt':
+    homepath = os.path.join('Z:/home', os.environ['USER'])
+else:
+    homepath = os.environ['HOME']
 
-bindir = os.path.join('Z:\\home\\', os.environ['USER'] ,'winbin')
+pidir = os.path.join(homepath ,'winbin', 'pyinstaller-1.5.1')
 
-analysis = Analysis([os.path.abspath(os.path.join(bindir, 'pyinstaller-1.5.1\\support\\_mountzlib.py')),
-           os.path.abspath(os.path.join(bindir, 'pyinstaller-1.5.1\\support\\useUnicode.py')),
-           os.path.abspath(os.path.join(cwd,'../decoy_finder.py'))],
+print os.path.abspath(os.path.join(pidir, 'support','_mountzlib.py'))
+
+analysis = Analysis([os.path.abspath(os.path.join(pidir, 'support','_mountzlib.py')),
+           os.path.abspath(os.path.join(pidir, 'support','useUnicode.py')),
+           os.path.abspath(os.path.join(cwd,'..','decoy_finder.py'))],
                     pathex=[],
                     hookspath=[],
                     excludes=excludes)
 
 pyz = PYZ(analysis.pure, level=9)
 
-
 executable = EXE( pyz,
                  analysis.scripts + includes + packages + options,
                  analysis.binaries - dll_excludes + dll_includes + data_files,
-                 name=r"DecoyFinder.exe",
+                 name=NAME,
                  debug=False,
                  console=False,
-                 strip=False,
+                 strip= os.name != 'nt',
                  upx=True,
                  icon=os.path.abspath(os.path.join(cwd, '../icon.ico')),
                  version=None)
