@@ -7,7 +7,7 @@ NAME=r"DecoyFinder"
 if os.name == 'nt':
     NAME += '.exe'
 else:
-    NAME +="_" + "_".join(platform.system().lower(), platform.architecture()[0])
+    NAME +="_" + "_".join([platform.system().lower(), platform.architecture()[0]])
 
 cwd = os.path.abspath(os.getcwd())
 
