@@ -25,6 +25,9 @@ for file in os.listdir(datadir):
     data_files.append((file, os.path.join(os.environ['BABEL_DATADIR'], file),
              'DATA'))
 
+data_files.append(('qt.conf', os.path.join(cwd, 'qt.conf'),
+             'DATA'))
+
 includes = []
 excludes = ['_gtkagg', '_tkagg', 'bsddb', 'curses', 'email', 'pywin.debugger',
             'pywin.debugger.dbgcon', 'pywin.dialogs', 'tcl',
