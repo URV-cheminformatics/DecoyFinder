@@ -1,35 +1,72 @@
 <!DOCTYPE html>
 <html><head>
+
   
-  <meta charset="utf-8">
-  <title>DecoyFinder</title>
+  <meta charset="utf-8"><title>DecoyFinder</title>
+  
 
   
   
   <style type="text/css">
-    body {
-      margin-top: 1.0em;
-      background-color: #4a0294;
-      font-family: Helvetica, Arial, FreeSans, san-serif;
-      color: #ffffff;
-    }
-    #container {
-      margin: 0 auto;
-      width: 700px;
-    }
-    h1 { font-size: 3.8em; color: #b5fd6b; margin-bottom: 3px; }
-    h1 .small { font-size: 0.4em; }
-    h1 a { text-decoration: none }
-    h2 { font-size: 1.5em; color: #b5fd6b; }
-    h3 { text-align: center; color: #b5fd6b; }
-    a { color: #b5fd6b; }
-    .description { font-size: 1.2em; margin-bottom: 30px; margin-top: 30px; font-style: italic;}
-    .download { float: right; }
-    pre { background: #000; color: #fff; padding: 15px;}
-    hr { border: 0; width: 80%; border-bottom: 1px solid #aaa}
-    .footer { text-align:center; padding-top:30px; font-style: italic; }
-  </style>
-</head><body>
+body {
+  margin-top: 1em;
+  background-color: #666666;
+  font-family: Helvetica,Arial,FreeSans,san-serif;
+  color: #ffffff;
+}
+#container {
+  margin: 0 auto;
+  width: 700px;
+}
+h1 {
+  font-size: 3.8em;
+  color: #b5fd6b;
+  margin-bottom: 3px;
+}
+h1 .small {
+  font-size: 0.4em;
+}
+h1 a {
+  text-decoration: none;
+}
+h2 {
+  font-size: 1.5em;
+  color: #b5fd6b;
+}
+h3 {
+  text-align: center;
+  color: #b5fd6b;
+}
+a {
+  color: #b5fd6b;
+}
+.description {
+  font-size: 1.2em;
+  margin-bottom: 30px;
+  margin-top: 30px;
+  font-style: italic;
+}
+.download {
+  float: right;
+}
+pre {
+  padding: 15px;
+  background: #000000 none repeat scroll 0%;
+  color: #ffffff;
+}
+hr {
+  border-style: none none solid;
+  border-color: -moz-use-text-color -moz-use-text-color #aaaaaa;
+  border-width: 0 0 1px;
+  width: 80%;
+}
+.footer {
+  text-align: center;
+  padding-top: 30px;
+  font-style: italic;
+}
+
+</style></head><body>
 
 <div style="width: 836px;" id="container"><img style="width: 128px; height: 128px;" alt="" src="icon.png" align="left"><big><big><big><big><big style="color: rgb(181, 253, 107);">&nbsp; <span style="font-weight: bold;">DecoyFinder</span></big> </big></big></big></big><br>
 <br>
@@ -44,24 +81,50 @@ bond acceptors, hydrogen bond donors, logP value and molecular weight,
 but are chemically different, which is defined by a maximum Tanimoto
 value threshold between active ligand and decoy molecule MACCS
 fingerprints. Optionally, a maximum Tanimoto value threshold can be set
-between decoys in order assure chemical diversity in the decoy set.
+between decoys in order assure chemical diversity in the decoy set.</p>
+<h2><span style="font-weight: bold;">Index</span></h2>
+<ul>
+  <li><a href="index.html#Authors"><span style="font-weight: bold;">Authors</span></a><br>
+    <a href="#Downloads_"><span style="font-weight: bold;"></span></a></li>
+  <li><a href="#Downloads_"><span style="font-weight: bold;">Downloads</span></a></li>
+  <li><span style="font-weight: bold;"><a href="#Install">Install</a></span></li>
+  <li><a href="#Dependencies"><span style="font-weight: bold;">Dependencies</span></a></li>
+  <li><span style="font-weight: bold;"><a href="index.html#Documentation">Documentation</a></span></li>
+  <li><a href="#License"><span style="font-weight: bold;">License</span></a></li>
+  <li><a href="#Contact"><span style="font-weight: bold;">Contact</span></a></li>
+</ul>
+<p>&nbsp; 
 </p>
-<h2><span style="font-weight: bold;">Downloads</span><br>
+<h2><a name="Authors"></a>Authors</h2>
+
+<p>Adrià Cereto-Massagué (<a href="mailto:adrian.cereto@urv.cat">adrian.cereto
+at urv .cat</a>), Laura Guasch, Miquel Mulero, Cristina Valls, Santiago
+García-Vallvé*, Gerard Pujadas</p>
+
+<small><span style="font-style: italic;">Grup de Recerca en
+Nutrigenòmica, Departament de Bioquímica i Biotecnologia, Universitat
+Rovira i Virgili, Campus de Sescelades, C/Marcel.lí Domingo s/n, 43007,
+Tarragona, Catalonia, Spain.</span></small>
+<p>
+</p>
+
+<h2><a name="Downloads_"></a><span style="font-weight: bold;">Downloads</span><br>
 </h2>
 <ul>
-  <li><a href="DecoyFinder-1.0_installer.exe"><span style="font-weight: bold;">Windows 32-bit</span></a></li>
-  <li><a href="decoyfinder-1.0_all.deb"><span style="font-weight: bold;">Ubuntu
+  <li><a href="https://github.com/downloads/URVnutrigenomica-CTNS/DecoyFinder/DecoyFinder-1.0_installer.exe"><span style="font-weight: bold;">Windows 32-bit installer<br>
+</span></a></li>
+  <li><a href="https://github.com/downloads/URVnutrigenomica-CTNS/DecoyFinder/decoyfinder-1.0_all.deb"><span style="font-weight: bold;">Ubuntu
 +11.10 and Debian testing</span></a></li>
-  <li><span style="font-weight: bold;"><a href="decoyfinder-pyqt-1.0_all.deb">Ubuntu +10.10 (PyQt4 version)</a><br>
+  <li><span style="font-weight: bold;"><a href="https://github.com/downloads/URVnutrigenomica-CTNS/DecoyFinder/decoyfinder-pyqt-1.0_all.deb">Ubuntu +10.10 (PyQt4 version)</a><br>
     </span></li>
   <li><span style="font-weight: bold;">Others:</span></li>
   <ul>
-    <li><a href="DecoyFinder-1.0.tar.bz2"><span style="font-weight: bold;">Source (PySide version)</span></a></li>
-    <li><span style="font-weight: bold;"><a href="DecoyFinder-pyqt-1.0.tar.bz2">Source (PyQt4 version)</a><br>
+    <li><a href="https://github.com/downloads/URVnutrigenomica-CTNS/DecoyFinder/DecoyFinder-1.0.tar.bz2"><span style="font-weight: bold;">Source (PySide version)</span></a></li>
+    <li><span style="font-weight: bold;"><a href="https://github.com/downloads/URVnutrigenomica-CTNS/DecoyFinder/DecoyFinder-pyqt-1.0.tar.bz2">Source (PyQt4 version)</a><br>
       </span></li>
   </ul>
 </ul>
-<h2>Install</h2>
+<h2><a name="Install"></a>Install</h2>
 <ul>
   <li><span style="font-weight: bold;">Windows users:</span> just use
 the installer, all needed files are provided.</li>
@@ -78,7 +141,7 @@ available, you must make sure you have all the dependencies are
 correctly installed and then it should work from the generic (source)
 package, just executing the following from a command line:</p>
 <pre style="margin-left: 71px; width: 476px;">$ python PATH/TO/DECOYFINDER/decoy_finder.py</pre>
-<h2 style="margin-left: 0px; width: 870px;">Dependencies</h2>
+<h2 style="margin-left: 0px; width: 870px;"><a name="Dependencies"></a>Dependencies</h2>
 <ul>
   <li><a href="http://www.python.org/getit/" target="_blank">Python</a>
 &gt;= 2.5,&nbsp; &lt; 3</li>
@@ -91,27 +154,14 @@ of <a href="http://code.google.com/p/cinfony/" target="_blank">cinfony</a>)</li>
 &gt;= 4.6 for PyQt4 version)</li>
   <li>Qt &gt;= 4.6 (sometimes included with PySide or PyQt, depending
 on your platform)</li>
-</ul>
-<h2>License</h2>
-<p>GPLv3: GNU General Public License version 3, wich can be read <a href="LICENCE.html" target="_blank">here</a>&nbsp; </p>
-<h2>Authors</h2>
+</ul> 
+<h2><a name="Documentation"></a>Documentation</h2>
+
+Documentation is available <a href="https://github.com/URVnutrigenomica-CTNS/DecoyFinder/wiki" target="_blank">here</a>
+<h2><a name="License"></a>License</h2>
+<p>GPLv3: GNU General Public License version 3, wich can be read <a href="LICENCE.html" target="_blank">here</a></p><h2><a name="Contact"></a>Contact</h2>
 <p>Adrià Cereto-Massagué (<a href="mailto:adrian.cereto@urv.cat">adrian.cereto
-at urv .cat</a>), Laura Guasch, Miquel Mulero, Cristina Valls, Santiago
-García-Vallvé*, Gerard Pujadas</p>
-<p><small><span style="font-style: italic;">Grup de Recerca en
-Nutrigenòmica, Departament de Bioquímica i Biotecnologia, Universitat
-Rovira i Virgili, Campus de Sescelades, C/Marcel.lí Domingo s/n, 43007,
-Tarragona, Catalonia, Spain.</span></small><br>
-</p>
-<h2>Contact</h2>
-<p>Adrià Cereto-Massagué (<a href="mailto:adrian.cereto@urv.cat">adrian.cereto
-at urv .cat</a>) </p>
-<h2>Documentation</h2>
-<p>Documentation is available <a href="https://github.com/URVnutrigenomica-CTNS/DecoyFinder/wiki" target="_blank">here</a><br>
-</p>
-<div style="width: 873px;" class="footer"><img style="width: 76px; height: 62px;" alt="Universitat Rovira i Virgili" title="Universitat Rovira i Virgili" src="urv.png" align="top"><br>
-<span style="font-weight: bold;">Universitat Rovira i Virgili</span><br style="font-weight: bold;">
-<span style="font-weight: bold;">Tarragona, Spain<br>
+at urv .cat</a>)</p><div style="width: 873px;" class="footer"><span style="font-weight: bold;"><a href="http://www.urv.cat"><img style="border: 0px solid ; width: 465px; height: 101px;" alt="www.urv.cat" src="URV.png"></a><a href="http://www.ctns.cat"><img style="border: 0px solid ; width: 200px; height: 79px;" alt="www.ctns.cat" src="logo_ctns.jpg"></a><br>
 <br>
 </span>get the source code on GitHub : <a href="https://github.com/URVnutrigenomica-CTNS/DecoyFinder">DecoyFinder</a>
 </div>
