@@ -24,8 +24,10 @@ import os, urllib2, tempfile, random,  sys,  gzip,  datetime
 from decimal import Decimal
 rdk = False
 try:
+    raise
     from cinfony import pybel, rdk
 except:
+    print('unable to load cinfony')
     import pybel
 #Decimal() can represent floating point data with higher precission than built-in float
 
