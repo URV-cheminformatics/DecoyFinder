@@ -75,8 +75,8 @@ class DecoyFinderThread(QThread):
                         ,tanimoto_t = float(self.settings.value('tanimoto_t', 0.9))
                         ,MW_t = int(self.settings.value('MW_t',40))
                         ,RB_t = int(self.settings.value('RB_t',0))
-                        ,min = int(self.settings.value('decoy_min',36))
-                        ,max = int(self.settings.value('decoy_max',36))
+                        ,mind = int(self.settings.value('decoy_min',36))
+                        ,maxd = int(self.settings.value('decoy_max',36))
                         ,tanimoto_d = float(self.settings.value('tanimoto_d', 0.9))
                         ,decoy_files = self.decoy_files
                         ,stopfile = self.stopfile
