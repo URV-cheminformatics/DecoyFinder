@@ -51,7 +51,7 @@ MW_t = 40
 RB_t = 0#1
 
 DEBUG=1
-def _debug(text):
+def debug(text):
     if DEBUG:
         print text
 
@@ -80,9 +80,9 @@ def get_zinc_slice(slicename = 'all', subset = '10', cachedir = tempfile.gettemp
     """
     if slicename in ('all', 'single', 'usual', 'metals'):
         script = "http://zinc12.docking.org/db/bysubset/%s/%s.sdf.csh" % (subset,slicename)
-        print 'Downloading files in %s' % script
+        debug('Downloading files in %s' % script)
         handler = urllib2.urlopen(script)
-        print("Reading ZINC data...")
+        debug("Reading ZINC data...")
         scriptcontent = handler.read().split('\n')
         handler.close()
         filelist = []
@@ -110,15 +110,15 @@ def get_zinc_slice(slicename = 'all', subset = '10', cachedir = tempfile.gettemp
                     localsize = os.path.getsize(outfilename)
                     download_needed = localsize != filesize
                     if download_needed:
-                        print("Local file outdated or incomplete")
+                        debug("Local file outdated or incomplete")
 
             if download_needed:
-                print('Downloading %s' % parenturl + file)
+                debug('Downloading %s' % parenturl + file)
                 outfile = open(outfilename, "wb")
                 outfile.write(dbhandler.read())
                 outfile.close()
             else:
-                print("Loading cached file: %s" % outfilename)
+                debug("Loading cached file: %s" % outfilename)
             dbhandler.close()
             yield str(outfilename)
 
@@ -244,7 +244,7 @@ def save_decoys(decoy_set, outputfile):
     """
     Save found decoys to outputfile
     """
-    print('saving %s decoys...' % len(decoy_set))
+    debug('saving %s decoys...' % len(decoy_set))
     if len(decoy_set):
         outputfile = checkoutputfile(outputfile)
         format = str(os.path.splitext(outputfile)[1][1:].lower())
@@ -252,7 +252,7 @@ def save_decoys(decoy_set, outputfile):
         for decoy in decoy_set:
             decoyfile.write(decoy.mol)
         decoyfile.close()
-        print('saved')
+        debug('saved')
         return outputfile
     else:
         return 'No decoys found'
@@ -298,7 +298,7 @@ class DecoyFinderThread(QThread):
     def __init__(self, query_files, db_files, decoy_files, stopfile):
         """
         """
-        #print "thread created"
+        debug("thread created")
         self.decoy_files = decoy_files
         self.query_files = query_files
         self.db_files = db_files
@@ -328,12 +328,12 @@ class DecoyFinderThread(QThread):
         """
         This is the star of the show
         """
-        _debug('inside find_decoys')
+        debug('inside find_decoys')
         outputfile = checkoutputfile(outputfile)
         tanimoto_t = Decimal(str(tanimoto_t))
         tanimoto_d = Decimal(str(tanimoto_d))
         ClogP_t = Decimal(str(ClogP_t))
-        print("Looking for decoys!")
+        debug("Looking for decoys!")
 
         db_entry_gen = parse_db_files(db_files)
 
@@ -411,27 +411,27 @@ class DecoyFinderThread(QThread):
                                     decoys_set.add(db_mol)
                                     decoys_inchikey_set.add(inchikey)
                                     ndecoys = len(decoys_set)
-                                    print('%s decoys found' % ndecoys)
+                                    debug('%s decoys found' % ndecoys)
                                     yield ('ndecoys',  ndecoys, complete_ligand_sets)
                                 if ligands_dict[ligand] ==  mind:
-                                    print('Decoy set completed for ', ligand.title)
+                                    debug('Decoy set completed for ' + ligand.title)
                                     complete_ligand_sets += 1
                                     yield ('ndecoys',  ndecoys, complete_ligand_sets)
             else:
-                print("finishing")
+                debug("finishing")
                 break
             if os.path.exists(stopfile):
                 os.remove(stopfile)
-                print('stopping by user request')
+                debug('stopping by user request')
                 break
 
         if mind:
-            print('Completed %s of %s decoy sets' % (complete_ligand_sets, nactive_ligands ))
+            debug('Completed %s of %s decoy sets' % (complete_ligand_sets, nactive_ligands ))
             minreached = complete_ligand_sets >= nactive_ligands
         if minreached and total_min <= len(decoys_set):
-            print("Found all wanted decoys")
+            debug("Found all wanted decoys")
         else:
-            print("Not all wanted decoys found")
+            debug("Not all wanted decoys found")
         #Generate logfile
         log = open('%s_log.csv' % outputfile,  'wb')
         log.write('"DecoyFinder 1.0 log file generated on %s\n\n"' % datetime.datetime.now())
@@ -519,7 +519,7 @@ class DecoyFinderThread(QThread):
                     self.progLimit.emit(self.total_min)
                     self.nactive_ligands = info[2]
                 else:
-                    print("Something very wrong")
+                    debug("Something very wrong")
 
             if self.filecount:
                 self.progress.emit(self.filecount +1)
