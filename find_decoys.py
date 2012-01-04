@@ -40,15 +40,7 @@ for format in pybel.informats.iterkeys():
         informats += "*.%s.%s " % (format,  compression)
 
 
-#Some default values:
-
-HBA_t = 0 #1
-HBD_t = 0#1
-ClogP_t = Decimal(1)#1.5
-tanimoto_t = Decimal('0.9')
-tanimoto_d = Decimal('0.9')
-MW_t = 40
-RB_t = 0#1
+SETTINGS = QSettings()
 
 DEBUG=1
 def debug(text):
@@ -296,7 +288,7 @@ class DecoyFinderThread(QThread):
     error = Signal(unicode)
     progLimit = Signal(int)
 
-    def __init__(self, query_files = None, db_files = None, decoy_files = None, stopfile = ''):
+    def __init__(self, query_files = None, db_files = None, decoy_files = [], stopfile = ''):
         """
         """
         debug("thread created")
@@ -310,20 +302,19 @@ class DecoyFinderThread(QThread):
         self.settings = QSettings()
         super(DecoyFinderThread, self).__init__(None)
 
-    def find_decoys(
-                self
+    def find_decoys(self
                 ,query_files
                 ,db_files
-                ,outputfile = 'found_decoys'
-                ,HBA_t = 0
-                ,HBD_t = 0
-                ,ClogP_t = Decimal(1)
-                ,tanimoto_t = Decimal('0.9')
-                ,tanimoto_d = Decimal('0.9')
-                ,MW_t = 40
-                ,RB_t = 0
-                ,mind = 36
-                ,maxd = 36
+                ,outputfile = str(SETTINGS.value('outputfile', 'found_decoys.sdf'))
+                ,HBA_t = int(SETTINGS.value('HBA_t', 0))
+                ,HBD_t = int(SETTINGS.value('HBD_t', 0))
+                ,ClogP_t = float(SETTINGS.value('ClogP_t', 1))
+                ,tanimoto_t = float(SETTINGS.value('tanimoto_t', 0.9))
+                ,tanimoto_d = float(SETTINGS.value('tanimoto_d', 0.9))
+                ,MW_t = int(SETTINGS.value('MW_t',40))
+                ,RB_t = int(SETTINGS.value('RB_t',0))
+                ,mind = int(SETTINGS.value('decoy_min',36))
+                ,maxd = int(SETTINGS.value('decoy_man',36))
                 ,decoy_files = []
                 ,stopfile = ''
                 ):
@@ -495,21 +486,21 @@ class DecoyFinderThread(QThread):
         try:
             outputfile = None
             self.find_decoys(
-                        query_files = self.query_files
-                        ,db_files = self.db_files
-                        ,outputfile =  str(self.settings.value('outputfile', 'found'))
-                        ,HBA_t = int(self.settings.value('HBA_t', 0))
-                        ,HBD_t = int(self.settings.value('HBD_t', 0))
-                        ,ClogP_t = float(self.settings.value('ClogP_t', 1))
-                        ,tanimoto_t = float(self.settings.value('tanimoto_t', 0.9))
-                        ,MW_t = int(self.settings.value('MW_t',40))
-                        ,RB_t = int(self.settings.value('RB_t',0))
-                        ,mind = int(self.settings.value('decoy_min',36))
-                        ,maxd = int(self.settings.value('decoy_max',36))
-                        ,tanimoto_d = float(self.settings.value('tanimoto_d', 0.9))
-                        ,decoy_files = self.decoy_files
-                        ,stopfile = self.stopfile
-                        )
+                query_files = self.query_files
+                ,db_files = self.db_filesq
+                ,outputfile = str(self.settings.value('outputfile', 'found_decoys.sdf'))
+                ,HBA_t = int(self.settings.value('HBA_t', 0))
+                ,HBD_t = int(self.settings.value('HBD_t', 0))
+                ,ClogP_t = float(self.settings.value('ClogP_t', 1))
+                ,tanimoto_t = float(self.settings.value('tanimoto_t', 0.9))
+                ,tanimoto_d = float(self.settings.value('tanimoto_d', 0.9))
+                ,MW_t = int(self.settings.value('MW_t',40))
+                ,RB_t = int(self.settings.value('RB_t',0))
+                ,mind = int(self.settings.value('decoy_min',36))
+                ,maxd = int(self.settings.value('decoy_man',36))
+                ,decoy_files = []
+                ,stopfile = self.stopfile
+                )
         except Exception, e:
             self.error.emit('Search was interrupted by an error or failure')
             err = unicode(e)
