@@ -3,7 +3,7 @@
 #
 #       find_decoys.py is part of Decoy Finder
 #
-#       Copyright 2011 Adrià Cereto Massagué <adrian.cereto@urv.cat>
+#       Copyright 2011, 2012 Adrià Cereto Massagué <adrian.cereto@urv.cat>
 #
 #       This program is free software; you can redistribute it and/or modify
 #       it under the terms of the GNU General Public License as published by
@@ -53,7 +53,7 @@ RB_t = 0#1
 DEBUG=1
 def debug(text):
     if DEBUG:
-        print text
+        print(text)
 
 #Dict of ZINC subsets
 ZINC_subsets = {
@@ -264,6 +264,7 @@ class ComparableMol():
     """
     def __init__(self, mol):
         self.mol = mol
+        self.title = self.mol.title
         if not rdk:
             self.fp = mol.calcfp("MACCS")
         else:
@@ -278,7 +279,6 @@ class ComparableMol():
         self.clogp = Decimal(str(self.mol.calcdesc(['logP'])['logP']))
         self.mw = self.mol.molwt
         self.rot = self.mol.OBMol.NumRotors()
-        self.title = self.mol.title
 
     def __str__(self):
         """
@@ -289,13 +289,14 @@ class ComparableMol():
 class DecoyFinderThread(QThread):
     """
     """
-    info = Signal(unicode) #needs to be defined OUTSIDE __init__
+    #need to be defined OUTSIDE __init__
+    info = Signal(unicode)
     progress = Signal(int)
     finished = Signal(tuple)
     error = Signal(unicode)
     progLimit = Signal(int)
 
-    def __init__(self, query_files, db_files, decoy_files, stopfile):
+    def __init__(self, query_files = None, db_files = None, decoy_files = None, stopfile = ''):
         """
         """
         debug("thread created")
@@ -304,7 +305,8 @@ class DecoyFinderThread(QThread):
         self.db_files = db_files
         self.stopfile = stopfile
         self.nactive_ligands = 0
-        self.ndecoys = 0
+        self.filecount = 0
+        self.currentfile = ''
         self.settings = QSettings()
         super(DecoyFinderThread, self).__init__(None)
 
@@ -342,14 +344,14 @@ class DecoyFinderThread(QThread):
         ligands_dict = parse_query_files(query_files)
         active_fp_set = set(active.fp for active in ligands_dict)
 
-        nactive_ligands = len(ligands_dict)
+        self.nactive_ligands = len(ligands_dict)
 
         complete_ligand_sets = 0
 
         minreached = False
         if mind:
-            total_min = nactive_ligands*mind
-            yield ('total_min',  total_min,  nactive_ligands)
+            self.total_min = self.nactive_ligands*mind
+            self.progLimit.emit(self.total_min)
         else:
             mind = None
 
@@ -358,8 +360,9 @@ class DecoyFinderThread(QThread):
         ndecoys = 0
         ligands_max = 0
 
+        debug('Checking for decoys files')
         if decoy_files:
-            yield ('file', 0, 'known decoy files...')
+            self.info.emit(self.trUtf8("Reading known decoy files..."))
             decoys_set = parse_decoy_files(decoy_files)
             ndecoys = len(decoys_set)
             for decoy in decoys_set:
@@ -370,33 +373,44 @@ class DecoyFinderThread(QThread):
                         kdecoys_inchikey_set.add(inchikey)
                         if mind and ligands_dict[ligand] == mind:
                             complete_ligand_sets += 1
-                            yield ('ndecoys',  ndecoys,  complete_ligand_sets)
+                            self.infondecoys(mind,  ndecoys,  complete_ligand_sets)
         else:
             decoys_set = set()
 
-        yield ('ndecoys',  len(decoys_set),  complete_ligand_sets)
-
+        self.infondecoys(mind,  ndecoys,  complete_ligand_sets)
+        debug('Reading new decoys sources')
         for db_mol, filecount, db_file in db_entry_gen:
+            debug(db_mol.title)
             used_db_files.add(db_file)
-            yield ('file',  filecount, db_file)
-            if maxd and ligands_max >= nactive_ligands:
+            self.filecount = filecount
+            if self.currentfile != db_file:
+                self.currentfile = db_file
+                self.info.emit(self.trUtf8("Reading %s, found %s decoys") % (self.currentfile,  ndecoys))
+                if not mind:
+                    self.progress.emit(filecount)
+            debug('Deciding wether to continue')
+            if maxd and ligands_max >= self.nactive_ligands:
                 break
-            if not mind or len(decoys_set) < total_min or complete_ligand_sets < nactive_ligands:
+            if not mind or ndecoys < self.total_min or complete_ligand_sets < self.nactive_ligands:
+                debug('Continuing...')
                 too_similar = False
                 if tanimoto_d < Decimal(1):
                     for decoy in decoys_set:
                         decoy_T = Decimal(str(decoy.fp | db_mol.fp))
                         if  decoy_T > tanimoto_d:
                             too_similar = True
+                            debug('Too similar to a decoy')
                             break
                 if not too_similar:
                     for active_fp in active_fp_set:
                         active_T = Decimal(str(active_fp | db_mol.fp))
                         if  active_T > tanimoto_t:
                             too_similar = True
+                            debug('Too similar to an active')
                             break
                     if too_similar:
                         continue
+                    debug('Calculating descriptors')
                     db_mol.calcdesc()
                     ligands_max = 0
                     for ligand in ligands_dict:
@@ -412,11 +426,13 @@ class DecoyFinderThread(QThread):
                                     decoys_inchikey_set.add(inchikey)
                                     ndecoys = len(decoys_set)
                                     debug('%s decoys found' % ndecoys)
-                                    yield ('ndecoys',  ndecoys, complete_ligand_sets)
+                                    self.infondecoys(mind,  ndecoys, complete_ligand_sets)
                                 if ligands_dict[ligand] ==  mind:
                                     debug('Decoy set completed for ' + ligand.title)
                                     complete_ligand_sets += 1
-                                    yield ('ndecoys',  ndecoys, complete_ligand_sets)
+                                    self.infondecoys(mind,  ndecoys, complete_ligand_sets)
+                        else:
+                            debug('Not a decoy')
             else:
                 debug("finishing")
                 break
@@ -426,9 +442,9 @@ class DecoyFinderThread(QThread):
                 break
 
         if mind:
-            debug('Completed %s of %s decoy sets' % (complete_ligand_sets, nactive_ligands ))
-            minreached = complete_ligand_sets >= nactive_ligands
-        if minreached and total_min <= len(decoys_set):
+            debug('Completed %s of %s decoy sets' % (complete_ligand_sets, self.nactive_ligands ))
+            minreached = complete_ligand_sets >= self.nactive_ligands
+        if minreached and self.total_min <= ndecoys:
             debug("Found all wanted decoys")
         else:
             debug("Not all wanted decoys found")
@@ -443,7 +459,7 @@ class DecoyFinderThread(QThread):
         log.write( '\n"Decoy sources:"\n')
         for file in used_db_files:
             log.write( '"%s"\n' % str(file))
-        log.write( '\n"Active ligands:","%s"\n' % nactive_ligands)
+        log.write( '\n"Active ligands:","%s"\n' % self.nactive_ligands)
         log.write( '"Decoys found:","%s"\n' % ndecoys)
         log.write( '\n"Search settings:"\n')
         log.write( '"Active ligand vs decoy tanimoto threshold","%s"\n' % str(tanimoto_t))
@@ -472,9 +488,6 @@ class DecoyFinderThread(QThread):
         result = None
         minreached = True
         try:
-            self.filecount = 0
-            self.currentfile = ''
-            min = int(self.settings.value('decoy_min', 36))
             outputfile = None
             for info in self.find_decoys(
                         query_files = self.query_files
@@ -492,37 +505,12 @@ class DecoyFinderThread(QThread):
                         ,decoy_files = self.decoy_files
                         ,stopfile = self.stopfile
                         ):
-                if info[0] in ('file',  'ndecoys'):
-                    if not min:
-                        if info[0] == 'file':
-                            self.filecount = info[1]
-                            if self.currentfile != info[2]:
-                                self.currentfile = info[2]
-                                self.info.emit(self.trUtf8("Reading %s, found %s decoys") % (self.currentfile,  self.ndecoys))
-                            if self.filecount:
-                                self.progress.emit(self.filecount)
-                        if info[0] == 'ndecoys':
-                            self.ndecoys = info[1]
-                            self.info.emit(self.trUtf8("Reading %s, found %s decoys" % (self.currentfile,  self.ndecoys)))
-                    else:
-                        if info[0] == 'ndecoys':
-                            if info[1] > self.total_min:
-                                self.progLimit.emit(info[1])
-                            self.progress.emit(info[1])
-                            self.info.emit(self.trUtf8("%s of %s decoy sets completed") % (info[2],  self.nactive_ligands))
-                elif info[0] == 'result':
+                if info[0] == 'result':
                     outputfile = info[2][0]
                     minreached =  info[2][1]
                     result = ( info[1],outputfile, minreached)
-                elif info[0] == 'total_min':
-                    self.total_min = info[1]
-                    self.progLimit.emit(self.total_min)
-                    self.nactive_ligands = info[2]
                 else:
                     debug("Something very wrong")
-
-            if self.filecount:
-                self.progress.emit(self.filecount +1)
         except Exception, e:
             err = unicode(e)
             self.error.emit(self.trUtf8("Error: %s" % err))
@@ -535,7 +523,14 @@ class DecoyFinderThread(QThread):
         else:
             self.error.emit('Search was interrupted by an error or failure')
 
-
+    def infondecoys(self, mind, ndecoys, complete_ligand_sets):
+        if not mind:
+            self.info.emit(self.trUtf8("Reading %s, found %s decoys" % (self.currentfile,  ndecoys)))
+        else:
+            if ndecoys > self.total_min:
+                self.progLimit.emit(ndecoys)
+            self.progress.emit(ndecoys)
+            self.info.emit(self.trUtf8("%s of %s decoy sets completed") % (complete_ligand_sets,  self.nactive_ligands))
 
 def main(args = sys.argv[1:]):
     """
