@@ -361,21 +361,20 @@ class DecoyFinderThread(QThread):
         ligands_max = 0
 
         debug('Checking for decoys files')
+        decoys_set = set()
         if decoy_files:
             self.info.emit(self.trUtf8("Reading known decoy files..."))
-            decoys_set = parse_decoy_files(decoy_files)
-            ndecoys = len(decoys_set)
-            for decoy in decoys_set:
+            for decoy in parse_decoy_files(decoy_files):
                 inchikey = decoy.mol.write('inchikey')[:-3]
                 for ligand in ligands_dict.keys():
-                    if isdecoy(decoy,ligand,HBA_t,HBD_t,ClogP_t,MW_t,RB_t ):
+                    if inchikey not in kdecoys_inchikey_set and isdecoy(decoy,ligand,HBA_t,HBD_t,ClogP_t,MW_t,RB_t ):
                         ligands_dict[ligand] +=1
-                        kdecoys_inchikey_set.add(inchikey)
+                        decoys_set.add(decoy)
                         if mind and ligands_dict[ligand] == mind:
                             complete_ligand_sets += 1
                             self.infondecoys(mind,  ndecoys,  complete_ligand_sets)
-        else:
-            decoys_set = set()
+                kdecoys_inchikey_set.add(inchikey)
+        ndecoys = len(decoys_set)
 
         self.infondecoys(mind,  ndecoys,  complete_ligand_sets)
         debug('Reading new decoys sources')
