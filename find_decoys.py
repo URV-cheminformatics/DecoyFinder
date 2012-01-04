@@ -247,7 +247,7 @@ def save_decoys(decoy_set, outputfile):
     debug('saving %s decoys...' % len(decoy_set))
     if len(decoy_set):
         outputfile = checkoutputfile(outputfile)
-        format = str(os.path.splitext(outputfile)[1][1:].lower())
+        format = get_fileformat(outputfile)
         decoyfile = pybel.Outputfile(format, str(outputfile))
         for decoy in decoy_set:
             decoyfile.write(decoy.mol)
@@ -478,7 +478,13 @@ class DecoyFinderThread(QThread):
         log.close()
 
         #Last, special yield:
-        yield ('result',  ligands_dict,  (save_decoys(decoys_set, outputfile), minreached))
+        if decoys_set:
+            save_decoys(decoys_set, outputfile)
+            self.info.emit("Decoys saved to " + outputfile)
+        else:
+            self.info.emit("No decoys were saved")
+        result = ( ligands_dict,outputfile, minreached)
+        self.finished.emit(result)
 
     def run(self):
         """
@@ -488,7 +494,7 @@ class DecoyFinderThread(QThread):
         minreached = True
         try:
             outputfile = None
-            for info in self.find_decoys(
+            self.find_decoys(
                         query_files = self.query_files
                         ,db_files = self.db_files
                         ,outputfile =  str(self.settings.value('outputfile', 'found'))
@@ -503,24 +509,11 @@ class DecoyFinderThread(QThread):
                         ,tanimoto_d = float(self.settings.value('tanimoto_d', 0.9))
                         ,decoy_files = self.decoy_files
                         ,stopfile = self.stopfile
-                        ):
-                if info[0] == 'result':
-                    outputfile = info[2][0]
-                    minreached =  info[2][1]
-                    result = ( info[1],outputfile, minreached)
-                else:
-                    debug("Something very wrong")
+                        )
         except Exception, e:
+            self.error.emit('Search was interrupted by an error or failure')
             err = unicode(e)
             self.error.emit(self.trUtf8("Error: %s" % err))
-        if outputfile:
-            self.info.emit("Decoys saved to " + outputfile)
-        else:
-            self.info.emit("No decoys were saved")
-        if result:
-            self.finished.emit(result)
-        else:
-            self.error.emit('Search was interrupted by an error or failure')
 
     def infondecoys(self, mind, ndecoys, complete_ligand_sets):
         if not mind:
