@@ -169,13 +169,8 @@ def parse_db_files(filelist):
     for dbfile in filelist:
         mols = pybel.readfile(get_fileformat(dbfile), dbfile)
         for mol in mols:
-            try:
-                cmol = ComparableMol(mol)
-            except Exception,  e:
-                print e
-                cmol = False
-            if cmol:
-                yield cmol, filecount, dbfile
+            cmol = ComparableMol(mol)
+            yield cmol, filecount, dbfile
         filecount += 1
 
 def parse_query_files(filelist):
@@ -187,13 +182,9 @@ def parse_query_files(filelist):
         file = str(file)
         mols = pybel.readfile(get_fileformat(file), file)
         for mol in mols:
-            try:
-                cmol = ComparableMol(mol)
-                cmol.calcdesc()
-                query_dict[cmol] = 0
-            except Exception,  e:
-                print e
-                continue
+            cmol = ComparableMol(mol)
+            cmol.calcdesc()
+            query_dict[cmol] = 0
     return query_dict
 
 def parse_decoy_files(decoyfilelist):
@@ -205,13 +196,9 @@ def parse_decoy_files(decoyfilelist):
         decoyfile = str(decoyfile)
         mols = pybel.readfile(get_fileformat(decoyfile), decoyfile)
         for mol in mols:
-            try:
-                cmol = ComparableMol(mol)
-                cmol.calcdesc()
-                decoy_set.add(cmol)
-            except Exception,  e:
-                print e
-                continue
+            cmol = ComparableMol(mol)
+            cmol.calcdesc()
+            decoy_set.add(cmol)
     return decoy_set
 
 def isdecoy(
@@ -226,13 +213,22 @@ def isdecoy(
     """
     Check if db_mol can be considered a decoy of ligand
     """
-    if  ligand.hba - HBA_t <= db_mol.hba <= ligand.hba + HBA_t\
-    and ligand.hbd - HBD_t <= db_mol.hbd <= ligand.hbd + HBD_t\
-    and ligand.clogp - ClogP_t <= db_mol.clogp <= ligand.clogp + ClogP_t \
-    and ligand.mw - MW_t <= db_mol.mw <= ligand.mw + MW_t \
-    and ligand.rot - RB_t <= db_mol.rot <= ligand.rot + RB_t \
-    :
-        return True
+    if  ligand.hba - HBA_t <= db_mol.hba <= ligand.hba + HBA_t:
+        if ligand.hbd - HBD_t <= db_mol.hbd <= ligand.hbd + HBD_t:
+            if ligand.clogp - ClogP_t <= db_mol.clogp <= ligand.clogp + ClogP_t :
+                if ligand.mw - MW_t <= db_mol.mw <= ligand.mw + MW_t :
+                    if ligand.rot - RB_t <= db_mol.rot <= ligand.rot + RB_t :
+                        return True
+                    else:
+                        debug('Unsuitable RBs: %s vs %s' % (ligand.rot, db_mol.rot))
+                else:
+                    debug('Unsuitable MW: %s vs %s' % (ligand.mw, db_mol.mw))
+            else:
+                debug('Unsuitable LogP: %s vs %s' % (ligand.clogp, db_mol.clogp))
+        else:
+            debug('Unsuitable HBDs: %s vs %s' % (ligand.hbd, db_mol.hbd))
+    else:
+        debug('Unsuitable HBAs: %s vs %s' % (ligand.hba, db_mol.hba))
     return False
 
 
@@ -294,22 +290,31 @@ class ComparableMol():
     def __init__(self, mol):
         self.mol = mol
         self.title = self.mol.title
+        fptype = str(SETTINGS.value('fptype', 'MACCS'))
         if not cinfony:
-            self.fp = mol.calcfp("MACCS")
+            self.fp = mol.calcfp(fptype)
         else:
             try:
-                self.fp = CtkFingerprint(rdk.Molecule(mol).calcfp('MACCS'))
-            except:
-                self.fp = CtkFingerprint(mol.calcfp("MACCS"))
+                if fptype.lower() in rdk.fps:
+                    mol = rdk.Molecule(mol)
+                else:
+                    raise ValueError('%s is not a %s supported fingerprint' % (fptype, 'RDkit'))
+            except Exception,  e:
+                print e
+            finally:
+                self.fp = CtkFingerprint(mol.calcfp(fptype))
     def calcdesc(self):
         """
         Calculate all interesting descriptors. Should be  called only when needed
+        HBA1 method has a bug which would sometimes report weird values.
+        Not sure about how is it triggered.
         """
-        self.hba = Decimal(str(self.mol.calcdesc(['HBA1'])['HBA1']))
+        self.hba = Decimal(str(self.mol.calcdesc(['HBA2'])['HBA2']))
         self.hbd = Decimal(str(self.mol.calcdesc(['HBD'])['HBD']))
         self.clogp = Decimal(str(self.mol.calcdesc(['logP'])['logP']))
         self.mw = self.mol.molwt
         self.rot = self.mol.OBMol.NumRotors()
+        debug(self)
 
     def __str__(self):
         """
