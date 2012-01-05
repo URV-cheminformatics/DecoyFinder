@@ -20,27 +20,48 @@
 #       Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 #       MA 02110-1301, USA.
 
-import os, urllib2, tempfile, random,  sys,  gzip,  datetime
+import os, urllib2, tempfile, random,  sys,  datetime, glob
 from PySide.QtCore import QSettings, QThread, Signal, Qt, Slot
 from decimal import Decimal
 
-rdk = False
+SETTINGS = QSettings()
+
+#{Toolkitname:module}
+tdict = {}
 try:
-    raise
-    from cinfony import pybel, rdk
+    from cinfony import pybel
+    cinfony = True
 except:
+    cinfony = False
     print('unable to load cinfony')
     import pybel
+tdict['OpenBabel'] = pybel
+
+if cinfony:
+    try:
+        from cinfony import rdk
+        tdict['RDkit'] = rdk
+    except:
+        print 'Unable to load RDkit'
+    try:
+        classpath = os.pathsep.join(glob.glob("/usr/share/java/*.jar"))
+        if 'CLASSPATH' in os.environ:
+            classpath =  os.environ['CLASSPATH'] + os.pathsep + classpath
+        os.environ['CLASSPATH'] = classpath
+        if not 'JPYPE_JVM' in os.environ:
+            os.environ['JPYPE_JVM'] = str(SETTINGS.value('JPYPE_JVM', '/usr/lib/jvm/java-6-openjdk-amd64/jre/lib/amd64/server/libjvm.so'))
+        from cinfony import  cdk
+        tdict['CDK'] = cdk
+    except:
+        print 'Unable to load the CDK'
+
 #Decimal() can represent floating point data with higher precission than built-in float
 
 informats = ''
-for format in pybel.informats.iterkeys():
+for format in pybel.informats:
     informats += "*.%s " %format
     for compression in ('gz', 'tar',  'bz',  'bz2',  'tar.gz',  'tar.bz',  'tar.bz2'):
         informats += "*.%s.%s " % (format,  compression)
-
-
-SETTINGS = QSettings()
 
 DEBUG=1
 def debug(text):
@@ -249,7 +270,23 @@ def save_decoys(decoy_set, outputfile):
     else:
         return 'No decoys found'
 
+class CtkFingerprint():
+    """
+    Wraps fingerprints coming from cinfony (any toolkit) so they can be mixed for Tanimoto calculations.
 
+    """
+    def __init__(self, cinfonyfingerprint):
+        self.fp = cinfonyfingerprint.fp
+        self.bits = cinfonyfingerprint.bits
+    def __or__(self, other):
+        """
+        This is borrowed from cinfony's webel.py
+        """
+        mybits = set(self.bits)
+        otherbits = set(other.bits)
+        return len(mybits&otherbits) / float(len(mybits|otherbits))
+    def __str__(self):
+        return ", ".join([str(x) for x in self.bits])
 
 class ComparableMol():
     """
@@ -257,11 +294,13 @@ class ComparableMol():
     def __init__(self, mol):
         self.mol = mol
         self.title = self.mol.title
-        if not rdk:
+        if not cinfony:
             self.fp = mol.calcfp("MACCS")
         else:
-            self.fp = rdk.Molecule(mol).calcfp('maccs')
-
+            try:
+                self.fp = CtkFingerprint(rdk.Molecule(mol).calcfp('MACCS'))
+            except:
+                self.fp = CtkFingerprint(mol.calcfp("MACCS"))
     def calcdesc(self):
         """
         Calculate all interesting descriptors. Should be  called only when needed
