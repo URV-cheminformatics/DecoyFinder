@@ -173,6 +173,17 @@ def parse_db_files(filelist):
             yield cmol, filecount, dbfile
         filecount += 1
 
+def query_db(conn, db='decoyfinder', tb='Molecules'):
+    """
+    """
+    cursor = conn.cursor()
+    cursor.execute("""SELECT * FROM `%s`.`%s`;""" %(db, tb))
+    rowcount = 0
+    for row in cursor:
+        rowcount +=1
+        yield DbMol(row), rowcount, 'database'
+    cursor.close()
+
 def parse_query_files(filelist):
     """
     Parses files containing active ligands
@@ -271,9 +282,13 @@ class CtkFingerprint():
     Wraps fingerprints coming from cinfony (any toolkit) so they can be mixed for Tanimoto calculations.
 
     """
-    def __init__(self, cinfonyfingerprint):
-        self.fp = cinfonyfingerprint.fp
-        self.bits = cinfonyfingerprint.bits
+    def __init__(self, cinfonyfingerprint = None, bits =[]):
+        if cinfonyfingerprint:
+            self.fp = cinfonyfingerprint.fp
+            self.bits = cinfonyfingerprint.bits
+        else:
+            self.bits = bits
+            self.fp = None
     def __or__(self, other):
         """
         This is borrowed from cinfony's webel.py
@@ -290,6 +305,7 @@ class ComparableMol():
     def __init__(self, mol):
         self.mol = mol
         self.title = self.mol.title
+        self.inchikey = mol.write('inchikey')[:-3]
         fptype = str(SETTINGS.value('fptype', 'MACCS'))
 #        if not cinfony:
         if 1:
@@ -322,6 +338,17 @@ class ComparableMol():
         For debug purposes
         """
         return "Title: %s; HBA: %s; HBD: %s; CLogP: %s; MW:%s \n" % (self.title, self.hba, self.hbd, self.clogp, self.mw)
+
+class DbMol(ComparableMol):
+    """
+    Loads information from a database
+    """
+    def __init__(self, row):
+        self.inchikey, maccsbits, self.rot, self.mw, self.clogp, self.hba, self.hbd, self.inchi, self.tpsa = row
+        bitlist = eval(maccsbits)
+        self.fp = CtkFingerprint(bits=bitlist)
+    def calcdesc(self):
+        pass
 
 class DecoyFinderThread(QThread):
     """
@@ -362,6 +389,7 @@ class DecoyFinderThread(QThread):
                 ,maxd = int(SETTINGS.value('decoy_man',36))
                 ,decoy_files = []
                 ,stopfile = ''
+                , conn = None
                 ):
         """
         This is the star of the show
@@ -401,7 +429,7 @@ class DecoyFinderThread(QThread):
         if decoy_files:
             self.info.emit(self.trUtf8("Reading known decoy files..."))
             for decoy in parse_decoy_files(decoy_files):
-                inchikey = decoy.mol.write('inchikey')[:-3]
+                inchikey = decoy.inchikey
                 for ligand in ligands_dict.keys():
                     if inchikey not in kdecoys_inchikey_set and isdecoy(decoy,ligand,HBA_t,HBD_t,ClogP_t,MW_t,RB_t ):
                         ligands_dict[ligand] +=1
@@ -453,7 +481,7 @@ class DecoyFinderThread(QThread):
                             ligands_max +=1
                             continue
                         if isdecoy(db_mol,ligand,HBA_t,HBD_t,ClogP_t,MW_t,RB_t ):
-                            inchikey = db_mol.mol.write('inchikey')[:-3]
+                            inchikey = db_mol.inchikey
                             if inchikey not in kdecoys_inchikey_set:
                                 ligands_dict[ligand] += 1
                                 if inchikey not in decoys_inchikey_set:
@@ -560,78 +588,78 @@ class DecoyFinderThread(QThread):
             self.progress.emit(ndecoys)
             self.info.emit(self.trUtf8("%s of %s decoy sets completed") % (complete_ligand_sets,  self.nactive_ligands))
 
-def main(args = sys.argv[1:]):
-    """
-    Run this function to run as a command-line application
-    """
-    exit('This is broken right now')
-    try:
-        import argparse
-    except:
-        exit("Unable to import module 'argparse'.\nInstall the argparse python module or upgrade to python 2.7 or higher")
-
-    parser = argparse.ArgumentParser(description='All margins are relative to active ligands\' values')
-    parser.add_argument('-a',  '--active-ligands-files', nargs='+', required=True
-                        , help='Files containing active ligands'
-                        , dest='query_files')
-    parser.add_argument('-b', '--database-files', nargs='+', required=True
-                        , help='Files containing possible decoys'
-                        , dest='db_files')
-    parser.add_argument('-d', '--known-decoys-files', nargs='+'
-                        , help='Files containing known decoy molecules'
-                        , dest='decoy_files')
-    parser.add_argument('-o', '--output-file', default='found_decoys.sdf'
-                        , help='Output file name'
-                        , dest='outputfile')
-    decopts = parser.add_argument_group('Decoy finding options')
-    decopts.add_argument('-m', '--minimum-decoys-per-set', default=36, type=int
-                        , help='Number of decoys to search for each active ligand'
-                        , dest='mind')
-    decopts.add_argument('-M', '--maximum-decoys-per-set', default=36, type=int
-                        , help='Stop looking for decoys for ligands with at least so many decoys found'
-                        , dest='maxd')
-    decopts.add_argument('-t', '--tanimoto-with-active', default=tanimoto_t, type=Decimal
-                        , help='Upper tanimoto threshold between active ligand and decoys'
-                        , dest='tanimoto_t')
-    decopts.add_argument('-i', '--inter-decoy-tanimoto', default=tanimoto_d, type=Decimal
-                        , help='Upper tanimoto threshold between decoys'
-                        , dest='tanimoto_d')
-    decopts.add_argument('-c','--clogp-margin', default=ClogP_t, type=Decimal
-                        , help='Decoy log P value margin'
-                        , dest='ClogP_t')
-    decopts.add_argument('-y', '--hba-margin', default=HBA_t, type=int
-                        , help='Decoy hydrogen bond acceptors margin'
-                        , dest='HBA_t')
-    decopts.add_argument('-g', '--hbd-margin', default=HBD_t, type=Decimal
-                        , help='Decoy hydrogen bond donors margin'
-                        , dest='HBD_t')
-    decopts.add_argument('-r', '--rotational-bonds-margin', default=RB_t, type=int
-                        , help='Decoy rotational bonds margin'
-                        , dest='RB_t')
-    decopts.add_argument('-w',  '--molecular-weight-margin', default=MW_t, type=int
-                        , help='Molecular weight margin'
-                        , dest='MW_t')
-
-    ns = parser.parse_args(args)
-
-    for info in find_decoys(
-        query_files = ns.query_files
-        ,db_files = ns.db_files
-        ,outputfile = ns.outputfile
-        ,HBA_t = ns.HBA_t
-        ,HBD_t = ns.HBD_t
-        ,ClogP_t = ns.ClogP_t
-        ,tanimoto_t = ns.tanimoto_t
-        ,MW_t = ns.MW_t
-        ,RB_t = ns.RB_t
-        ,mind = ns.mind
-        ,maxd = ns.maxd
-        ,tanimoto_d = ns.tanimoto_d
-        ,decoy_files = ns.decoy_files
-    ):
-        pass
-
-
-if __name__ == '__main__':
-    main()
+#def main(args = sys.argv[1:]):
+#    """
+#    Run this function to run as a command-line application
+#    """
+#    exit('This is broken right now')
+#    try:
+#        import argparse
+#    except:
+#        exit("Unable to import module 'argparse'.\nInstall the argparse python module or upgrade to python 2.7 or higher")
+#
+#    parser = argparse.ArgumentParser(description='All margins are relative to active ligands\' values')
+#    parser.add_argument('-a',  '--active-ligands-files', nargs='+', required=True
+#                        , help='Files containing active ligands'
+#                        , dest='query_files')
+#    parser.add_argument('-b', '--database-files', nargs='+', required=True
+#                        , help='Files containing possible decoys'
+#                        , dest='db_files')
+#    parser.add_argument('-d', '--known-decoys-files', nargs='+'
+#                        , help='Files containing known decoy molecules'
+#                        , dest='decoy_files')
+#    parser.add_argument('-o', '--output-file', default='found_decoys.sdf'
+#                        , help='Output file name'
+#                        , dest='outputfile')
+#    decopts = parser.add_argument_group('Decoy finding options')
+#    decopts.add_argument('-m', '--minimum-decoys-per-set', default=36, type=int
+#                        , help='Number of decoys to search for each active ligand'
+#                        , dest='mind')
+#    decopts.add_argument('-M', '--maximum-decoys-per-set', default=36, type=int
+#                        , help='Stop looking for decoys for ligands with at least so many decoys found'
+#                        , dest='maxd')
+#    decopts.add_argument('-t', '--tanimoto-with-active', default=tanimoto_t, type=Decimal
+#                        , help='Upper tanimoto threshold between active ligand and decoys'
+#                        , dest='tanimoto_t')
+#    decopts.add_argument('-i', '--inter-decoy-tanimoto', default=tanimoto_d, type=Decimal
+#                        , help='Upper tanimoto threshold between decoys'
+#                        , dest='tanimoto_d')
+#    decopts.add_argument('-c','--clogp-margin', default=ClogP_t, type=Decimal
+#                        , help='Decoy log P value margin'
+#                        , dest='ClogP_t')
+#    decopts.add_argument('-y', '--hba-margin', default=HBA_t, type=int
+#                        , help='Decoy hydrogen bond acceptors margin'
+#                        , dest='HBA_t')
+#    decopts.add_argument('-g', '--hbd-margin', default=HBD_t, type=Decimal
+#                        , help='Decoy hydrogen bond donors margin'
+#                        , dest='HBD_t')
+#    decopts.add_argument('-r', '--rotational-bonds-margin', default=RB_t, type=int
+#                        , help='Decoy rotational bonds margin'
+#                        , dest='RB_t')
+#    decopts.add_argument('-w',  '--molecular-weight-margin', default=MW_t, type=int
+#                        , help='Molecular weight margin'
+#                        , dest='MW_t')
+#
+#    ns = parser.parse_args(args)
+#
+#    for info in find_decoys(
+#        query_files = ns.query_files
+#        ,db_files = ns.db_files
+#        ,outputfile = ns.outputfile
+#        ,HBA_t = ns.HBA_t
+#        ,HBD_t = ns.HBD_t
+#        ,ClogP_t = ns.ClogP_t
+#        ,tanimoto_t = ns.tanimoto_t
+#        ,MW_t = ns.MW_t
+#        ,RB_t = ns.RB_t
+#        ,mind = ns.mind
+#        ,maxd = ns.maxd
+#        ,tanimoto_d = ns.tanimoto_d
+#        ,decoy_files = ns.decoy_files
+#    ):
+#        pass
+#
+#
+#if __name__ == '__main__':
+#    main()
 
