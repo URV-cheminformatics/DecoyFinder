@@ -291,7 +291,8 @@ class ComparableMol():
         self.mol = mol
         self.title = self.mol.title
         fptype = str(SETTINGS.value('fptype', 'MACCS'))
-        if not cinfony:
+#        if not cinfony:
+        if 1:
             self.fp = mol.calcfp(fptype)
         else:
             try:
