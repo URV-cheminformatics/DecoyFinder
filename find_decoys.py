@@ -20,7 +20,7 @@
 #       Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 #       MA 02110-1301, USA.
 
-import os, urllib2, tempfile, random,  sys,  datetime, glob
+import os, urllib2, tempfile, random,  sys,  datetime, glob, itertools
 from PySide.QtCore import QSettings, QThread, Signal, Qt, Slot
 from decimal import Decimal
 
@@ -63,7 +63,7 @@ for format in pybel.informats:
     for compression in ('gz', 'tar',  'bz',  'bz2',  'tar.gz',  'tar.bz',  'tar.bz2'):
         informats += "*.%s.%s " % (format,  compression)
 
-DEBUG=1
+DEBUG=0
 def debug(text):
     if DEBUG:
         print(text)
@@ -173,15 +173,19 @@ def parse_db_files(filelist):
             yield cmol, filecount, dbfile
         filecount += 1
 
-def query_db(conn, db='decoyfinder', tb='Molecules'):
+def query_db(conn, table='Molecules'):
     """
     """
     cursor = conn.cursor()
-    cursor.execute("""SELECT * FROM `%s`.`%s`;""" %(db, tb))
+    cursor.execute("""SELECT * FROM %s;""" % table)
     rowcount = 0
     for row in cursor:
         rowcount +=1
-        yield DbMol(row), rowcount, 'database'
+        try:
+            mol = DbMol(row)
+            yield mol, rowcount, 'database'
+        except Exception, e:
+            print e
     cursor.close()
 
 def parse_query_files(filelist):
@@ -308,18 +312,7 @@ class ComparableMol():
         self.inchikey = mol.write('inchikey')[:-3]
         fptype = str(SETTINGS.value('fptype', 'MACCS'))
 #        if not cinfony:
-        if 1:
-            self.fp = mol.calcfp(fptype)
-        else:
-            try:
-                if fptype.lower() in rdk.fps:
-                    mol = rdk.Molecule(mol)
-                else:
-                    raise ValueError('%s is not a %s supported fingerprint' % (fptype, 'RDkit'))
-            except Exception,  e:
-                print e
-            finally:
-                self.fp = CtkFingerprint(mol.calcfp(fptype))
+        self.fp = CtkFingerprint(mol.calcfp(fptype))
     def calcdesc(self):
         """
         Calculate all interesting descriptors. Should be  called only when needed
@@ -344,11 +337,13 @@ class DbMol(ComparableMol):
     Loads information from a database
     """
     def __init__(self, row):
-        self.inchikey, maccsbits, self.rot, self.mw, self.clogp, self.hba, self.hbd, self.inchi, self.tpsa = row
+        self.inchikey, maccsbits, self.rot, self.mw, self.clogp, self.hba, self.hbd, self.mdlmol, self.tpsa = row
         bitlist = eval(maccsbits)
         self.fp = CtkFingerprint(bits=bitlist)
+        self.mol = pybel.readstring('mol', str(self.mdlmol))
+        self.title = self.mol.title
     def calcdesc(self):
-        pass
+        debug(self)
 
 class DecoyFinderThread(QThread):
     """
@@ -389,7 +384,7 @@ class DecoyFinderThread(QThread):
                 ,maxd = int(SETTINGS.value('decoy_man',36))
                 ,decoy_files = []
                 ,stopfile = ''
-                , conn = None
+                ,conn = None
                 ):
         """
         This is the star of the show
@@ -402,6 +397,12 @@ class DecoyFinderThread(QThread):
         debug("Looking for decoys!")
 
         db_entry_gen = parse_db_files(db_files)
+
+        if conn:
+            try:
+                db_entry_gen = itertools.chain(query_db(conn) , db_entry_gen)
+            except Exception, e:
+                print e
 
         used_db_files = set()
 
@@ -458,6 +459,7 @@ class DecoyFinderThread(QThread):
                 debug('Continuing...')
                 too_similar = False
                 if tanimoto_d < Decimal(1):
+                    debug('Checking if decoys are similar to previous ones')
                     for decoy in decoys_set:
                         decoy_T = Decimal(str(decoy.fp | db_mol.fp))
                         if  decoy_T > tanimoto_d:
@@ -465,11 +467,12 @@ class DecoyFinderThread(QThread):
                             debug('Too similar to a decoy')
                             break
                 if not too_similar:
+                    debug('They are not too similar')
                     for active_fp in active_fp_set:
                         active_T = Decimal(str(active_fp | db_mol.fp))
                         if  active_T > tanimoto_t:
                             too_similar = True
-                            debug('Too similar to an active')
+                            debug('But too similar to an active')
                             break
                     if too_similar:
                         continue
