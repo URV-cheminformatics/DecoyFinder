@@ -240,23 +240,6 @@ def checkoutputfile(outputfile):
         outputfile = filename + extension
     return outputfile
 
-def save_decoys(decoy_set, outputfile):
-    """
-    Save found decoys to outputfile
-    """
-    print('saving %s decoys...' % len(decoy_set))
-    if len(decoy_set):
-        outputfile = checkoutputfile(outputfile)
-        format = str(os.path.splitext(outputfile)[1][1:].lower())
-        decoyfile = pybel.Outputfile(format, str(outputfile))
-        for decoy in decoy_set:
-            decoyfile.write(decoy.mol)
-        decoyfile.close()
-        print('saved')
-        return outputfile
-    else:
-        return 'No decoys found'
-
 def find_decoys(
                 query_files
                 ,db_files
@@ -304,7 +287,11 @@ def find_decoys(
     kdecoys_can_set = set()
     ndecoys = 0
     ligands_max = 0
-    decoys_set = set()
+
+    outputfile = checkoutputfile(outputfile)
+    format = get_fileformat(outputfile)
+    decoyfile = pybel.Outputfile(format, str(outputfile))
+    decoys_fp_set = set()
 
     if decoy_files:
         yield ('file', 0, 'known decoy files...')
@@ -313,25 +300,26 @@ def find_decoys(
             for ligand in ligands_dict.keys():
                 if can not in kdecoys_can_set and isdecoy(decoy,ligand,HBA_t,HBD_t,ClogP_t,MW_t,RB_t ):
                     ligands_dict[ligand] +=1
-                    decoys_set.add(decoy)
+                    decoys_fp_set.add(decoy.fp)
+                    decoyfile.write(decoy.mol)
                     if min and ligands_dict[ligand] == min:
                         complete_ligand_sets += 1
+                        ndecoys = len(kdecoys_can_set)
                         yield ('ndecoys',  ndecoys,  complete_ligand_sets)
             kdecoys_can_set.add(can)
-    ndecoys = len(decoys_set)
 
-    yield ('ndecoys',  len(decoys_set),  complete_ligand_sets)
+    yield ('ndecoys', ndecoys,  complete_ligand_sets)
 
     for db_mol, filecount, db_file in db_entry_gen:
         used_db_files.add(db_file)
         yield ('file',  filecount, db_file)
         if max and ligands_max >= nactive_ligands:
             break
-        if not min or len(decoys_set) < total_min or complete_ligand_sets < nactive_ligands:
+        if not min or ndecoys < total_min or complete_ligand_sets < nactive_ligands:
             too_similar = False
             if tanimoto_d < Decimal(1):
-                for decoy in decoys_set:
-                    decoy_T = Decimal(str(decoy.fp | db_mol.fp))
+                for decoyfp in decoys_fp_set:
+                    decoy_T = Decimal(str(decoyfp | db_mol.fp))
                     if  decoy_T > tanimoto_d:
                         too_similar = True
                         break
@@ -354,9 +342,10 @@ def find_decoys(
                         if can not in kdecoys_can_set:
                             ligands_dict[ligand] += 1
                             if can not in decoys_can_set:
-                                decoys_set.add(db_mol)
+                                decoys_fp_set.add(db_mol.fp)
+                                decoyfile.write(db_mol.mol)
                                 decoys_can_set.add(can)
-                                ndecoys = len(decoys_set)
+                                ndecoys = len(decoys_can_set | kdecoys_can_set)
                                 print('%s decoys found' % ndecoys)
                                 yield ('ndecoys',  ndecoys, complete_ligand_sets)
                             if ligands_dict[ligand] ==  min:
@@ -374,7 +363,7 @@ def find_decoys(
     if min:
         print('Completed %s of %s decoy sets' % (complete_ligand_sets, nactive_ligands ))
         minreached = complete_ligand_sets >= nactive_ligands
-    if minreached and total_min <= len(decoys_set):
+    if minreached and total_min <= len(decoys_can_set | kdecoys_can_set):
         print("Found all wanted decoys")
     else:
         print("Not all wanted decoys found")
@@ -411,8 +400,12 @@ def find_decoys(
     logfile.write(log)
     logfile.close()
 
+    decoyfile.close()
+
+    if not decoys_fp_set:
+        os.remove(outputfile)
     #Last, special yield:
-    yield ('result',  ligands_dict,  (save_decoys(decoys_set, outputfile), minreached))
+    yield ('result',  ligands_dict,  outputfile, minreached)
 
 def main(args = sys.argv[1:]):
     """
