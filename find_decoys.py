@@ -264,22 +264,22 @@ def checkoutputfile(outputfile):
         outputfile = filename + extension
     return outputfile
 
-def save_decoys(decoy_set, outputfile):
-    """
-    Save found decoys to outputfile
-    """
-    debug('saving %s decoys...' % len(decoy_set))
-    if len(decoy_set):
-        outputfile = checkoutputfile(outputfile)
-        format = get_fileformat(outputfile)
-        decoyfile = pybel.Outputfile(format, str(outputfile))
-        for decoy in decoy_set:
-            decoyfile.write(decoy.mol)
-        decoyfile.close()
-        debug('saved')
-        return outputfile
-    else:
-        return 'No decoys found'
+#def save_decoys(decoy_set, outputfile):
+#    """
+#    Save found decoys to outputfile
+#    """
+#    debug('saving %s decoys...' % len(decoy_set))
+#    if len(decoy_set):
+#        outputfile = checkoutputfile(outputfile)
+#        format = get_fileformat(outputfile)
+#        decoyfile = pybel.Outputfile(format, str(outputfile))
+#        for decoy in decoy_set:
+#            decoyfile.write(decoy.mol)
+#        decoyfile.close()
+#        debug('saved')
+#        return outputfile
+#    else:
+#        return 'No decoys found'
 
 class CtkFingerprint():
     """
@@ -422,11 +422,16 @@ class DecoyFinderThread(QThread):
 
         decoys_inchikey_set = set()
         kdecoys_inchikey_set = set()
-        ndecoys = 0
+        ndecoys = len(kdecoys_inchikey_set)
         ligands_max = 0
 
+        outputfile = checkoutputfile(outputfile)
+        format = get_fileformat(outputfile)
+        decoyfile = pybel.Outputfile(format, str(outputfile))
+
         debug('Checking for decoys files')
-        decoys_set = set()
+        #decoys_set = set()
+        decoys_fp_set = set()
         if decoy_files:
             self.info.emit(self.trUtf8("Reading known decoy files..."))
             for decoy in parse_decoy_files(decoy_files):
@@ -434,12 +439,14 @@ class DecoyFinderThread(QThread):
                 for ligand in ligands_dict.keys():
                     if inchikey not in kdecoys_inchikey_set and isdecoy(decoy,ligand,HBA_t,HBD_t,ClogP_t,MW_t,RB_t ):
                         ligands_dict[ligand] +=1
-                        decoys_set.add(decoy)
+                        #decoys_set.add(decoy)
+                        decoys_fp_set.add(decoy.fp)
+                        decoyfile.write(decoy.mol)
                         if mind and ligands_dict[ligand] == mind:
                             complete_ligand_sets += 1
+                            ndecoys = len(kdecoys_inchikey_set)
                             self.infondecoys(mind,  ndecoys,  complete_ligand_sets)
                 kdecoys_inchikey_set.add(inchikey)
-        ndecoys = len(decoys_set)
 
         self.infondecoys(mind,  ndecoys,  complete_ligand_sets)
         debug('Reading new decoys sources')
@@ -460,8 +467,8 @@ class DecoyFinderThread(QThread):
                 too_similar = False
                 if tanimoto_d < Decimal(1):
                     debug('Checking if decoys are similar to previous ones')
-                    for decoy in decoys_set:
-                        decoy_T = Decimal(str(decoy.fp | db_mol.fp))
+                    for decoyfp in decoys_fp_set:
+                        decoy_T = Decimal(str(decoyfp | db_mol.fp))
                         if  decoy_T > tanimoto_d:
                             too_similar = True
                             debug('Too similar to a decoy')
@@ -488,9 +495,11 @@ class DecoyFinderThread(QThread):
                             if inchikey not in kdecoys_inchikey_set:
                                 ligands_dict[ligand] += 1
                                 if inchikey not in decoys_inchikey_set:
-                                    decoys_set.add(db_mol)
+                                    #decoys_set.add(db_mol)
+                                    decoys_fp_set.add(db_mol.fp)
+                                    decoyfile.write(db_mol.mol)
                                     decoys_inchikey_set.add(inchikey)
-                                    ndecoys = len(decoys_set)
+                                    ndecoys = len(decoys_inchikey_set | kdecoys_inchikey_set)
                                     debug('%s decoys found' % ndecoys)
                                     self.infondecoys(mind,  ndecoys, complete_ligand_sets)
                                 if ligands_dict[ligand] ==  mind:
@@ -544,12 +553,13 @@ class DecoyFinderThread(QThread):
         log.write( "\n")
         log.close()
 
-        #Last, special yield:
-        if decoys_set:
-            save_decoys(decoys_set, outputfile)
+        decoyfile.close()
+        if decoys_fp_set:
+            #save_decoys(decoys_set, outputfile)
             self.info.emit("Decoys saved to " + outputfile)
         else:
             self.info.emit("No decoys were saved")
+            os.remove(outputfile)
         result = ( ligands_dict,outputfile, minreached)
         self.finished.emit(result)
 
@@ -563,7 +573,7 @@ class DecoyFinderThread(QThread):
             outputfile = None
             self.find_decoys(
                 query_files = self.query_files
-                ,db_files = self.db_filesq
+                ,db_files = self.db_files
                 ,outputfile = str(self.settings.value('outputfile', 'found_decoys.sdf'))
                 ,HBA_t = int(self.settings.value('HBA_t', 0))
                 ,HBD_t = int(self.settings.value('HBD_t', 0))

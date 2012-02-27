@@ -468,15 +468,15 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         """
         Slot documentation goes here.
         """
-        self.hbaBox.setValue(HBA_t)
-        self.hbdBox.setValue(HBD_t)
-        self.clogpBox.setValue(int(ClogP_t))
-        self.tanimotoBox.setValue(float(tanimoto_t))
-        self.molwtBox.setValue(MW_t)
-        self.rotbBox.setValue(RB_t)
+        self.hbaBox.setValue(0)
+        self.hbdBox.setValue(0)
+        self.clogpBox.setValue(1)
+        self.tanimotoBox.setValue(0.9)
+        self.molwtBox.setValue(40)
+        self.rotbBox.setValue(0)
         self.decoyMinSpinBox.setValue(36)
         self.decoyMaxSpinBox.setValue(36)
-        self.dTanimotoBox.setValue(float(tanimoto_d))
+        self.dTanimotoBox.setValue(0.9)
         self.cachDirectoryLineEdit.setText(tempfile.gettempdir())
         for field in (self.hbaBox, self.hbdBox, self.clogpBox, self.tanimotoBox, self.molwtBox, self.rotbBox,  self.decoyMinSpinBox, self.decoyMaxSpinBox, self.dTanimotoBox, self.cachDirectoryLineEdit):
             field.editingFinished.emit()
