@@ -304,22 +304,21 @@ def find_decoys(
     kdecoys_can_set = set()
     ndecoys = 0
     ligands_max = 0
+    decoys_set = set()
 
     if decoy_files:
         yield ('file', 0, 'known decoy files...')
-        decoys_set = parse_decoy_files(decoy_files)
-        ndecoys = len(decoys_set)
-        for decoy in decoys_set:
+        for decoy in parse_decoy_files(decoy_files):
             can = decoy.mol.write('can')
             for ligand in ligands_dict.keys():
-                if isdecoy(decoy,ligand,HBA_t,HBD_t,ClogP_t,MW_t,RB_t ):
+                if can not in kdecoys_can_set and isdecoy(decoy,ligand,HBA_t,HBD_t,ClogP_t,MW_t,RB_t ):
                     ligands_dict[ligand] +=1
-                    kdecoys_can_set.add(can)
+                    decoys_set.add(decoy)
                     if min and ligands_dict[ligand] == min:
                         complete_ligand_sets += 1
                         yield ('ndecoys',  ndecoys,  complete_ligand_sets)
-    else:
-        decoys_set = set()
+            kdecoys_can_set.add(can)
+    ndecoys = len(decoys_set)
 
     yield ('ndecoys',  len(decoys_set),  complete_ligand_sets)
 
