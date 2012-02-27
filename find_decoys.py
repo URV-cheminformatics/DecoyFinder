@@ -368,7 +368,7 @@ def find_decoys(
     else:
         print("Not all wanted decoys found")
     #Generate logfile
-    log = '"DecoyFinder 1.0 log file generated on %s\n"' % datetime.datetime.now()
+    log = '"DecoyFinder 1.1 log file generated on %s\n"' % datetime.datetime.now()
     log += "\n"
     log += '"Output file:","%s"\n' % outputfile
     log += "\n"

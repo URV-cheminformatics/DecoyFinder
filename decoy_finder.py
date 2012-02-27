@@ -39,7 +39,7 @@ from PySide.QtCore import QTranslator, QLocale
 
 ORGNAME = u'Universitat Rovira i Virgili - Grup de Recerca en Nutrigenòmica'
 NAME = 'DecoyFinder'
-VERSION = '1.0'
+VERSION = '1.1'
 URL = 'urvnutrigenomica-ctns.github.com/DecoyFinder/'
 
 def main():
