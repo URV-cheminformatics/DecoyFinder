@@ -20,6 +20,7 @@ CREATE  TABLE IF NOT EXISTS `decoyfinder`.`Molecules` (
   `tpsa` DECIMAL(7,3) NOT NULL ,
   PRIMARY KEY (`inchikey`) ,
   UNIQUE INDEX `inchikey_UNIQUE` (`inchikey` ASC) )
+-- ENGINE = MyISAM;
 ENGINE = InnoDB;
 
 
