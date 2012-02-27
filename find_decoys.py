@@ -37,7 +37,7 @@ except:
     import pybel
 tdict['OpenBabel'] = pybel
 
-if cinfony:
+if cinfony and False:
     try:
         from cinfony import rdk
         tdict['RDkit'] = rdk
@@ -63,7 +63,7 @@ for format in pybel.informats:
     for compression in ('gz', 'tar',  'bz',  'bz2',  'tar.gz',  'tar.bz',  'tar.bz2'):
         informats += "*.%s.%s " % (format,  compression)
 
-DEBUG=0
+DEBUG=1
 def debug(text):
     if DEBUG:
         print(text)
