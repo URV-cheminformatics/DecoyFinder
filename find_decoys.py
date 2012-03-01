@@ -63,7 +63,7 @@ for format in pybel.informats:
     for compression in ('gz', 'tar',  'bz',  'bz2',  'tar.gz',  'tar.bz',  'tar.bz2'):
         informats += "*.%s.%s " % (format,  compression)
 
-DEBUG=1
+DEBUG=0
 def debug(text):
     if DEBUG:
         print(text)
