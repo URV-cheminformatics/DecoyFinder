@@ -23,7 +23,7 @@ import os, sys, shutil, subprocess, tarfile
 from glob import glob
 sys.path.append('..')
 import metadata
-
+exit
 if metadata.PYQT:
     metadata.NAME += '-pyqt'
 
@@ -197,42 +197,61 @@ def make_rpm(srcdir):
     rpmdir = 'rpm'
     if not os.path.isdir(rpmdir):
         os.makedirs(rpmdir)
+    RPMMACROS = os.path.join(os.path.expanduser('~'), '.rpmmacros')
+    macrosfile = open(RPMMACROS, 'wb')
+    macrosfile.write("%_topdir " + os.path.abspath(rpmdir) + '\n')
+    macrosfile.write("%_buildrootdir "+ os.path.abspath(rpmdir) + "/BUILD\n")
+    macrosfile.write("% _rpmdir "+ os.path.abspath(rpmdir) +"/RPMS\n")
+    macrosfile.write("%_tmppath "+ os.path.abspath(rpmdir) + "/tmp\n")
+    for dir in ('SRPMS', 'BUILD', 'RPMS', 'SPECS', 'tmp'):
+        fullpath = os.path.abspath(os.path.join(rpmdir, dir))
+        if not os.path.isdir(fullpath):
+            os.makedirs(fullpath)
     ####Put files in place####
     print 'Copying files...'
-    destdir = os.path.join(rpmdir, 'usr', 'share', 'applications')
+    buildroot = os.path.abspath(os.path.join(rpmdir, 'BUILD', "%s-%s-1.noarch" % (metadata.NAME,  metadata.VERSION)))
+    if os.path.exists(buildroot):
+        shutil.rmtree(buildroot)
+    os.makedirs(buildroot)
+    destdir = os.path.join(buildroot, 'usr', 'share', 'applications')
     destfile = os.path.join(destdir, metadata.NAME.lower() + '.desktop')
     if not os.path.exists(destdir):
         os.makedirs(destdir)
     elif os.path.exists(destfile):
         os.remove(destfile)
     shutil.copy(metadata.NAME.lower() + '.desktop', destdir)
-    destdir = os.path.join(rpmdir, 'usr', 'local', 'bin')
+    destdir = os.path.join(buildroot, 'usr', 'bin')
     destfile = os.path.join(destdir, metadata.NAME.lower())
     if not os.path.exists(destdir):
         os.makedirs(destdir)
     elif os.path.exists(destfile):
         os.remove(destfile)
     shutil.copy(metadata.NAME.lower(), destdir)
-    destdir = os.path.join(rpmdir, 'opt', metadata.NAME)
+    destdir = os.path.join(buildroot, 'opt', metadata.NAME)
     if os.path.isdir(destdir):
         shutil.rmtree(destdir)
     shutil.copytree(srcdir, destdir)
     specfile = metadata.NAME + '-' + metadata.VERSION +'_rpm.spec'
+    if os.path.isdir(os.path.join(rpmdir, 'SOURCES')):
+        shutil.rmtree(os.path.join(rpmdir, 'SOURCES'))
+        os.makedirs(os.path.join(rpmdir, 'SOURCES'))
+    shutil.copy(os.path.join('..', 'icon.xpm'), os.path.join(rpmdir, 'SOURCES'))
     if os.path.exists(specfile):
         os.remove(specfile)
-    spec_template = "Buildroot: %s\n" % os.path.abspath(rpmdir)
+    spec_template = ""
     spec_template +="Name: %s\n" % metadata.NAME
     spec_template +="Version: %s\n" % metadata.VERSION
     spec_template +="Url: http://%s\n" % metadata.URL
-    spec_template +="Vendor: %s\n" %(author + ' <%s>' % author_email)
+    spec_template +="Vendor: Grup de Recerca en Nutrigenomica - Universitat Rovira i Virgili\n"
+    spec_template +="Packager: %s\n" %(author + ' <%s>' % author_email)
     spec_template +="Release: 1\n"
     spec_template +="Summary: %s\n" % description
     spec_template +="License: GPL v3\n"
     spec_template +="Group: Science\n"
-    #spec_template +="Icon: %s\n" % 'icon.png'
+    spec_template +="Icon: %s\n" % 'icon.xpm'
     spec_template +="BuildArch: noarch\n"
+    spec_template +="Buildroot: %s\n" % buildroot
     spec_template +="Requires: python\n"
-    spec_template +="%define _rpmdir ../\n"
     spec_template +="%define _rpmfilename %%{NAME}-%%{VERSION}-%%{RELEASE}.%%{ARCH}.rpm\n"
     spec_template +="%define _unpackaged_files_terminate_build 0\n"
     spec_template +="%description\n"
@@ -241,44 +260,31 @@ def make_rpm(srcdir):
     files_spec = """
 
 %files
-%dir "/"
-%dir "/usr/"
-%dir "/usr/share/"
-%dir "/usr/share/applications/"
-"/usr/share/applications/decoyfinder.desktop"
-%dir "/usr/local/"
-%dir "/usr/local/bin/"
-"/usr/local/bin/decoyfinder"
+%defattr(-,root,root,-)
+%{_datarootdir}/applications/decoyfinder.desktop
+%{_bindir}/decoyfinder
 %dir "/opt/"
 %dir "/opt/DecoyFinder/"
-"/opt/DecoyFinder/RELEASE_NOTES.txt"
-"/opt/DecoyFinder/icons_rc.py"
-"/opt/DecoyFinder/metadata.py"
-"/opt/DecoyFinder/icon.png"
-"/opt/DecoyFinder/LICENCE.txt"
-"/opt/DecoyFinder/Ui_AboutDiag.py"
-"/opt/DecoyFinder/decoy_finder.py"
-"/opt/DecoyFinder/README.txt"
-"/opt/DecoyFinder/Ui_MainWindow.py"
-"/opt/DecoyFinder/resources_rc.py"
-"/opt/DecoyFinder/AboutDiag.py"
-"/opt/DecoyFinder/LICENCE.html"
-"/opt/DecoyFinder/find_decoys.py"
-"/opt/DecoyFinder/MainWindow.py"
+/opt/DecoyFinder/*
 """
     sf = open(specfile, 'wb')
     sf.write(spec_template)
     sf.write(files_spec)
     sf.close()
-    subprocess.call(['sudo', 'chown', '-R', 'root:root'] + glob(rpmdir + '/*'))
-    subprocess.call(['sudo', 'chmod', '-R', 'o+rx-w'] + glob(rpmdir + '/*'))
-    subprocess.call(['sudo', 'chmod', 'a-x'] + glob(os.path.join(rpmdir, 'opt', metadata.NAME, '*')))
+    subprocess.call(['sudo', 'chown', '-R', 'root:root'] + glob(buildroot + '/*'))
+    subprocess.call(['sudo', 'chmod', '-R', 'o+rx-w'] + glob(buildroot + '/*'))
+    subprocess.call(['sudo', 'chmod', 'a-x'] + glob(os.path.join(buildroot, 'opt', metadata.NAME, '*')))
     ####Build the RPM####
-    subprocess.call(['rpmbuild', specfile])
+    macrosfile.close()
+    subprocess.call(['rpmbuild', '--target=noarch', '--nodeps', '-bb', specfile])
+    rpmname = "%s-%s-1.noarch.rpm" % (metadata.NAME,  metadata.VERSION)
+    if os.path.isfile(os.path.join('packages', rpmname)):
+        os.remove(os.path.join('packages', rpmname))
+    shutil.move(os.path.join(rpmdir, 'RPMS',rpmname), 'packages')
     ####Cleanup####
     print 'Cleaning files...'
-    subprocess.call(['sudo', 'chmod', '-R', 'a+rw', rpmdir])
-    shutil.rmtree(rpmdir)
+    subprocess.call(['sudo', 'chmod', '-R', 'a+rw', buildroot])
+    shutil.rmtree(buildroot)
 
 if __name__ == '__main__':
     srcdir = get_clean_src('..')
@@ -286,4 +292,4 @@ if __name__ == '__main__':
     if os.name != 'nt':
         make_deb(srcdir)
         make_rpm(srcdir)
-    #make_win32(srcdir)
+    make_win32(srcdir)
