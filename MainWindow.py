@@ -2,7 +2,7 @@
 #
 #       MainWindow.py is part of Decoy Finder
 #
-#       Copyright 2011, 2012 Adrià Cereto Massagué <adrian.cereto@urv.cat>
+#       Copyright 2011-2012 Adrià Cereto Massagué <adrian.cereto@urv.cat>
 #
 #       This program is free software; you can redistribute it and/or modify
 #       it under the terms of the GNU General Public License as published by
@@ -53,39 +53,43 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         for subset in ZINC_subsets:
             self.zsubComboBox.addItem(subset)
         self.zsubComboBox.setCurrentIndex(self.zsubComboBox.findText('everything'))
-        ###Load icons###
-        if not QIcon.themeName():
-            print("No icon theme set, using default: Tango")
-            import icons_rc
-            QIcon.setThemeName('iconset')
-        addIcon = QIcon.fromTheme('list-add', QIcon())
-        clearIcon = QIcon.fromTheme('edit-clear', QIcon())
-        outIcon = QIcon.fromTheme('document-save-as', QIcon())
-        finddIcon = QIcon.fromTheme('media-playback-start', QIcon())
-        stopIcon = QIcon.fromTheme('process-stop', QIcon())
-        cachedirIcon = QIcon.fromTheme('folder-open', QIcon())
-        defaultsIcon = QIcon.fromTheme('view-refresh', QIcon())
-        helpIcon = QIcon.fromTheme('internet-web-browser', QIcon())
-        aboutIcon = QIcon.fromTheme('dialog-information', QIcon())
+        ###Load icons, if Qt is new enough###
+        if 'themeName' in dir(QIcon):
+            if not QIcon.themeName():
+                print("No icon theme set, using default: Tango")
+                import icons_rc
+                QIcon.setThemeName('iconset')
+            addIcon = QIcon.fromTheme('list-add', QIcon())
+            clearIcon = QIcon.fromTheme('edit-clear', QIcon())
+            outIcon = QIcon.fromTheme('document-save-as', QIcon())
+            finddIcon = QIcon.fromTheme('media-playback-start', QIcon())
+            stopIcon = QIcon.fromTheme('process-stop', QIcon())
+            cachedirIcon = QIcon.fromTheme('folder-open', QIcon())
+            defaultsIcon = QIcon.fromTheme('view-refresh', QIcon())
+            helpIcon = QIcon.fromTheme('internet-web-browser', QIcon())
+            aboutIcon = QIcon.fromTheme('dialog-information', QIcon())
 
-        self.addQueryButton.setIcon(addIcon)
-        self.addDecoysButton.setIcon(addIcon)
-        self.addDButton.setIcon(addIcon)
+            self.addQueryButton.setIcon(addIcon)
+            self.addDecoysButton.setIcon(addIcon)
+            self.addDButton.setIcon(addIcon)
 
-        self.clearActives.setIcon(clearIcon)
-        self.clearDecoys.setIcon(clearIcon)
-        self.clearDB.setIcon(clearIcon)
-        self.clearButton.setIcon(clearIcon)
+            self.clearActives.setIcon(clearIcon)
+            self.clearDecoys.setIcon(clearIcon)
+            self.clearDB.setIcon(clearIcon)
+            self.clearButton.setIcon(clearIcon)
 
-        self.outDirButton.setIcon(outIcon)
-        self.findDecoysButton.setIcon(finddIcon)
-        self.stopButton.setIcon(stopIcon)
+            self.outDirButton.setIcon(outIcon)
+            self.findDecoysButton.setIcon(finddIcon)
+            self.stopButton.setIcon(stopIcon)
 
-        self.cacheButton.setIcon(cachedirIcon)
-        self.defaultsButton.setIcon(defaultsIcon)
+            self.cacheButton.setIcon(cachedirIcon)
+            self.defaultsButton.setIcon(defaultsIcon)
 
-        self.actionAbout.setIcon(aboutIcon)
-        self.actionHelp.setIcon(helpIcon)
+            self.actionAbout.setIcon(aboutIcon)
+            self.actionHelp.setIcon(helpIcon)
+        else:
+            print 'Your version of Qt is way too old. Consider upgrading it to at least 4.6!'
+            print 'Icons will not be displayed because of that'
         ############
 
         self.toolBar.addAction(self.actionAbout)
