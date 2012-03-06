@@ -1,5 +1,31 @@
-* Webpage + correct links
+# Core
 
-* Move from canonical SMILES to InChI or InChIkey for internal unique representation (Requires OpenBabel 2.3.1)
+* QtCore, QThread and Signal/slot powered find_decoys.py
+
+* Take advantadge of multiple cores
+
+* Optionally use CDK, Indigo, RDkit, etc. (provided by cinfony)
+
+* Python3 compatibility?
+
+* Write tests
+
+* Improve performance (identify bottlenecks)
+
+# GUI
+
+* Make the _New Decoy sources_ section more intuitive
+
+* Inform about ZINC file downloads
+
+* Real-time _Run statistics_?
+
+# Distribution
+
+* Lintian-proof .deb packaging
 
 * MacOSX support?
+
+* RPM packages?
+
+* Linux bundled binary? (using PySideKick.Hatchet and myppy? with PyInstaller)

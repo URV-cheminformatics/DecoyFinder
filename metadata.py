@@ -21,6 +21,6 @@
 
 ORGNAME = u'Universitat Rovira i Virgili - Grup de Recerca en Nutrigenòmica'
 NAME = 'DecoyFinder'
-VERSION = '1.1'
+VERSION = '2.x-devel'
 URL = 'urvnutrigenomica-ctns.github.com/DecoyFinder/'
 PYQT = True
