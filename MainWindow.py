@@ -113,7 +113,13 @@ class DecoyFinderThread(QThread):
             if self.filecount:
                 self.progress.emit(self.filecount +1)
         except Exception, e:
-            err = unicode(e)
+            try:
+                err = unicode(e)
+            except:
+                try:
+                    err = str(e)
+                except:
+                    err =e
             self.error.emit(self.trUtf8("Error: %s" % err))
         if outputfile:
             self.info.emit("Decoys saved to " + outputfile)
