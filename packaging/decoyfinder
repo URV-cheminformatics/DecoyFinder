@@ -1,1 +1,7 @@
-deb/usr/local/bin/decoyfinder
+#!/bin/sh
+# installation directory
+OLDDIR=$PWD
+DECOYFINDERDIR=/opt/DecoyFinder
+cd $DECOYFINDERDIR
+python decoy_finder.py &
+cd $PWD
