@@ -250,8 +250,9 @@ def make_rpm(srcdir):
     spec_template +="Group: Science\n"
     spec_template +="Icon: %s\n" % 'icon.xpm'
     spec_template +="BuildArch: noarch\n"
+    spec_template +="ExclusiveArch: noarch\n"
     spec_template +="Buildroot: %s\n" % buildroot
-    spec_template +="Requires: python\n"
+    spec_template +="Requires: python-openbabel >= 2.3 , python-pyside\n"
     spec_template +="%define _rpmfilename %%{NAME}-%%{VERSION}-%%{RELEASE}.%%{ARCH}.rpm\n"
     spec_template +="%define _unpackaged_files_terminate_build 0\n"
     spec_template +="%description\n"
@@ -285,6 +286,10 @@ def make_rpm(srcdir):
     print 'Cleaning files...'
     subprocess.call(['sudo', 'chmod', '-R', 'a+rw', buildroot])
     shutil.rmtree(buildroot)
+    if os.path.isfile(os.path.join('packages', rpmname)):
+        print '%s successfully built!' % rpmname
+    else:
+        print 'Unable to build rpm package!'
 
 if __name__ == '__main__':
     srcdir = get_clean_src('..')
