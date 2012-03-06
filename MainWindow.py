@@ -2,7 +2,7 @@
 #
 #       MainWindow.py is part of Decoy Finder
 #
-#       Copyright 2011 Adrià Cereto Massagué <adrian.cereto@urv.cat>
+#       Copyright 2011-2012 Adrià Cereto Massagué <adrian.cereto@urv.cat>
 #
 #       This program is free software; you can redistribute it and/or modify
 #       it under the terms of the GNU General Public License as published by
@@ -115,7 +115,13 @@ class DecoyFinderThread(QThread):
             if self.filecount:
                 self.progress.emit(self.filecount +1)
         except Exception, e:
-            err = unicode(e)
+            try:
+                err = unicode(e)
+            except:
+                try:
+                    err = str(e)
+                except:
+                    err =e
             self.error.emit(self.trUtf8("Error: %s" % err))
         if outputfile:
             self.info.emit("Decoys saved to " + outputfile)

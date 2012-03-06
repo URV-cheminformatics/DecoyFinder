@@ -40,10 +40,7 @@ sip.setapi('QVariant', 2)
 from PyQt4.QtGui import QApplication
 from PyQt4.QtCore import QTranslator, QLocale
 
-ORGNAME = u'Universitat Rovira i Virgili - Grup de Recerca en Nutrigenòmica'
-NAME = 'DecoyFinder'
-VERSION = '1.1'
-URL = 'urvnutrigenomica-ctns.github.com/DecoyFinder/'
+from metadata import *
 
 def main():
     """

@@ -1,6 +1,0 @@
-#!/bin/sh
-# installation directory
-DECOYFINDERDIR=/opt/DecoyFinder-pyqt
-cd $DECOYFINDERDIR
-python decoy_finder.py
-cd
