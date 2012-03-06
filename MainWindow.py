@@ -2,7 +2,7 @@
 #
 #       MainWindow.py is part of Decoy Finder
 #
-#       Copyright 2011 Adrià Cereto Massagué <adrian.cereto@urv.cat>
+#       Copyright 2011-2012 Adrià Cereto Massagué <adrian.cereto@urv.cat>
 #
 #       This program is free software; you can redistribute it and/or modify
 #       it under the terms of the GNU General Public License as published by
@@ -34,98 +34,6 @@ from find_decoys import *
 from Ui_MainWindow import Ui_MainWindow
 from AboutDiag import AboutDialog
 
-class DecoyFinderThread(QThread):
-    """
-    """
-    info = Signal(unicode) #needs to be defined OUTSIDE __init__
-    progress = Signal(int)
-    finished = Signal(tuple)
-    error = Signal(unicode)
-    progLimit = Signal(int)
-
-    def __init__(self, query_files, db_files, decoy_files, stopfile):
-        """
-        """
-        #print "thread created"
-        self.decoy_files = decoy_files
-        self.query_files = query_files
-        self.db_files = db_files
-        self.stopfile = stopfile
-        self.nactive_ligands = 0
-        self.ndecoys = 0
-        self.settings = QSettings()
-        super(DecoyFinderThread, self).__init__(None)
-
-    def run(self):
-        """
-        """
-        self.info.emit(self.tr("Reading files..."))
-        result = None
-        minreached = True
-        try:
-            self.filecount = 0
-            self.currentfile = ''
-            min = int(self.settings.value('decoy_min', 36))
-            outputfile = None
-            for info in find_decoys(
-                        query_files = self.query_files
-                        ,db_files = self.db_files
-                        ,outputfile =  str(self.settings.value('outputfile', 'found'))
-                        ,HBA_t = int(self.settings.value('HBA_t', 0))
-                        ,HBD_t = int(self.settings.value('HBD_t', 0))
-                        ,ClogP_t = float(self.settings.value('ClogP_t', 1))
-                        ,tanimoto_t = float(self.settings.value('tanimoto_t', 0.9))
-                        ,MW_t = int(self.settings.value('MW_t',40))
-                        ,RB_t = int(self.settings.value('RB_t',0))
-                        ,min = int(self.settings.value('decoy_min',36))
-                        ,max = int(self.settings.value('decoy_max',36))
-                        ,tanimoto_d = float(self.settings.value('tanimoto_d', 0.9))
-                        ,decoy_files = self.decoy_files
-                        ,stopfile = self.stopfile
-                        ):
-                if info[0] in ('file',  'ndecoys'):
-                    if not min:
-                        if info[0] == 'file':
-                            self.filecount = info[1]
-                            if self.currentfile != info[2]:
-                                self.currentfile = info[2]
-                                self.info.emit(self.trUtf8("Reading %s, found %s decoys") % (self.currentfile,  self.ndecoys))
-                            if self.filecount:
-                                self.progress.emit(self.filecount)
-                        if info[0] == 'ndecoys':
-                            self.ndecoys = info[1]
-                            self.info.emit(self.trUtf8("Reading %s, found %s decoys" % (self.currentfile,  self.ndecoys)))
-                    else:
-                        if info[0] == 'ndecoys':
-                            if info[1] > self.total_min:
-                                self.progLimit.emit(info[1])
-                            self.progress.emit(info[1])
-                            self.info.emit(self.trUtf8("%s of %s decoy sets completed") % (info[2],  self.nactive_ligands))
-                elif info[0] == 'result':
-                    outputfile = info[2][0]
-                    minreached =  info[2][1]
-                    result = ( info[1],outputfile, minreached)
-                elif info[0] == 'total_min':
-                    self.total_min = info[1]
-                    self.progLimit.emit(self.total_min)
-                    self.nactive_ligands = info[2]
-                else:
-                    print("Something very wrong")
-
-            if self.filecount:
-                self.progress.emit(self.filecount +1)
-        except Exception, e:
-            err = unicode(e)
-            self.error.emit(self.trUtf8("Error: %s" % err))
-        if outputfile:
-            self.info.emit("Decoys saved to " + outputfile)
-        else:
-            self.info.emit("No decoys were saved")
-        if result:
-            self.finished.emit(result)
-        else:
-            self.error.emit('Search was interrupted by an error or failure')
-
 class MainWindow(QMainWindow, Ui_MainWindow):
     """
     Class documentation goes here.
@@ -147,39 +55,43 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         for subset in ZINC_subsets:
             self.zsubComboBox.addItem(subset)
         self.zsubComboBox.setCurrentIndex(self.zsubComboBox.findText('everything'))
-        ###Load icons###
-        if not QIcon.themeName():
-            print("No icon theme set, using default: Tango")
-            import icons_rc
-            QIcon.setThemeName('iconset')
-        addIcon = QIcon.fromTheme('list-add', QIcon())
-        clearIcon = QIcon.fromTheme('edit-clear', QIcon())
-        outIcon = QIcon.fromTheme('document-save-as', QIcon())
-        finddIcon = QIcon.fromTheme('media-playback-start', QIcon())
-        stopIcon = QIcon.fromTheme('process-stop', QIcon())
-        cachedirIcon = QIcon.fromTheme('folder-open', QIcon())
-        defaultsIcon = QIcon.fromTheme('view-refresh', QIcon())
-        helpIcon = QIcon.fromTheme('internet-web-browser', QIcon())
-        aboutIcon = QIcon.fromTheme('dialog-information', QIcon())
+        ###Load icons, if Qt is new enough###
+        if 'themeName' in dir(QIcon):
+            if not QIcon.themeName():
+                print("No icon theme set, using default: Tango")
+                import icons_rc
+                QIcon.setThemeName('iconset')
+            addIcon = QIcon.fromTheme('list-add', QIcon())
+            clearIcon = QIcon.fromTheme('edit-clear', QIcon())
+            outIcon = QIcon.fromTheme('document-save-as', QIcon())
+            finddIcon = QIcon.fromTheme('media-playback-start', QIcon())
+            stopIcon = QIcon.fromTheme('process-stop', QIcon())
+            cachedirIcon = QIcon.fromTheme('folder-open', QIcon())
+            defaultsIcon = QIcon.fromTheme('view-refresh', QIcon())
+            helpIcon = QIcon.fromTheme('internet-web-browser', QIcon())
+            aboutIcon = QIcon.fromTheme('dialog-information', QIcon())
 
-        self.addQueryButton.setIcon(addIcon)
-        self.addDecoysButton.setIcon(addIcon)
-        self.addDButton.setIcon(addIcon)
+            self.addQueryButton.setIcon(addIcon)
+            self.addDecoysButton.setIcon(addIcon)
+            self.addDButton.setIcon(addIcon)
 
-        self.clearActives.setIcon(clearIcon)
-        self.clearDecoys.setIcon(clearIcon)
-        self.clearDB.setIcon(clearIcon)
-        self.clearButton.setIcon(clearIcon)
+            self.clearActives.setIcon(clearIcon)
+            self.clearDecoys.setIcon(clearIcon)
+            self.clearDB.setIcon(clearIcon)
+            self.clearButton.setIcon(clearIcon)
 
-        self.outDirButton.setIcon(outIcon)
-        self.findDecoysButton.setIcon(finddIcon)
-        self.stopButton.setIcon(stopIcon)
+            self.outDirButton.setIcon(outIcon)
+            self.findDecoysButton.setIcon(finddIcon)
+            self.stopButton.setIcon(stopIcon)
 
-        self.cacheButton.setIcon(cachedirIcon)
-        self.defaultsButton.setIcon(defaultsIcon)
+            self.cacheButton.setIcon(cachedirIcon)
+            self.defaultsButton.setIcon(defaultsIcon)
 
-        self.actionAbout.setIcon(aboutIcon)
-        self.actionHelp.setIcon(helpIcon)
+            self.actionAbout.setIcon(aboutIcon)
+            self.actionHelp.setIcon(helpIcon)
+        else:
+            print 'Your version of Qt is way too old. Consider upgrading it to at least 4.6!'
+            print 'Icons will not be displayed because of that'
         ############
 
         self.toolBar.addAction(self.actionAbout)
@@ -562,15 +474,15 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         """
         Slot documentation goes here.
         """
-        self.hbaBox.setValue(HBA_t)
-        self.hbdBox.setValue(HBD_t)
-        self.clogpBox.setValue(int(ClogP_t))
-        self.tanimotoBox.setValue(float(tanimoto_t))
-        self.molwtBox.setValue(MW_t)
-        self.rotbBox.setValue(RB_t)
+        self.hbaBox.setValue(0)
+        self.hbdBox.setValue(0)
+        self.clogpBox.setValue(1)
+        self.tanimotoBox.setValue(0.9)
+        self.molwtBox.setValue(40)
+        self.rotbBox.setValue(0)
         self.decoyMinSpinBox.setValue(36)
         self.decoyMaxSpinBox.setValue(36)
-        self.dTanimotoBox.setValue(float(tanimoto_d))
+        self.dTanimotoBox.setValue(0.9)
         self.cachDirectoryLineEdit.setText(tempfile.gettempdir())
         for field in (self.hbaBox, self.hbdBox, self.clogpBox, self.tanimotoBox, self.molwtBox, self.rotbBox,  self.decoyMinSpinBox, self.decoyMaxSpinBox, self.dTanimotoBox, self.cachDirectoryLineEdit):
             field.editingFinished.emit()

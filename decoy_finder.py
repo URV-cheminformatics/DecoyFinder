@@ -3,7 +3,7 @@
 #
 #       decoy_finder.py is part of Decoy Finder
 #
-#       Copyright 2011 Adrià Cereto Massagué <adrian.cereto@urv.cat>
+#       Copyright 2011, 2012 Adrià Cereto Massagué <adrian.cereto@urv.cat>
 #
 #       This program is free software; you can redistribute it and/or modify
 #       it under the terms of the GNU General Public License as published by
@@ -40,10 +40,7 @@ sip.setapi('QVariant', 2)
 from PyQt4.QtGui import QApplication
 from PyQt4.QtCore import QTranslator, QLocale
 
-ORGNAME = u'Universitat Rovira i Virgili - Grup de Recerca en Nutrigenòmica'
-NAME = 'DecoyFinder'
-VERSION = '1.0'
-URL = 'urvnutrigenomica-ctns.github.com/DecoyFinder/'
+from metadata import *
 
 def main():
     """
