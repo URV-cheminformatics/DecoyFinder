@@ -391,7 +391,7 @@ def find_decoys(
     log += '"Minimum nº of decoys per active ligand","%s"\n' % str(min)
     log += '"Maximum nº of decoys per active ligand","%s"\n' % str(max)
     log += "\n"
-    log += '"Avtive ligand","HBA","HBD","logP","MW","RB","nº of Decoys found"\n'
+    log += '"Active ligand","HBA","HBD","logP","MW","RB","nº of Decoys found"\n'
     for active in ligands_dict:
         log += '"%s","%s","%s","%s","%s","%s","%s"\n' % (active.title,  active.hba,  active.hbd,  active.clogp,  active.mw,  active.rot,  ligands_dict[active])
     log += "\n"
