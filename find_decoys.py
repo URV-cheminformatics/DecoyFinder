@@ -21,6 +21,7 @@
 #       MA 02110-1301, USA.
 
 import pybel, os, urllib2, tempfile, random,  sys,  gzip,  datetime
+import metadata
 from decimal import Decimal
 #Decimal() can represent floating point data with higher precission than built-in float
 
@@ -368,7 +369,7 @@ def find_decoys(
     else:
         print("Not all wanted decoys found")
     #Generate logfile
-    log = '"DecoyFinder 1.1 log file generated on %s\n"' % datetime.datetime.now()
+    log = '"%s %s log file generated on %s\n"' % (metadata.NAME, metadata.VERSION, datetime.datetime.now())
     log += "\n"
     log += '"Output file:","%s"\n' % outputfile
     log += "\n"
