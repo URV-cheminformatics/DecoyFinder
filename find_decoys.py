@@ -316,7 +316,9 @@ def find_decoys(
         yield ('file',  filecount, db_file)
         if max and ligands_max >= nactive_ligands:
             break
-        if not min or ndecoys < total_min or complete_ligand_sets < nactive_ligands:
+        if complete_ligand_sets >= nactive_ligands:
+            break
+        if not min or ndecoys < total_min :
             too_similar = False
             if tanimoto_d < Decimal(1):
                 for decoyfp in decoys_fp_set:
