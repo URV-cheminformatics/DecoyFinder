@@ -344,7 +344,6 @@ def find_decoys(
                         can = db_mol.mol.write('can').split('\t')[0]
                         if can not in decoys_can_set:
                             ligands_dict[ligand] += 1
-                            decoys_fp_set.add(db_mol.fp)
                             if not saved:
                                 decoyfile.write(db_mol.mol)
                                 saved = True
@@ -356,6 +355,7 @@ def find_decoys(
                                 yield ('ndecoys',  ndecoys, complete_ligand_sets)
                 if saved:
                     decoys_can_set.add(can)
+                    decoys_fp_set.add(db_mol.fp)
                     ndecoys = len(decoys_can_set)
         else:
             print("finishing")
