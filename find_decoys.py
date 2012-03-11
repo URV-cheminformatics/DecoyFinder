@@ -315,8 +315,11 @@ def find_decoys(
         used_db_files.add(db_file)
         yield ('file',  filecount, db_file)
         if max and ligands_max >= nactive_ligands:
+            print 'Maximum reached'
+            minreached = True
             break
         if complete_ligand_sets >= nactive_ligands:
+            print 'All decoy sets complete'
             break
         if not min or ndecoys < total_min :
             too_similar = False
@@ -364,11 +367,13 @@ def find_decoys(
             os.remove(stopfile)
             print('stopping by user request')
             break
+    else:
+        print 'No more input molecules'
 
     if min:
         print('Completed %s of %s decoy sets' % (complete_ligand_sets, nactive_ligands ))
         minreached = complete_ligand_sets >= nactive_ligands
-    if minreached and total_min <= len(decoys_can_set):
+    if minreached:
         print("Found all wanted decoys")
     else:
         print("Not all wanted decoys found")
