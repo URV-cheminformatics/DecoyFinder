@@ -42,10 +42,6 @@ tanimoto_d = Decimal('0.9')
 MW_t = 40
 RB_t = 0#1
 
-#SMARTS patterns for HBD and HBA:
-HBA = pybel.Smarts("[#7,#8]")
-HBD = pybel.Smarts("[#7,#8;!H0]")
-
 #Dict of ZINC subsets
 ZINC_subsets = {
     "lead-like":"1"
@@ -76,8 +72,8 @@ class ComparableMol():
         """
         Calculate all interesting descriptors. Should be  called only when needed
         """
-        self.hba = len(HBA.findall(self.mol))
-        self.hbd = len(HBD.findall(self.mol))
+        self.hba = Decimal(str(self.mol.calcdesc(['HBA2'])['HBA2']))
+        self.hbd = Decimal(str(self.mol.calcdesc(['HBD'])['HBD']))
         self.clogp = Decimal(str(self.mol.calcdesc(['logP'])['logP']))
         self.mw = self.mol.molwt
         self.rot = self.mol.OBMol.NumRotors()
