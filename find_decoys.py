@@ -334,15 +334,15 @@ def find_decoys(
                         break
                 if too_similar:
                     continue
-                db_mol.calcdesc()
+                can = db_mol.mol.write('can').split('\t')[0]
                 ligands_max = 0
-                for ligand in ligands_dict.iterkeys():
-                    if max and ligands_dict[ligand] >= max:
-                        ligands_max +=1
-                        continue
-                    if isdecoy(db_mol,ligand,HBA_t,HBD_t,ClogP_t,MW_t,RB_t ):
-                        can = db_mol.mol.write('can').split('\t')[0]
-                        if can not in decoys_can_set:
+                if can not in decoys_can_set:
+                    db_mol.calcdesc()
+                    for ligand in ligands_dict.iterkeys():
+                        if max and ligands_dict[ligand] >= max:
+                            ligands_max +=1
+                            continue
+                        if isdecoy(db_mol,ligand,HBA_t,HBD_t,ClogP_t,MW_t,RB_t ):
                             ligands_dict[ligand] += 1
                             if not saved:
                                 decoyfile.write(db_mol.mol)
@@ -353,10 +353,10 @@ def find_decoys(
                                 print('Decoy set completed for ', ligand.title)
                                 complete_ligand_sets += 1
                                 yield ('ndecoys',  ndecoys, complete_ligand_sets)
-                if saved:
-                    decoys_can_set.add(can)
-                    decoys_fp_set.add(db_mol.fp)
-                    ndecoys = len(decoys_can_set)
+                    if saved:
+                        decoys_can_set.add(can)
+                        decoys_fp_set.add(db_mol.fp)
+                        ndecoys = len(decoys_can_set)
         else:
             print("finishing")
             break
