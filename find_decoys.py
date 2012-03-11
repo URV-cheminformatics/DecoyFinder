@@ -410,7 +410,7 @@ def find_decoys(
     if not decoys_fp_set:
         os.remove(outputfile)
     #Last, special yield:
-    yield ('result',  ligands_dict,  outputfile, minreached)
+    yield ('result',  ligands_dict,  [outputfile, minreached])
 
 def main(args = sys.argv[1:]):
     """
