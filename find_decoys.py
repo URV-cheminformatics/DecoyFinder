@@ -374,7 +374,7 @@ def find_decoys(
     else:
         print("Not all wanted decoys found")
     #Generate logfile
-    log = '"%s %s log file generated on %s\n"' % (metadata.NAME, metadata.VERSION, datetime.datetime.now())
+    log = '"%s %s log file generated on %s"\n' % (metadata.NAME, metadata.VERSION, datetime.datetime.now())
     log += "\n"
     log += '"Output file:","%s"\n' % outputfile
     log += "\n"
