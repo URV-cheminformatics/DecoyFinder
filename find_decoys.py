@@ -219,6 +219,8 @@ def isdecoy(
         return True
     return False
 
+def get_ndecoys(ligands_dict, max):
+    return sum((x for x in ligands_dict.itervalues() if not max or max >= x))
 
 def checkoutputfile(outputfile):
     """
@@ -281,7 +283,7 @@ def find_decoys(
         min = None
 
     decoys_can_set = set()
-    ndecoys = 0
+    ndecoys = get_ndecoys(ligands_dict, max)
     ligands_max = 0
 
     outputfile = checkoutputfile(outputfile)
@@ -299,7 +301,7 @@ def find_decoys(
                     ligands_dict[ligand] +=1
                     if min and ligands_dict[ligand] == min:
                         complete_ligand_sets += 1
-                        ndecoys = len(decoys_can_set)
+                        ndecoys = get_ndecoys(ligands_dict, max)
                         yield ('ndecoys',  ndecoys,  complete_ligand_sets)
             decoys_can_set.add(can)
             decoys_fp_set.add(decoy.fp)
@@ -346,6 +348,7 @@ def find_decoys(
                             if not saved:
                                 decoyfile.write(db_mol.mol)
                                 saved = True
+                            ndecoys = get_ndecoys(ligands_dict, max)
                             print('%s decoys found' % ndecoys)
                             yield ('ndecoys',  ndecoys, complete_ligand_sets)
                             if ligands_dict[ligand] ==  min:
@@ -355,7 +358,6 @@ def find_decoys(
                     if saved:
                         decoys_can_set.add(can)
                         decoys_fp_set.add(db_mol.fp)
-                        ndecoys = len(decoys_can_set)
         else:
             print("finishing")
             break
