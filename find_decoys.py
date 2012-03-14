@@ -411,7 +411,8 @@ def find_decoys(
     decoyfile.close()
 
     if not decoys_fp_set:
-        os.remove(outputfile)
+        if os.path.exists(outputfile):
+            os.remove(outputfile)
     #Last, special yield:
     yield ('result',  ligands_dict,  [outputfile, minreached])
 
