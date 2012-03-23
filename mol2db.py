@@ -27,9 +27,9 @@ import sqlite3
 
 insert_template = """REPLACE INTO Molecules (`inchikey`, `maccs`, `rotatable_bonds`, `weight`, `logp`, `hba`, `hbd`, `mol`, `tpsa`) VALUES ("%s", "%s", %s, %s, %s, %s,%s, "%s", %s);"""
 
-#filelist = glob.glob('ZINC/*.sdf')
+filelist = glob.glob('ZINC_0.9_2/*.sdf')
 
-filelist = ['/home/adria/ZINC.sdf']
+#filelist = ['/home/adria/ZINC.sdf']
 
 if __name__ == "__main__":
     dblist = set()
@@ -97,6 +97,9 @@ if __name__ == "__main__":
     LASTCOMMIT = 0
     COMMIT = 0
     for file in filelist:
+        finished = file + '_finished'
+        if os.path.exists(finished):
+            continue
         print '####################################%s##################################' % file
         mols = pybel.readfile('sdf', file)
         for mol in mols:
@@ -174,6 +177,7 @@ if __name__ == "__main__":
                     else:
                         print 'Unable to commit changes!'
             print recordcount
+        open(finished, 'wb').write('')
     print 'tancant...'
     for db in dblist:
         db.close()
