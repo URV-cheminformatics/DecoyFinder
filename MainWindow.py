@@ -315,7 +315,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                     self.progressBar.setMaximum(total_files)
             rsg = tempfile._RandomNameSequence()
             self.stopfile = os.path.join(tempfile.gettempdir(),  rsg.next() + rsg.next())
-            self.finder = DecoyFinderThread(query_files, db_files, decoy_files,  self.stopfile)
+            self.finder = DecoyFinderThread(query_files, db_files, decoy_files,  self.stopfile, unique = self.uniqueCheckBox.isChecked())
             self.finder.info.connect(self.statusbar.showMessage)
             self.finder.progress.connect(self.progressBar.setValue)
             self.finder.finished.connect(self.on_finder_finished)
@@ -472,15 +472,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         """
         Slot documentation goes here.
         """
-        self.hbaBox.setValue(0)
-        self.hbdBox.setValue(0)
-        self.clogpBox.setValue(1)
-        self.tanimotoBox.setValue(0.9)
-        self.molwtBox.setValue(40)
-        self.rotbBox.setValue(0)
-        self.decoyMinSpinBox.setValue(36)
-        self.decoyMaxSpinBox.setValue(36)
-        self.dTanimotoBox.setValue(0.9)
+        self.uniqueCheckBox.setChecked(False)
+        self.hbaBox.setValue(HBA_t)
+        self.hbdBox.setValue(HBD_t)
+        self.clogpBox.setValue(int(ClogP_t))
+        self.tanimotoBox.setValue(float(tanimoto_t))
+        self.molwtBox.setValue(MW_t)
+        self.rotbBox.setValue(RB_t)
         self.cachDirectoryLineEdit.setText(tempfile.gettempdir())
         for field in (self.hbaBox, self.hbdBox, self.clogpBox, self.tanimotoBox, self.molwtBox, self.rotbBox,  self.decoyMinSpinBox, self.decoyMaxSpinBox, self.dTanimotoBox, self.cachDirectoryLineEdit):
             field.editingFinished.emit()

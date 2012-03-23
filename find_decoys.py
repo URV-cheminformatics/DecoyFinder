@@ -22,6 +22,7 @@
 
 import os, urllib2, tempfile, random,  sys,  datetime, glob, itertools
 from PySide.QtCore import QSettings, QThread, Signal, Qt, Slot
+import metadata
 from decimal import Decimal
 
 SETTINGS = QSettings()
@@ -63,10 +64,24 @@ for format in pybel.informats:
     for compression in ('gz', 'tar',  'bz',  'bz2',  'tar.gz',  'tar.bz',  'tar.bz2'):
         informats += "*.%s.%s " % (format,  compression)
 
+
 DEBUG=0
 def debug(text):
     if DEBUG:
         print(text)
+
+
+#Some default values:
+
+HBA_t = 2
+HBD_t = 1
+ClogP_t = Decimal(1)#1.5
+tanimoto_t = Decimal('0.75')
+tanimoto_d = Decimal('0.9')
+MW_t = 25
+RB_t = 1
+mind = 36
+maxd = mind
 
 #Dict of ZINC subsets
 ZINC_subsets = {
@@ -86,6 +101,30 @@ ZINC_subsets = {
     ,"sarah":"37"
     ,"Stan":"94"
     }
+
+class ComparableMol():
+    """
+    """
+    def __init__(self, mol):
+        self.mol = mol
+        self.fp = mol.calcfp("MACCS")
+
+    def calcdesc(self):
+        """
+        Calculate all interesting descriptors. Should be  called only when needed
+        """
+        self.hba = Decimal(str(self.mol.calcdesc(['HBA2'])['HBA2']))
+        self.hbd = Decimal(str(self.mol.calcdesc(['HBD'])['HBD']))
+        self.clogp = Decimal(str(self.mol.calcdesc(['logP'])['logP']))
+        self.mw = self.mol.molwt
+        self.rot = self.mol.OBMol.NumRotors()
+        self.title = self.mol.title
+
+    def __str__(self):
+        """
+        For debug purposes
+        """
+        return "Title: %s; HBA: %s; HBD: %s; CLogP: %s; MW:%s \n" % (self.title, self.hba, self.hbd, self.clogp, self.mw)
 
 def get_zinc_slice(slicename = 'all', subset = '10', cachedir = tempfile.gettempdir(),  keepcache = False):
     """
@@ -246,6 +285,8 @@ def isdecoy(
         debug('Unsuitable HBAs: %s vs %s' % (ligand.hba, db_mol.hba))
     return False
 
+def get_ndecoys(ligands_dict, maxd):
+    return sum((x for x in ligands_dict.itervalues() if not maxd or maxd >= x))
 
 def checkoutputfile(outputfile):
     """
@@ -355,10 +396,11 @@ class DecoyFinderThread(QThread):
     error = Signal(unicode)
     progLimit = Signal(int)
 
-    def __init__(self, query_files = None, db_files = None, decoy_files = [], stopfile = ''):
+    def __init__(self, query_files = None, db_files = None, decoy_files = [], stopfile = '', unique=False):
         """
         """
         debug("thread created")
+        self.unique = unique
         self.decoy_files = decoy_files
         self.query_files = query_files
         self.db_files = db_files
@@ -385,6 +427,7 @@ class DecoyFinderThread(QThread):
                 ,decoy_files = []
                 ,stopfile = ''
                 ,conn = None
+                ,unique = False
                 ):
         """
         This is the star of the show
@@ -421,8 +464,7 @@ class DecoyFinderThread(QThread):
             mind = None
 
         decoys_inchikey_set = set()
-        kdecoys_inchikey_set = set()
-        ndecoys = len(kdecoys_inchikey_set)
+        ndecoys = sum(ligands_dict.values())
         ligands_max = 0
 
         outputfile = checkoutputfile(outputfile)
@@ -437,16 +479,18 @@ class DecoyFinderThread(QThread):
             for decoy in parse_decoy_files(decoy_files):
                 inchikey = decoy.inchikey
                 for ligand in ligands_dict.keys():
-                    if inchikey not in kdecoys_inchikey_set and isdecoy(decoy,ligand,HBA_t,HBD_t,ClogP_t,MW_t,RB_t ):
+                    if inchikey not in decoys_inchikey_set and isdecoy(decoy,ligand,HBA_t,HBD_t,ClogP_t,MW_t,RB_t ):
                         ligands_dict[ligand] +=1
                         #decoys_set.add(decoy)
                         decoys_fp_set.add(decoy.fp)
                         decoyfile.write(decoy.mol)
                         if mind and ligands_dict[ligand] == mind:
                             complete_ligand_sets += 1
-                            ndecoys = len(kdecoys_inchikey_set)
+                            ndecoys = sum(ligands_dict.values())
                             self.infondecoys(mind,  ndecoys,  complete_ligand_sets)
-                kdecoys_inchikey_set.add(inchikey)
+                        if unique:
+                            break
+                decoys_inchikey_set.add(inchikey)
 
         self.infondecoys(mind,  ndecoys,  complete_ligand_sets)
         debug('Reading new decoys sources')
@@ -487,25 +531,27 @@ class DecoyFinderThread(QThread):
                     db_mol.calcdesc()
                     ligands_max = 0
                     for ligand in ligands_dict:
+
                         if maxd and ligands_dict[ligand] >= maxd:
                             ligands_max +=1
                             continue
                         if isdecoy(db_mol,ligand,HBA_t,HBD_t,ClogP_t,MW_t,RB_t ):
                             inchikey = db_mol.inchikey
-                            if inchikey not in kdecoys_inchikey_set:
-                                ligands_dict[ligand] += 1
-                                if inchikey not in decoys_inchikey_set:
-                                    #decoys_set.add(db_mol)
-                                    decoys_fp_set.add(db_mol.fp)
-                                    decoyfile.write(db_mol.mol)
-                                    decoys_inchikey_set.add(inchikey)
-                                    ndecoys = len(decoys_inchikey_set | kdecoys_inchikey_set)
-                                    debug('%s decoys found' % ndecoys)
-                                    self.infondecoys(mind,  ndecoys, complete_ligand_sets)
-                                if ligands_dict[ligand] ==  mind:
-                                    debug('Decoy set completed for ' + ligand.title)
-                                    complete_ligand_sets += 1
-                                    self.infondecoys(mind,  ndecoys, complete_ligand_sets)
+                            ligands_dict[ligand] += 1
+                            if inchikey not in decoys_inchikey_set:
+                                #decoys_set.add(db_mol)
+                                decoys_fp_set.add(db_mol.fp)
+                                decoyfile.write(db_mol.mol)
+                                decoys_inchikey_set.add(inchikey)
+                                ndecoys = sum(ligands_dict.values())
+                                debug('%s decoys found' % ndecoys)
+                                self.infondecoys(mind,  ndecoys, complete_ligand_sets)
+                            if ligands_dict[ligand] ==  mind:
+                                debug('Decoy set completed for ' + ligand.title)
+                                complete_ligand_sets += 1
+                                self.infondecoys(mind,  ndecoys, complete_ligand_sets)
+                            if unique:
+                                break
                         else:
                             debug('Not a decoy')
             else:
@@ -586,6 +632,7 @@ class DecoyFinderThread(QThread):
                 ,maxd = int(self.settings.value('decoy_man',36))
                 ,decoy_files = []
                 ,stopfile = self.stopfile
+                ,unique = self.unique
                 )
         except Exception, e:
             self.error.emit('Search was interrupted by an error or failure')
@@ -600,79 +647,3 @@ class DecoyFinderThread(QThread):
                 self.progLimit.emit(ndecoys)
             self.progress.emit(ndecoys)
             self.info.emit(self.trUtf8("%s of %s decoy sets completed") % (complete_ligand_sets,  self.nactive_ligands))
-
-#def main(args = sys.argv[1:]):
-#    """
-#    Run this function to run as a command-line application
-#    """
-#    exit('This is broken right now')
-#    try:
-#        import argparse
-#    except:
-#        exit("Unable to import module 'argparse'.\nInstall the argparse python module or upgrade to python 2.7 or higher")
-#
-#    parser = argparse.ArgumentParser(description='All margins are relative to active ligands\' values')
-#    parser.add_argument('-a',  '--active-ligands-files', nargs='+', required=True
-#                        , help='Files containing active ligands'
-#                        , dest='query_files')
-#    parser.add_argument('-b', '--database-files', nargs='+', required=True
-#                        , help='Files containing possible decoys'
-#                        , dest='db_files')
-#    parser.add_argument('-d', '--known-decoys-files', nargs='+'
-#                        , help='Files containing known decoy molecules'
-#                        , dest='decoy_files')
-#    parser.add_argument('-o', '--output-file', default='found_decoys.sdf'
-#                        , help='Output file name'
-#                        , dest='outputfile')
-#    decopts = parser.add_argument_group('Decoy finding options')
-#    decopts.add_argument('-m', '--minimum-decoys-per-set', default=36, type=int
-#                        , help='Number of decoys to search for each active ligand'
-#                        , dest='mind')
-#    decopts.add_argument('-M', '--maximum-decoys-per-set', default=36, type=int
-#                        , help='Stop looking for decoys for ligands with at least so many decoys found'
-#                        , dest='maxd')
-#    decopts.add_argument('-t', '--tanimoto-with-active', default=tanimoto_t, type=Decimal
-#                        , help='Upper tanimoto threshold between active ligand and decoys'
-#                        , dest='tanimoto_t')
-#    decopts.add_argument('-i', '--inter-decoy-tanimoto', default=tanimoto_d, type=Decimal
-#                        , help='Upper tanimoto threshold between decoys'
-#                        , dest='tanimoto_d')
-#    decopts.add_argument('-c','--clogp-margin', default=ClogP_t, type=Decimal
-#                        , help='Decoy log P value margin'
-#                        , dest='ClogP_t')
-#    decopts.add_argument('-y', '--hba-margin', default=HBA_t, type=int
-#                        , help='Decoy hydrogen bond acceptors margin'
-#                        , dest='HBA_t')
-#    decopts.add_argument('-g', '--hbd-margin', default=HBD_t, type=Decimal
-#                        , help='Decoy hydrogen bond donors margin'
-#                        , dest='HBD_t')
-#    decopts.add_argument('-r', '--rotational-bonds-margin', default=RB_t, type=int
-#                        , help='Decoy rotational bonds margin'
-#                        , dest='RB_t')
-#    decopts.add_argument('-w',  '--molecular-weight-margin', default=MW_t, type=int
-#                        , help='Molecular weight margin'
-#                        , dest='MW_t')
-#
-#    ns = parser.parse_args(args)
-#
-#    for info in find_decoys(
-#        query_files = ns.query_files
-#        ,db_files = ns.db_files
-#        ,outputfile = ns.outputfile
-#        ,HBA_t = ns.HBA_t
-#        ,HBD_t = ns.HBD_t
-#        ,ClogP_t = ns.ClogP_t
-#        ,tanimoto_t = ns.tanimoto_t
-#        ,MW_t = ns.MW_t
-#        ,RB_t = ns.RB_t
-#        ,mind = ns.mind
-#        ,maxd = ns.maxd
-#        ,tanimoto_d = ns.tanimoto_d
-#        ,decoy_files = ns.decoy_files
-#    ):
-#        pass
-#
-#
-#if __name__ == '__main__':
-#    main()
-
