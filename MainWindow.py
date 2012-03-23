@@ -41,13 +41,14 @@ class DecoyFinderThread(QThread):
     error = Signal(unicode)
     progLimit = Signal(int)
 
-    def __init__(self, query_files, db_files, decoy_files, stopfile):
+    def __init__(self, query_files, db_files, decoy_files, stopfile, unique = False):
         """
         """
         #print "thread created"
         self.decoy_files = decoy_files
         self.query_files = query_files
         self.db_files = db_files
+        self.unique = unique
         self.stopfile = stopfile
         self.nactive_ligands = 0
         self.ndecoys = 0
@@ -80,6 +81,7 @@ class DecoyFinderThread(QThread):
                         ,tanimoto_d = float(self.settings.value('tanimoto_d', 0.9))
                         ,decoy_files = self.decoy_files
                         ,stopfile = self.stopfile
+                        ,unique = self.unique
                         ):
                 if info[0] in ('file',  'ndecoys'):
                     if not min:
@@ -413,7 +415,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                     self.progressBar.setMaximum(total_files)
             rsg = tempfile._RandomNameSequence()
             self.stopfile = os.path.join(tempfile.gettempdir(),  rsg.next() + rsg.next())
-            self.finder = DecoyFinderThread(query_files, db_files, decoy_files,  self.stopfile)
+            self.finder = DecoyFinderThread(query_files, db_files, decoy_files,  self.stopfile, unique = self.uniqueCheckBox.isChecked())
             self.finder.info.connect(self.statusbar.showMessage)
             self.finder.progress.connect(self.progressBar.setValue)
             self.finder.finished.connect(self.on_finder_finished)
