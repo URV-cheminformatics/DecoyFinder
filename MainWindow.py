@@ -64,7 +64,7 @@ class DecoyFinderThread(QThread):
         try:
             self.filecount = 0
             self.currentfile = ''
-            min = int(self.settings.value('decoy_min', 36))
+            mind = int(self.settings.value('decoy_min', 36))
             outputfile = None
             for info in find_decoys(
                         query_files = self.query_files
@@ -76,15 +76,15 @@ class DecoyFinderThread(QThread):
                         ,tanimoto_t = float(self.settings.value('tanimoto_t', tanimoto_t))
                         ,MW_t = int(self.settings.value('MW_t',MW_t))
                         ,RB_t = int(self.settings.value('RB_t',RB_t))
-                        ,min = int(self.settings.value('decoy_min',min))
-                        ,max = int(self.settings.value('decoy_max',max))
+                        ,mind = int(self.settings.value('decoy_min',mind))
+                        ,maxd = int(self.settings.value('decoy_max',maxd))
                         ,tanimoto_d = float(self.settings.value('tanimoto_d', tanimoto_d))
                         ,decoy_files = self.decoy_files
                         ,stopfile = self.stopfile
                         ,unique = self.unique
                         ):
                 if info[0] in ('file',  'ndecoys'):
-                    if not min:
+                    if not mind:
                         if info[0] == 'file':
                             self.filecount = info[1]
                             if self.currentfile != info[2]:
