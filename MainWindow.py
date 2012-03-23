@@ -70,15 +70,15 @@ class DecoyFinderThread(QThread):
                         query_files = self.query_files
                         ,db_files = self.db_files
                         ,outputfile =  str(self.settings.value('outputfile', 'found'))
-                        ,HBA_t = int(self.settings.value('HBA_t', 0))
-                        ,HBD_t = int(self.settings.value('HBD_t', 0))
-                        ,ClogP_t = float(self.settings.value('ClogP_t', 1))
-                        ,tanimoto_t = float(self.settings.value('tanimoto_t', 0.9))
-                        ,MW_t = int(self.settings.value('MW_t',40))
-                        ,RB_t = int(self.settings.value('RB_t',0))
-                        ,min = int(self.settings.value('decoy_min',36))
-                        ,max = int(self.settings.value('decoy_max',36))
-                        ,tanimoto_d = float(self.settings.value('tanimoto_d', 0.9))
+                        ,HBA_t = int(self.settings.value('HBA_t', HBA_t))
+                        ,HBD_t = int(self.settings.value('HBD_t', HBD_t))
+                        ,ClogP_t = float(self.settings.value('ClogP_t', ClogP_t))
+                        ,tanimoto_t = float(self.settings.value('tanimoto_t', tanimoto_t))
+                        ,MW_t = int(self.settings.value('MW_t',MW_t))
+                        ,RB_t = int(self.settings.value('RB_t',RB_t))
+                        ,min = int(self.settings.value('decoy_min',min))
+                        ,max = int(self.settings.value('decoy_max',max))
+                        ,tanimoto_d = float(self.settings.value('tanimoto_d', tanimoto_d))
                         ,decoy_files = self.decoy_files
                         ,stopfile = self.stopfile
                         ,unique = self.unique
@@ -572,6 +572,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         """
         Slot documentation goes here.
         """
+        self.uniqueCheckBox.setChecked(False)
         self.hbaBox.setValue(HBA_t)
         self.hbdBox.setValue(HBD_t)
         self.clogpBox.setValue(int(ClogP_t))

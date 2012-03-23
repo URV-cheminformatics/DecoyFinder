@@ -34,13 +34,13 @@ for format in pybel.informats.iterkeys():
 
 #Some default values:
 
-HBA_t = 0 #1
-HBD_t = 0#1
+HBA_t = 2
+HBD_t = 1
 ClogP_t = Decimal(1)#1.5
-tanimoto_t = Decimal('0.9')
+tanimoto_t = Decimal('0.75')
 tanimoto_d = Decimal('0.9')
-MW_t = 40
-RB_t = 0#1
+MW_t = 25
+RB_t = 1
 
 #Dict of ZINC subsets
 ZINC_subsets = {
