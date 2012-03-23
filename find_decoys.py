@@ -254,6 +254,7 @@ def find_decoys(
                 ,max = 36
                 ,decoy_files = []
                 ,stopfile = ''
+                ,unique = False
                 ):
     """
     This is the star of the show
@@ -303,6 +304,8 @@ def find_decoys(
                         complete_ligand_sets += 1
                         ndecoys = get_ndecoys(ligands_dict, max)
                         yield ('ndecoys',  ndecoys,  complete_ligand_sets)
+                    if unique:
+                        break
             decoys_can_set.add(can)
             decoys_fp_set.add(decoy.fp)
 
@@ -355,6 +358,8 @@ def find_decoys(
                                 print('Decoy set completed for ', ligand.title)
                                 complete_ligand_sets += 1
                                 yield ('ndecoys',  ndecoys, complete_ligand_sets)
+                            if unique:
+                                break
                     if saved:
                         decoys_can_set.add(can)
                         decoys_fp_set.add(db_mol.fp)
