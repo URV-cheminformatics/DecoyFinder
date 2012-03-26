@@ -20,7 +20,7 @@
 #       MA 02110-1301, USA.
 
 """
-Module implementing MainWindow.
+Module implementing DecoyFinder's main window.
 """
 
 import os, itertools, random, tempfile, time,  webbrowser
@@ -42,9 +42,6 @@ class DecoyFinderThread(QThread):
     progLimit = Signal(int)
 
     def __init__(self, query_files, db_files, decoy_files, stopfile, unique = False):
-        """
-        """
-        #print "thread created"
         self.decoy_files = decoy_files
         self.query_files = query_files
         self.db_files = db_files
@@ -56,8 +53,6 @@ class DecoyFinderThread(QThread):
         super(DecoyFinderThread, self).__init__(None)
 
     def run(self):
-        """
-        """
         self.info.emit(self.tr("Reading files..."))
         result = None
         minreached = True
@@ -133,9 +128,6 @@ class DecoyFinderThread(QThread):
             self.error.emit('Search was interrupted by an error or failure')
 
 class MainWindow(QMainWindow, Ui_MainWindow):
-    """
-    Class documentation goes here.
-    """
     def __init__(self, app, parent = None):
         """
         Constructor
@@ -214,14 +206,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.stopfile = '' #File to stop iteration
 
     def _getListWidgetItemTextList(self, listWidget):
-        """
-        """
         itemlist = [str(listWidget.item(index).text()) for index in xrange(listWidget.count())]
         return itemlist
 
     def on_finder_finished(self, resulttuple):
-        """
-        """
         self.resultsTable.setSortingEnabled(False)
         self.tabWidget.setEnabled(True)
         self.stopButton.setEnabled(False)
@@ -280,16 +268,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             )
 
     def clearResultsTable(self):
-        """
-        """
         while  self.resultsTable.rowCount():
             self.resultsTable.removeRow(0)
 
     @Slot("")
     def on_addQueryButton_clicked(self):
-        """
-        Slot documentation goes here.
-        """
         itemlist = self._getListWidgetItemTextList(self.queryList)
         dialog =  QFileDialog(self)
         dialog.setFileMode(QFileDialog.ExistingFiles)
@@ -305,9 +288,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     @Slot("")
     def on_addDecoysButton_clicked(self):
-        """
-        Slot documentation goes here.
-        """
         itemlist = self._getListWidgetItemTextList(self.decoyList)
         dialog =  QFileDialog(self)
         dialog.setFileMode(QFileDialog.ExistingFiles)
@@ -322,9 +302,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     @Slot("")
     def on_addDButton_clicked(self):
-        """
-        Slot documentation goes here.
-        """
         itemlist = self._getListWidgetItemTextList(self.dbListWidget)
         if self.dbComboBox.currentIndex() == 0:
             dialog =  QFileDialog(self)
@@ -346,17 +323,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     @Slot("")
     def on_outputDirectoryLineEdit_editingFinished(self):
-        """
-        Slot documentation goes here.
-        """
         dir = self.outputDirectoryLineEdit.text()
         self.settings.setValue('outputfile', dir)
 
     @Slot("")
     def on_outDirButton_clicked(self):
-        """
-        Slot documentation goes here.
-        """
         dialog =  QFileDialog(self)
         dialog.setFileMode(QFileDialog.AnyFile)
         dialog.setDirectory(self.settings.value('lastdir',os.path.expanduser('~')))
@@ -369,9 +340,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     @Slot("")
     def on_findDecoysButton_clicked(self):
-        """
-        Slot documentation goes here.
-        """
         self.tabWidget.setEnabled(False)
         self.clearButton.setEnabled(False)
         self.findDecoysButton.setEnabled(False)
@@ -433,9 +401,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     @Slot("")
     def on_stopButton_clicked(self):
-        """
-        Slot documentation goes here.
-        """
         if self.stopfile:
             self.stopButton.setEnabled(False)
             stopfile = open(self.stopfile,  'wb')
@@ -446,84 +411,51 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     @Slot("")
     def on_clearButton_clicked(self):
-        """
-        Slot documentation goes here.
-        """
         self.progressBar.setMaximum(1)
         self.clearResultsTable()
 
     @Slot(int)
     def on_dbComboBox_currentIndexChanged(self,  index):
-        """
-        Slot documentation goes here.
-        """
         for widget in (self.cacheCheckBox, self.zsubComboBox, self.zinclabel):
             widget.setEnabled(bool(index))
 
     @Slot(int)
     def on_cacheCheckBox_stateChanged(self,  index):
-        """
-        Slot documentation goes here.
-        """
         self.settings.setValue('usecache',  bool(index))
 
     ############ Options tab  #############
 
     @Slot(int)
     def on_uniqueCheckBox_stateChanged(self,  index):
-        """
-        Slot documentation goes here.
-        """
         self.settings.setValue('unique',  bool(index))
 
     @Slot("")
     def on_tanimotoBox_editingFinished(self):
-        """
-        Slot documentation goes here.
-        """
         self.settings.setValue('tanimoto_t', self.tanimotoBox.value())
 
 
     @Slot("")
     def on_clogpBox_editingFinished(self):
-        """
-        Slot documentation goes here.
-        """
         self.settings.setValue('ClogP_t', self.clogpBox.value())
 
     @Slot("")
     def on_molwtBox_editingFinished(self):
-        """
-        Slot documentation goes here.
-        """
         self.settings.setValue('MW_t', self.molwtBox.value())
 
     @Slot("")
     def on_rotbBox_editingFinished(self):
-        """
-        Slot documentation goes here.
-        """
         self.settings.setValue('RB_t', self.rotbBox.value())
 
     @Slot("")
     def on_hbaBox_editingFinished(self):
-        """
-        Slot documentation goes here.
-        """
         self.settings.setValue('HBA_t', self.hbaBox.value())
 
     @Slot("")
     def on_hbdBox_editingFinished(self):
-        """
-        Slot documentation goes here.
-        """
         self.settings.setValue('HBD_t', self.hbdBox.value())
 
     @Slot("")
     def on_decoyMinSpinBox_editingFinished(self):
-        """
-        Slot documentation goes here.
-        """
         value = self.decoyMinSpinBox.value()
         self.settings.setValue('decoy_min', value)
         if self.decoyMaxSpinBox.value() and value > self.decoyMaxSpinBox.value():
@@ -532,9 +464,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     @Slot("")
     def on_decoyMaxSpinBox_editingFinished(self):
-        """
-        Slot documentation goes here.
-        """
         value = self.decoyMaxSpinBox.value()
         self.settings.setValue('decoy_max', value)
         if value  and value < self.decoyMinSpinBox.value():
@@ -544,25 +473,16 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     @Slot("")
     def on_dTanimotoBox_editingFinished(self):
-        """
-        Slot documentation goes here.
-        """
         self.settings.setValue('tanimoto_d', self.dTanimotoBox.value())
 
     @Slot("")
     def on_cachDirectoryLineEdit_editingFinished(self):
-        """
-        Slot documentation goes here.
-        """
         dir = self.cachDirectoryLineEdit.text()
         if os.path.isdir(dir):
             self.settings.setValue('cachedir', dir)
 
     @Slot("")
     def on_cacheButton_clicked(self):
-        """
-        Slot documentation goes here.
-        """
         dialog =  QFileDialog(self)
         dialog.setFileMode(QFileDialog.Directory)
         dialog.setOption(QFileDialog.ShowDirsOnly, True)
@@ -578,9 +498,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     @Slot("")
     def on_defaultsButton_clicked(self):
-        """
-        Slot documentation goes here.
-        """
         self.uniqueCheckBox.setChecked(False)
         self.hbaBox.setValue(HBA_t)
         self.hbdBox.setValue(HBD_t)
@@ -600,9 +517,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     @Slot("")
     def on_actionAbout_activated(self):
-        """
-        Slot documentation goes here.
-        """
         aboutdiag = AboutDialog()
         aboutdiag.setWindowTitle('About '+self.App.applicationName())
         fixedinfo = aboutdiag.infolabel.text().replace('URL',  self.App.organizationDomain())
@@ -613,7 +527,4 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     @Slot("")
     def on_actionHelp_activated(self):
-        """
-        Slot documentation goes here.
-        """
         webbrowser.open_new_tab("http://" + self.App.organizationDomain())
