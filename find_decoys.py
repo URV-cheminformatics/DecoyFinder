@@ -20,7 +20,7 @@
 #       Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 #       MA 02110-1301, USA.
 
-import os, urllib2, tempfile, random,  sys,  datetime, glob, itertools
+import os, urllib2, tempfile, random,  sys,  datetime, glob, itertools, zlib
 from PySide.QtCore import QSettings, QThread, Signal, Qt, Slot
 import metadata
 from decimal import Decimal
@@ -357,7 +357,7 @@ class DbMol(ComparableMol):
         self.inchikey, maccsbits, self.rot, self.mw, self.clogp, self.hba, self.hbd, self.mdlmol, self.tpsa = row
         bitlist = eval(maccsbits)
         self.fp = CtkFingerprint(bits=bitlist)
-        self.mol = pybel.readstring('mol', str(self.mdlmol))
+        self.mol = pybel.readstring('mol', str(zlib.decompress(self.mdlmol)))
         self.title = self.mol.title
     def calcdesc(self):
         debug(self)
