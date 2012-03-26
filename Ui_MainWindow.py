@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file '/home/ssorgatem/uni/PEI/decoys/MainWindow.ui'
+# Form implementation generated from reading ui file '/home/adria/Documents/decoys/MainWindow.ui'
 #
-# Created: Mon Nov 28 16:43:11 2011
-#      by: pyside-uic 0.2.13 running on PySide 1.0.8
+# Created: Fri Mar 23 12:37:08 2012
+#      by: pyside-uic 0.2.11 running on PySide 1.0.6
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -240,6 +240,10 @@ class Ui_MainWindow(object):
         self.dTanimotoBox.setSingleStep(0.1)
         self.dTanimotoBox.setObjectName("dTanimotoBox")
         self._3.setWidget(1, QtGui.QFormLayout.FieldRole, self.dTanimotoBox)
+        spacerItem11 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
+        self._3.setItem(2, QtGui.QFormLayout.LabelRole, spacerItem11)
+        spacerItem12 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
+        self._3.setItem(2, QtGui.QFormLayout.FieldRole, spacerItem12)
         self.hBALabel_2 = QtGui.QLabel(self.tabWidgetPage2)
         self.hBALabel_2.setObjectName("hBALabel_2")
         self._3.setWidget(3, QtGui.QFormLayout.LabelRole, self.hBALabel_2)
@@ -272,6 +276,10 @@ class Ui_MainWindow(object):
         self.clogpBox.setSingleStep(0.1)
         self.clogpBox.setObjectName("clogpBox")
         self._3.setWidget(7, QtGui.QFormLayout.FieldRole, self.clogpBox)
+        spacerItem13 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
+        self._3.setItem(8, QtGui.QFormLayout.LabelRole, spacerItem13)
+        spacerItem14 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
+        self._3.setItem(8, QtGui.QFormLayout.FieldRole, spacerItem14)
         self.maximumDecoysPerActiveLigandLabel = QtGui.QLabel(self.tabWidgetPage2)
         self.maximumDecoysPerActiveLigandLabel.setObjectName("maximumDecoysPerActiveLigandLabel")
         self._3.setWidget(9, QtGui.QFormLayout.LabelRole, self.maximumDecoysPerActiveLigandLabel)
@@ -286,16 +294,19 @@ class Ui_MainWindow(object):
         self.decoyMinSpinBox.setMaximum(99999)
         self.decoyMinSpinBox.setObjectName("decoyMinSpinBox")
         self._3.setWidget(10, QtGui.QFormLayout.FieldRole, self.decoyMinSpinBox)
-        spacerItem11 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
-        self._3.setItem(2, QtGui.QFormLayout.LabelRole, spacerItem11)
-        spacerItem12 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
-        self._3.setItem(8, QtGui.QFormLayout.LabelRole, spacerItem12)
-        spacerItem13 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
-        self._3.setItem(2, QtGui.QFormLayout.FieldRole, spacerItem13)
-        spacerItem14 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
-        self._3.setItem(8, QtGui.QFormLayout.FieldRole, spacerItem14)
         self.verticalLayout_3.addLayout(self._3)
+        self.horizontalLayout_10 = QtGui.QHBoxLayout()
+        self.horizontalLayout_10.setObjectName("horizontalLayout_10")
+        spacerItem15 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
+        self.horizontalLayout_10.addItem(spacerItem15)
+        self.uniqueCheckBox = QtGui.QCheckBox(self.tabWidgetPage2)
+        self.uniqueCheckBox.setObjectName("uniqueCheckBox")
+        self.horizontalLayout_10.addWidget(self.uniqueCheckBox)
+        spacerItem16 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
+        self.horizontalLayout_10.addItem(spacerItem16)
+        self.verticalLayout_3.addLayout(self.horizontalLayout_10)
         self.formLayout_6 = QtGui.QFormLayout()
+        self.formLayout_6.setFieldGrowthPolicy(QtGui.QFormLayout.ExpandingFieldsGrow)
         self.formLayout_6.setObjectName("formLayout_6")
         self.cacheButton = QtGui.QPushButton(self.tabWidgetPage2)
         self.cacheButton.setObjectName("cacheButton")
@@ -311,13 +322,13 @@ class Ui_MainWindow(object):
         self.verticalLayout_3.addLayout(self.formLayout_6)
         self.horizontalLayout_7 = QtGui.QHBoxLayout()
         self.horizontalLayout_7.setObjectName("horizontalLayout_7")
-        spacerItem15 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
-        self.horizontalLayout_7.addItem(spacerItem15)
+        spacerItem17 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
+        self.horizontalLayout_7.addItem(spacerItem17)
         self.defaultsButton = QtGui.QPushButton(self.tabWidgetPage2)
         self.defaultsButton.setObjectName("defaultsButton")
         self.horizontalLayout_7.addWidget(self.defaultsButton)
-        spacerItem16 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
-        self.horizontalLayout_7.addItem(spacerItem16)
+        spacerItem18 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
+        self.horizontalLayout_7.addItem(spacerItem18)
         self.verticalLayout_3.addLayout(self.horizontalLayout_7)
         self.tabWidget.addTab(self.tabWidgetPage2, "")
         self.verticalLayout_4.addWidget(self.tabWidget)
@@ -326,14 +337,14 @@ class Ui_MainWindow(object):
         self.clearButton = QtGui.QPushButton(self.centralwidget)
         self.clearButton.setObjectName("clearButton")
         self._2.addWidget(self.clearButton)
-        spacerItem17 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
-        self._2.addItem(spacerItem17)
+        spacerItem19 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
+        self._2.addItem(spacerItem19)
         self.stopButton = QtGui.QPushButton(self.centralwidget)
         self.stopButton.setEnabled(False)
         self.stopButton.setObjectName("stopButton")
         self._2.addWidget(self.stopButton)
-        spacerItem18 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
-        self._2.addItem(spacerItem18)
+        spacerItem20 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
+        self._2.addItem(spacerItem20)
         self.findDecoysButton = QtGui.QPushButton(self.centralwidget)
         self.findDecoysButton.setObjectName("findDecoysButton")
         self._2.addWidget(self.findDecoysButton)
@@ -493,6 +504,9 @@ class Ui_MainWindow(object):
 "If set to 0, the search will not stop until the above maximum number of decoys has been found for all active ligands (if the maximum is set to other than 0) or all decoy sources have been completely parsed.", None, QtGui.QApplication.UnicodeUTF8))
         self.decoyLimitLabel.setText(QtGui.QApplication.translate("MainWindow", "Minimum decoys per active ligand:", None, QtGui.QApplication.UnicodeUTF8))
         self.decoyMinSpinBox.setToolTip(QtGui.QApplication.translate("MainWindow", "Limit how many decoys to find for each ligand. If the limit is 0, there is no limit.", None, QtGui.QApplication.UnicodeUTF8))
+        self.uniqueCheckBox.setToolTip(QtGui.QApplication.translate("MainWindow", "This will make Decoyfinder try to find diferent decoys for each active ligand, i.e each decoy will count as a decoy only for one active ligand", None, QtGui.QApplication.UnicodeUTF8))
+        self.uniqueCheckBox.setWhatsThis(QtGui.QApplication.translate("MainWindow", "This will make Decoyfinder try to find diferent decoys for each active ligand, i.e each decoy will count as a decoy only for one active ligand", None, QtGui.QApplication.UnicodeUTF8))
+        self.uniqueCheckBox.setText(QtGui.QApplication.translate("MainWindow", "Force unique decoys for each ligand (avoid overlapping)", None, QtGui.QApplication.UnicodeUTF8))
         self.cacheButton.setToolTip(QtGui.QApplication.translate("MainWindow", "This is the directory where temporary ZINC files will be downloaded.\n"
 "They will be kept here if the \'Use cache\' option is enabled, otherwise they will be removed after they have been parsed.\n"
 "\n"

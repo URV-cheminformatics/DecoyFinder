@@ -21,6 +21,7 @@
 #       MA 02110-1301, USA.
 
 import pybel, os, urllib2, tempfile, random,  sys,  gzip,  datetime
+import metadata
 from decimal import Decimal
 #Decimal() can represent floating point data with higher precission than built-in float
 
@@ -33,17 +34,15 @@ for format in pybel.informats.iterkeys():
 
 #Some default values:
 
-HBA_t = 0 #1
-HBD_t = 0#1
+HBA_t = 2
+HBD_t = 1
 ClogP_t = Decimal(1)#1.5
-tanimoto_t = Decimal('0.9')
+tanimoto_t = Decimal('0.75')
 tanimoto_d = Decimal('0.9')
-MW_t = 40
-RB_t = 0#1
-
-#SMARTS patterns for HBD and HBA:
-HBA = pybel.Smarts("[#7,#8]")
-HBD = pybel.Smarts("[#7,#8;!H0]")
+MW_t = 25
+RB_t = 1
+mind = 36
+maxd = mind
 
 #Dict of ZINC subsets
 ZINC_subsets = {
@@ -75,8 +74,8 @@ class ComparableMol():
         """
         Calculate all interesting descriptors. Should be  called only when needed
         """
-        self.hba = len(HBA.findall(self.mol))
-        self.hbd = len(HBD.findall(self.mol))
+        self.hba = Decimal(str(self.mol.calcdesc(['HBA2'])['HBA2']))
+        self.hbd = Decimal(str(self.mol.calcdesc(['HBD'])['HBD']))
         self.clogp = Decimal(str(self.mol.calcdesc(['logP'])['logP']))
         self.mw = self.mol.molwt
         self.rot = self.mol.OBMol.NumRotors()
@@ -222,6 +221,8 @@ def isdecoy(
         return True
     return False
 
+def get_ndecoys(ligands_dict, maxd):
+    return sum((x for x in ligands_dict.itervalues() if not maxd or maxd >= x))
 
 def checkoutputfile(outputfile):
     """
@@ -251,10 +252,11 @@ def find_decoys(
                 ,tanimoto_d = Decimal('0.9')
                 ,MW_t = 40
                 ,RB_t = 0
-                ,min = 36
-                ,max = 36
+                ,mind = 36
+                ,maxd = 36
                 ,decoy_files = []
                 ,stopfile = ''
+                ,unique = False
                 ):
     """
     This is the star of the show
@@ -277,15 +279,14 @@ def find_decoys(
     complete_ligand_sets = 0
 
     minreached = False
-    if min:
-        total_min = nactive_ligands*min
+    if mind:
+        total_min = nactive_ligands*mind
         yield ('total_min',  total_min,  nactive_ligands)
     else:
-        min = None
+        mind = None
 
     decoys_can_set = set()
-    kdecoys_can_set = set()
-    ndecoys = 0
+    ndecoys = get_ndecoys(ligands_dict, maxd)
     ligands_max = 0
 
     outputfile = checkoutputfile(outputfile)
@@ -296,26 +297,34 @@ def find_decoys(
     if decoy_files:
         yield ('file', 0, 'known decoy files...')
         for decoy in parse_decoy_files(decoy_files):
-            can = decoy.mol.write('can')
-            for ligand in ligands_dict.keys():
-                if can not in kdecoys_can_set and isdecoy(decoy,ligand,HBA_t,HBD_t,ClogP_t,MW_t,RB_t ):
+            decoyfile.write(decoy.mol)
+            can = decoy.mol.write('can').split('\t')[0]
+            for ligand in ligands_dict:
+                if can not in decoys_can_set and isdecoy(decoy,ligand,HBA_t,HBD_t,ClogP_t,MW_t,RB_t ):
                     ligands_dict[ligand] +=1
-                    decoys_fp_set.add(decoy.fp)
-                    decoyfile.write(decoy.mol)
-                    if min and ligands_dict[ligand] == min:
+                    if mind and ligands_dict[ligand] == mind:
                         complete_ligand_sets += 1
-                        ndecoys = len(kdecoys_can_set)
+                        ndecoys = get_ndecoys(ligands_dict, maxd)
                         yield ('ndecoys',  ndecoys,  complete_ligand_sets)
-            kdecoys_can_set.add(can)
+                    if unique:
+                        break
+            decoys_can_set.add(can)
+            decoys_fp_set.add(decoy.fp)
 
     yield ('ndecoys', ndecoys,  complete_ligand_sets)
 
     for db_mol, filecount, db_file in db_entry_gen:
+        saved = False
         used_db_files.add(db_file)
         yield ('file',  filecount, db_file)
-        if max and ligands_max >= nactive_ligands:
+        if maxd and ligands_max >= nactive_ligands:
+            print 'Maximum reached'
+            minreached = True
             break
-        if not min or ndecoys < total_min or complete_ligand_sets < nactive_ligands:
+        if complete_ligand_sets >= nactive_ligands:
+            print 'All decoy sets complete'
+            break
+        if not mind or ndecoys < total_min :
             too_similar = False
             if tanimoto_d < Decimal(1):
                 for decoyfp in decoys_fp_set:
@@ -331,27 +340,31 @@ def find_decoys(
                         break
                 if too_similar:
                     continue
-                db_mol.calcdesc()
+                can = db_mol.mol.write('can').split('\t')[0]
                 ligands_max = 0
-                for ligand in ligands_dict.iterkeys():
-                    if max and ligands_dict[ligand] >= max:
-                        ligands_max +=1
-                        continue
-                    if isdecoy(db_mol,ligand,HBA_t,HBD_t,ClogP_t,MW_t,RB_t ):
-                        can = db_mol.mol.write('can')
-                        if can not in kdecoys_can_set:
+                if can not in decoys_can_set:
+                    db_mol.calcdesc()
+                    for ligand in ligands_dict.iterkeys():
+                        if maxd and ligands_dict[ligand] >= maxd:
+                            ligands_max +=1
+                            continue
+                        if isdecoy(db_mol,ligand,HBA_t,HBD_t,ClogP_t,MW_t,RB_t ):
                             ligands_dict[ligand] += 1
-                            if can not in decoys_can_set:
-                                decoys_fp_set.add(db_mol.fp)
+                            if not saved:
                                 decoyfile.write(db_mol.mol)
-                                decoys_can_set.add(can)
-                                ndecoys = len(decoys_can_set | kdecoys_can_set)
-                                print('%s decoys found' % ndecoys)
-                                yield ('ndecoys',  ndecoys, complete_ligand_sets)
-                            if ligands_dict[ligand] ==  min:
+                                saved = True
+                            ndecoys = get_ndecoys(ligands_dict, maxd)
+                            print('%s decoys found' % ndecoys)
+                            yield ('ndecoys',  ndecoys, complete_ligand_sets)
+                            if ligands_dict[ligand] ==  mind:
                                 print('Decoy set completed for ', ligand.title)
                                 complete_ligand_sets += 1
                                 yield ('ndecoys',  ndecoys, complete_ligand_sets)
+                            if unique:
+                                break
+                    if saved:
+                        decoys_can_set.add(can)
+                        decoys_fp_set.add(db_mol.fp)
         else:
             print("finishing")
             break
@@ -359,16 +372,18 @@ def find_decoys(
             os.remove(stopfile)
             print('stopping by user request')
             break
+    else:
+        print 'No more input molecules'
 
-    if min:
+    if mind:
         print('Completed %s of %s decoy sets' % (complete_ligand_sets, nactive_ligands ))
         minreached = complete_ligand_sets >= nactive_ligands
-    if minreached and total_min <= len(decoys_can_set | kdecoys_can_set):
+    if minreached:
         print("Found all wanted decoys")
     else:
         print("Not all wanted decoys found")
     #Generate logfile
-    log = '"DecoyFinder 1.1 log file generated on %s\n"' % datetime.datetime.now()
+    log = '"%s %s log file generated on %s"\n' % (metadata.NAME, metadata.VERSION, datetime.datetime.now())
     log += "\n"
     log += '"Output file:","%s"\n' % outputfile
     log += "\n"
@@ -388,10 +403,10 @@ def find_decoys(
     log += '"LogP range","%s"\n' % str(ClogP_t)
     log += '"Molecular weight range","%s"\n' % str(MW_t)
     log += '"Rotational bonds range","%s"\n' % str(RB_t)
-    log += '"Minimum nº of decoys per active ligand","%s"\n' % str(min)
-    log += '"Maximum nº of decoys per active ligand","%s"\n' % str(max)
+    log += '"Minimum nº of decoys per active ligand","%s"\n' % str(mind)
+    log += '"Maximum nº of decoys per active ligand","%s"\n' % str(maxd)
     log += "\n"
-    log += '"Avtive ligand","HBA","HBD","logP","MW","RB","nº of Decoys found"\n'
+    log += '"Active ligand","HBA","HBD","logP","MW","RB","nº of Decoys found"\n'
     for active in ligands_dict:
         log += '"%s","%s","%s","%s","%s","%s","%s"\n' % (active.title,  active.hba,  active.hbd,  active.clogp,  active.mw,  active.rot,  ligands_dict[active])
     log += "\n"
@@ -403,81 +418,7 @@ def find_decoys(
     decoyfile.close()
 
     if not decoys_fp_set:
-        os.remove(outputfile)
+        if os.path.exists(outputfile):
+            os.remove(outputfile)
     #Last, special yield:
-    yield ('result',  ligands_dict,  outputfile, minreached)
-
-def main(args = sys.argv[1:]):
-    """
-    Run this function to run as a command-line application
-    """
-    try:
-        import argparse
-    except:
-        exit("Unable to import module 'argparse'.\nInstall the argparse python module or upgrade to python 2.7 or higher")
-
-    parser = argparse.ArgumentParser(description='All margins are relative to active ligands\' values')
-    parser.add_argument('-a',  '--active-ligands-files', nargs='+', required=True
-                        , help='Files containing active ligands'
-                        , dest='query_files')
-    parser.add_argument('-b', '--database-files', nargs='+', required=True
-                        , help='Files containing possible decoys'
-                        , dest='db_files')
-    parser.add_argument('-d', '--known-decoys-files', nargs='+'
-                        , help='Files containing known decoy molecules'
-                        , dest='decoy_files')
-    parser.add_argument('-o', '--output-file', default='found_decoys.sdf'
-                        , help='Output file name'
-                        , dest='outputfile')
-    decopts = parser.add_argument_group('Decoy finding options')
-    decopts.add_argument('-m', '--minimum-decoys-per-set', default=36, type=int
-                        , help='Number of decoys to search for each active ligand'
-                        , dest='min')
-    decopts.add_argument('-M', '--maximum-decoys-per-set', default=36, type=int
-                        , help='Stop looking for decoys for ligands with at least so many decoys found'
-                        , dest='max')
-    decopts.add_argument('-t', '--tanimoto-with-active', default=tanimoto_t, type=Decimal
-                        , help='Upper tanimoto threshold between active ligand and decoys'
-                        , dest='tanimoto_t')
-    decopts.add_argument('-i', '--inter-decoy-tanimoto', default=tanimoto_d, type=Decimal
-                        , help='Upper tanimoto threshold between decoys'
-                        , dest='tanimoto_d')
-    decopts.add_argument('-c','--clogp-margin', default=ClogP_t, type=Decimal
-                        , help='Decoy log P value margin'
-                        , dest='ClogP_t')
-    decopts.add_argument('-y', '--hba-margin', default=HBA_t, type=int
-                        , help='Decoy hydrogen bond acceptors margin'
-                        , dest='HBA_t')
-    decopts.add_argument('-g', '--hbd-margin', default=HBD_t, type=Decimal
-                        , help='Decoy hydrogen bond donors margin'
-                        , dest='HBD_t')
-    decopts.add_argument('-r', '--rotational-bonds-margin', default=RB_t, type=int
-                        , help='Decoy rotational bonds margin'
-                        , dest='RB_t')
-    decopts.add_argument('-w',  '--molecular-weight-margin', default=MW_t, type=int
-                        , help='Molecular weight margin'
-                        , dest='MW_t')
-
-    ns = parser.parse_args(args)
-
-    for info in find_decoys(
-        query_files = ns.query_files
-        ,db_files = ns.db_files
-        ,outputfile = ns.outputfile
-        ,HBA_t = ns.HBA_t
-        ,HBD_t = ns.HBD_t
-        ,ClogP_t = ns.ClogP_t
-        ,tanimoto_t = ns.tanimoto_t
-        ,MW_t = ns.MW_t
-        ,RB_t = ns.RB_t
-        ,min = ns.min
-        ,max = ns.max
-        ,tanimoto_d = ns.tanimoto_d
-        ,decoy_files = ns.decoy_files
-    ):
-        pass
-
-
-if __name__ == '__main__':
-    main()
-
+    yield ('result',  ligands_dict,  [outputfile, minreached])
