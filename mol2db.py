@@ -22,7 +22,6 @@
 
 import pybel, os
 import glob, time
-import mysql.connector as mysql
 import sqlite3
 import zlib
 import multiprocessing
