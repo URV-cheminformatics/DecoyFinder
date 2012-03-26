@@ -196,15 +196,16 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.toolBar.addAction(self.actionHelp)
 
         ######Display current settings########
-        self.hbaBox.setValue(int(self.settings.value('HBA_t', 0)))
-        self.hbdBox.setValue(int(self.settings.value('HBD_t', 0)))
-        self.clogpBox.setValue(float(self.settings.value('ClogP_t', 1)))
-        self.tanimotoBox.setValue(float(self.settings.value('tanimoto_t', 0.9)))
-        self.molwtBox.setValue(int(self.settings.value('MW_t',40)))
-        self.rotbBox.setValue(int(self.settings.value('RB_t',0)))
-        self.decoyMinSpinBox.setValue(int(self.settings.value('decoy_min',36)))
-        self.decoyMaxSpinBox.setValue(int(self.settings.value('decoy_max',36)))
-        self.dTanimotoBox.setValue(float(self.settings.value('tanimoto_d', 0.9)))
+        self.hbaBox.setValue(int(self.settings.value('HBA_t', HBA_t)))
+        self.hbdBox.setValue(int(self.settings.value('HBD_t', HBD_t)))
+        self.clogpBox.setValue(float(self.settings.value('ClogP_t', ClogP_t)))
+        self.tanimotoBox.setValue(float(self.settings.value('tanimoto_t', tanimoto_t)))
+        self.molwtBox.setValue(int(self.settings.value('MW_t',MW_t)))
+        self.rotbBox.setValue(int(self.settings.value('RB_t',RB_t)))
+        self.decoyMinSpinBox.setValue(int(self.settings.value('decoy_min',mind)))
+        self.decoyMaxSpinBox.setValue(int(self.settings.value('decoy_max',maxd)))
+        self.dTanimotoBox.setValue(float(self.settings.value('tanimoto_d', tanimoto_d)))
+        self.uniqueCheckBox.setChecked('false' != self.settings.value('unique',  False))
         self.cachDirectoryLineEdit.setText(self.settings.value('cachedir',tempfile.gettempdir()))
         self.outputDirectoryLineEdit.setText(checkoutputfile(self.settings.value('outputfile',os.path.join(os.path.expanduser('~'), 'found_decoys.sdf'))))
         ########################
@@ -467,6 +468,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.settings.setValue('usecache',  bool(index))
 
     ############ Options tab  #############
+
+    @Slot(int)
+    def on_uniqueCheckBox_stateChanged(self,  index):
+        """
+        Slot documentation goes here.
+        """
+        self.settings.setValue('unique',  bool(index))
+
     @Slot("")
     def on_tanimotoBox_editingFinished(self):
         """
