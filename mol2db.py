@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 #-*- coding:utf-8 -*-
 #
-#       mol2db.py is part of Decoy Finder
+#       decoy_finder.py is part of Decoy Finder
 #
-#       Copyright 2012 Adrià Cereto Massagué <adrian.cereto@urv.cat>
+#       Copyright 2011-2012 Adrià Cereto Massagué <adrian.cereto@urv.cat>
 #
 #       This program is free software; you can redistribute it and/or modify
 #       it under the terms of the GNU General Public License as published by
@@ -20,79 +20,70 @@
 #       Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 #       MA 02110-1301, USA.
 
-import pybel
+import pybel, os
 import glob, time
 import mysql.connector as mysql
 import sqlite3
+import zlib
+import multiprocessing
 
-insert_template = """REPLACE INTO Molecules (`inchikey`, `maccs`, `rotatable_bonds`, `weight`, `logp`, `hba`, `hbd`, `mol`, `tpsa`) VALUES ("%s", "%s", %s, %s, %s, %s,%s, "%s", %s);"""
+insert_template = """REPLACE INTO Molecules (`inchikey`, `smiles`,`maccs`, `rotatable_bonds`, `weight`, `logp`, `hba`, `hbd`, `mol`, `tpsa`) VALUES (?, ?, ?,?, ?, ?, ?,?, ?, ?);"""
 
 filelist = glob.glob('ZINC_0.9_2/*.sdf')
 
 #filelist = ['/home/adria/ZINC.sdf']
 
+def calcdesc(mdlmol):
+    #print 'emmagatzemant en MDL MOL'
+    #print 'calculant inchikey'
+    tries = 0
+    while tries <2:
+        try:
+            mol = pybel.readstring('mol', mdlmol)
+            cmol = zlib.compress(mdlmol, 9)
+            inchikey = mol.write('inchikey').strip()[:25]
+            smiles = mol.write('can').split('\t')[0].strip()
+            #print 'Calculant HBA'
+            hba = str(mol.calcdesc(['HBA2'])['HBA2'])
+            #print 'Calculant HBD'
+            hbd = str(mol.calcdesc(['HBD'])['HBD'])
+            #print 'Calculant logP'
+            logp = str(mol.calcdesc(['logP'])['logP'])
+            #print 'Calculant TPSA'
+            tpsa = str(mol.calcdesc(['TPSA'])['TPSA'])
+            #print 'calculant fingerprint'
+            maccs = repr(mol.calcfp('MACCS').bits)
+            #print 'calculant enllaços rotacionals'
+            rotatable_bonds = str(mol.OBMol.NumRotors())
+            #print 'calculant PM'
+            weight = str(mol.molwt)
+            break
+        except Exception, e:
+            tries +=1
+    #print "fent l'insert"
+    return [inchikey
+                , smiles
+                , maccs
+                , rotatable_bonds
+                , weight
+                , logp
+                , hba
+                , hbd
+                , cmol
+                , tpsa
+                ]
+    return insert_str
+
 if __name__ == "__main__":
     dblist = set()
-    sqlitedb = sqlite3.connect('sql/decoyfinder.db')
+    sqlitedb = sqlite3.connect('sql/decoyfinder_idx.dfdb')
     lcur = sqlitedb.cursor()
     sqlfile = open('sql/molecules_sqlite.sql', 'rb')
-    lcur.execute(sqlfile.read())
+    lcur.executescript(sqlfile.read())
     sqlfile.close()
     sqlitedb.commit()
     lcur.close()
     dblist.add(sqlitedb)
-#    mysqldb = mysql.Connect(host="10.30.233.105"
-#                                     ,user="adria"
-#                                     ,password="decoyfinder")
-#    mysqldb = mysql.Connect(host="localhost"
-#                                     ,user="adria"
-#                                     ,password="decoyfinder")
-#    mcur = mysqldb.cursor()
-#    sqlfile = open('sql/molecules.sql', 'rb')
-#    mcur.execute(sqlfile.read())
-#    sqlfile.close()
-#    mysqldb.commit()
-#    mcur.close()
-#    dblist.add(mysqldb)
-#
-    sl_known_keys = set()
-    ms_known_keys = set()
-    cur = sqlitedb.cursor()
-    cur.execute("""SELECT inchikey FROM Molecules;""")
-    for row in cur:
-        sl_known_keys.update(row)
-    cur.close()
-#    cur = mysqldb.cursor()
-#    cur.execute("""SELECT inchikey FROM Molecules;""")
-#    for row in cur:
-#        ms_known_keys.update(row)
-#    cur.close()
-    known_keys = sl_known_keys #&  ms_known_keys
-#    if not known_keys:
-#
-#
-#        for key in sl_known_keys:
-#            cur = sqlitedb.cursor()
-#            cur.execute("""SELECT `inchikey`, `maccs`, `rotatable_bonds`, `weight`, `logp`, `hba`, `hbd`, `mol`, `tpsa` FROM Molecules WHERE inchikey = '%s'""" % key)
-#            insert_str = insert_template % cur.fetchone()
-#            print insert_str
-#            cur2 = mysqldb.cursor()
-#            cur2.execute(insert_str)
-#            cur2.close()
-#            mysqldb.commit()
-#            time.sleep(1)
-#            cur.close()
-#        cur = mysqldb.cursor()
-#        for key in ms_known_keys:
-#            cur.execute("""SELECT `inchikey`, `maccs`, `rotatable_bonds`, `weight`, `logp`, `hba`, `hbd`, `mol`, `tpsa` FROM Molecules WHERE inchikey = '%s'""" % key)
-#            insert_str = insert_template % cur.fetchone()
-#            cur2 = sqlitedb.cursor()
-#            cur2.execute(insert_str)
-#            cur2.close()
-#        cur.close()
-#        sqlitedb.commit()
-#        known_keys = ms_known_keys | sl_known_keys
-
     recordcount = 0
     LASTCOMMIT = 0
     COMMIT = 0
@@ -101,53 +92,17 @@ if __name__ == "__main__":
         if os.path.exists(finished):
             continue
         print '####################################%s##################################' % file
-        mols = pybel.readfile('sdf', file)
-        for mol in mols:
-            #print 'emmagatzemant en MDL MOL'
-            mdlmol = mol.write('mol')
-            #print 'calculant inchikey'
-            inchikey = mol.write('inchikey').strip()[:25]
-            if inchikey in known_keys:
-                print len(known_keys)
-                known_keys.discard(inchikey)
-                continue
-            tries = 0
-            while tries <3:
-                try:
-                    #print 'Calculant HBA'
-                    hba = str(mol.calcdesc(['HBA2'])['HBA2'])
-                    #print 'Calculant HBD'
-                    hbd = str(mol.calcdesc(['HBD'])['HBD'])
-                    #print 'Calculant logP'
-                    logp = str(mol.calcdesc(['logP'])['logP'])
-                    #print 'Calculant TPSA'
-                    tpsa = str(mol.calcdesc(['TPSA'])['TPSA'])
-                    #print 'calculant fingerprint'
-                    maccs = repr(mol.calcfp('MACCS').bits)
-                    #print 'calculant enllaços rotacionals'
-                    rotatable_bonds = str(mol.OBMol.NumRotors())
-                    #print 'calculant PM'
-                    weight = str(mol.molwt)
-                    recordcount +=1
-                    break
-                except Exception, e:
-                    tries +=1
-                    mol = pybel.readstring('sdf', mdlmol)
+        mols = (mol.write('mol') for mol in pybel.readfile('sdf', file))
+        pool = multiprocessing.Pool()
+        for val_tupl in pool.imap_unordered(calcdesc, mols):
+        #for val_tupl in (calcdesc(mol) for mol in mols):
+            if val_tupl:
+                recordcount +=1
+                val_tupl[-2] = buffer(val_tupl[-2])
             else:
                 continue
-            #print "fent l'insert"
-            insert_str = insert_template % (inchikey
-                                                            , maccs
-                                                            , rotatable_bonds
-                                                            , weight
-                                                            , logp
-                                                            , hba
-                                                            , hbd
-                                                            , mdlmol
-                                                            , tpsa
-                                                            )
-            if recordcount - LASTCOMMIT > 999:
-                    COMMIT = 2
+            if recordcount - LASTCOMMIT > 1999:
+                    COMMIT = len(dblist)
                     LASTCOMMIT = recordcount
             for db in dblist:
                 cursor = None
@@ -155,7 +110,7 @@ if __name__ == "__main__":
                     cursor = db.cursor()
                     #print "Executing:"
 #                   print insert_str
-                    cursor.execute(insert_str)
+                    cursor.execute(insert_template, val_tupl)
                     #db.commit()
                     cursor.close()
                 except Exception, e:
@@ -163,8 +118,7 @@ if __name__ == "__main__":
                 finally:
                     if cursor:
                         cursor.close()
-
-                if COMMIT:
+                if COMMIT > 0:
                     COMMIT -= 1
                     tries = 0
                     while tries < 3:
@@ -177,8 +131,11 @@ if __name__ == "__main__":
                     else:
                         print 'Unable to commit changes!'
             print recordcount
+        pool.terminate()
+        pool.join()
         open(finished, 'wb').write('')
     print 'tancant...'
     for db in dblist:
+        db.commit()
         db.close()
     print 'fet'
