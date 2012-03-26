@@ -102,30 +102,6 @@ ZINC_subsets = {
     ,"Stan":"94"
     }
 
-class ComparableMol():
-    """
-    """
-    def __init__(self, mol):
-        self.mol = mol
-        self.fp = mol.calcfp("MACCS")
-
-    def calcdesc(self):
-        """
-        Calculate all interesting descriptors. Should be  called only when needed
-        """
-        self.hba = Decimal(str(self.mol.calcdesc(['HBA2'])['HBA2']))
-        self.hbd = Decimal(str(self.mol.calcdesc(['HBD'])['HBD']))
-        self.clogp = Decimal(str(self.mol.calcdesc(['logP'])['logP']))
-        self.mw = self.mol.molwt
-        self.rot = self.mol.OBMol.NumRotors()
-        self.title = self.mol.title
-
-    def __str__(self):
-        """
-        For debug purposes
-        """
-        return "Title: %s; HBA: %s; HBD: %s; CLogP: %s; MW:%s \n" % (self.title, self.hba, self.hbd, self.clogp, self.mw)
-
 def get_zinc_slice(slicename = 'all', subset = '10', cachedir = tempfile.gettempdir(),  keepcache = False):
     """
     returns an iterable list of files from  online ZINC slices
