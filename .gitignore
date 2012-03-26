@@ -16,3 +16,4 @@ warn*.txt
 *.bz2
 *.log
 build
+packaging
