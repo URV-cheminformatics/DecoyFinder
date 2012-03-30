@@ -195,7 +195,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.decoyMinSpinBox.setValue(int(self.settings.value('decoy_min',mind)))
         self.decoyMaxSpinBox.setValue(int(self.settings.value('decoy_max',maxd)))
         self.dTanimotoBox.setValue(float(self.settings.value('tanimoto_d', tanimoto_d)))
-        self.uniqueCheckBox.setChecked('false' != self.settings.value('unique',  False))
+        self.uniqueCheckBox.setChecked('false' != self.settings.value('unique',  True))
         self.cachDirectoryLineEdit.setText(self.settings.value('cachedir',tempfile.gettempdir()))
         self.outputDirectoryLineEdit.setText(checkoutputfile(self.settings.value('outputfile',os.path.join(os.path.expanduser('~'), 'found_decoys.sdf'))))
         ########################
@@ -496,7 +496,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     @Slot("")
     def on_defaultsButton_clicked(self):
-        self.uniqueCheckBox.setChecked(False)
+        self.uniqueCheckBox.setChecked(True)
         self.hbaBox.setValue(HBA_t)
         self.hbdBox.setValue(HBD_t)
         self.clogpBox.setValue(int(ClogP_t))

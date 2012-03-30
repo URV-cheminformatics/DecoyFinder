@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file '/home/adria/Documents/decoys/MainWindow.ui'
 #
-# Created: Fri Mar 23 12:37:08 2012
+# Created: Fri Mar 30 11:31:23 2012
 #      by: pyside-uic 0.2.11 running on PySide 1.0.6
 #
 # WARNING! All changes made in this file will be lost!
@@ -506,7 +506,7 @@ class Ui_MainWindow(object):
         self.decoyMinSpinBox.setToolTip(QtGui.QApplication.translate("MainWindow", "Limit how many decoys to find for each ligand. If the limit is 0, there is no limit.", None, QtGui.QApplication.UnicodeUTF8))
         self.uniqueCheckBox.setToolTip(QtGui.QApplication.translate("MainWindow", "This will make Decoyfinder try to find diferent decoys for each active ligand, i.e each decoy will count as a decoy only for one active ligand", None, QtGui.QApplication.UnicodeUTF8))
         self.uniqueCheckBox.setWhatsThis(QtGui.QApplication.translate("MainWindow", "This will make Decoyfinder try to find diferent decoys for each active ligand, i.e each decoy will count as a decoy only for one active ligand", None, QtGui.QApplication.UnicodeUTF8))
-        self.uniqueCheckBox.setText(QtGui.QApplication.translate("MainWindow", "Force unique decoys for each ligand (avoid overlapping)", None, QtGui.QApplication.UnicodeUTF8))
+        self.uniqueCheckBox.setText(QtGui.QApplication.translate("MainWindow", "Avoid decoy overlap between active ligands", None, QtGui.QApplication.UnicodeUTF8))
         self.cacheButton.setToolTip(QtGui.QApplication.translate("MainWindow", "This is the directory where temporary ZINC files will be downloaded.\n"
 "They will be kept here if the \'Use cache\' option is enabled, otherwise they will be removed after they have been parsed.\n"
 "\n"
