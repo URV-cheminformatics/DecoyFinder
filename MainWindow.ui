@@ -914,7 +914,7 @@ If set to 0, the search will not stop until the above maximum number of decoys h
              <string>This will make Decoyfinder try to find diferent decoys for each active ligand, i.e each decoy will count as a decoy only for one active ligand</string>
             </property>
             <property name="text">
-             <string>Force unique decoys for each ligand (avoid overlapping)</string>
+             <string>Avoid decoy overlap between active ligands</string>
             </property>
            </widget>
           </item>
