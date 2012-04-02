@@ -71,26 +71,31 @@ ZINC_subsets = {
     ,"Stan":"94"
     }
 
-class ComparableMol():
+class ComparableMol(object):
     """
     """
     def __init__(self, mol):
         self.mol = mol
-        self.fp = mol.calcfp("MACCS")
-        self.can = mol.write(REP)
-        if REP in ('smi', 'can'):
-            self.can = self.can.split('\t')[0]
 
-    def calcdesc(self):
-        """
-        Calculate all interesting descriptors. Should be  called only when needed
-        """
-        self.hba = Decimal(str(self.mol.calcdesc(['HBA2'])['HBA2']))
-        self.hbd = Decimal(str(self.mol.calcdesc(['HBD'])['HBD']))
-        self.clogp = Decimal(str(self.mol.calcdesc(['logP'])['logP']))
-        self.mw = self.mol.molwt
-        self.rot = self.mol.OBMol.NumRotors()
-        self.title = self.mol.title
+    #Calculate all interesting descriptors. Called only when needed
+
+    def calc_hba(self): return Decimal(str(self.mol.calcdesc(['HBA2'])['HBA2']))
+    def calc_hbd(self): return Decimal(str(self.mol.calcdesc(['HBD'])['HBD']))
+    def calc_clogp(self): return Decimal(str(self.mol.calcdesc(['logP'])['logP']))
+    def calc_mw(self): return self.mol.molwt
+    def calc_rot(self): return self.mol.OBMol.NumRotors()
+    def calc_fp(self): return self.mol.calcfp("MACCS")
+    def calc_title(self): return self.mol.title
+    def calc_can(self):
+        can = self.mol.write(REP)
+        if REP in ('smi', 'can'):
+            can = can.split('\t')[0]
+        return can
+
+    def __getattr__(self, attr):
+        if attr not in self.__dict__:
+            self.__dict__[attr] = eval('self.calc_%s' % attr)()
+        return self.__dict__[attr]
 
     def __str__(self):
         """
@@ -198,9 +203,8 @@ def parse_query_files(filelist):
         for mol in mols:
             try:
                 cmol = ComparableMol(mol)
-                cmol.calcdesc()
                 query_dict[cmol] = 0
-            except e,  Exception:
+            except Exception, e:
                 _debug(e)
     return query_dict
 
@@ -215,9 +219,8 @@ def parse_decoy_files(decoyfilelist):
         for mol in mols:
             try:
                 cmol = ComparableMol(mol)
-                cmol.calcdesc()
                 decoy_set.add(cmol)
-            except e,  Exception:
+            except Exception, e:
                 _debug(e)
     return decoy_set
 
@@ -278,7 +281,7 @@ def find_decoys(
                 ,decoy_files = []
                 ,stopfile = ''
                 ,unique = False
-                ,internal = 'can'
+                ,internal = REP
                 ):
     """
     This is the star of the show
@@ -371,7 +374,6 @@ def find_decoys(
                     continue
                 ligands_max = 0
                 if db_mol.can not in decoys_can_set:
-                    db_mol.calcdesc()
                     for ligand in ligands_dict:
                         if maxd and ligands_dict[ligand] >= maxd:
                             ligands_max +=1
