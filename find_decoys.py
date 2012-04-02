@@ -318,7 +318,7 @@ def find_decoys(
 
     decoys_can_set = set()
     ndecoys = get_ndecoys(ligands_dict, maxd)
-    ligands_max = 0
+    ligands_max = set()
 
     outputfile = checkoutputfile(outputfile)
     format = get_fileformat(outputfile)
@@ -347,7 +347,7 @@ def find_decoys(
         saved = False
         used_db_files.add(db_file)
         yield ('file',  filecount, db_file)
-        if maxd and ligands_max >= nactive_ligands:
+        if maxd and len(ligands_max) >= nactive_ligands:
             _debug( 'Maximum reached')
             minreached = True
             break
@@ -357,8 +357,9 @@ def find_decoys(
         if not mind or ndecoys < total_min :
             ligands_decoy = set()
             for ligand in ligands_dict:
-                if isdecoy(db_mol,ligand,HBA_t,HBD_t,ClogP_t,MW_t,RB_t ):
-                    ligands_decoy.add(ligand)
+                if ligand not in ligands_max:
+                    if isdecoy(db_mol,ligand,HBA_t,HBD_t,ClogP_t,MW_t,RB_t ):
+                        ligands_decoy.add(ligand)
             if not ligands_decoy:
                 continue
             too_similar = False
@@ -378,27 +379,24 @@ def find_decoys(
                             break
                 if too_similar:
                     continue
-                ligands_max = 0
                 for ligand in ligands_decoy:
                     if maxd and ligands_dict[ligand] >= maxd:
-                        ligands_max +=1
+                        ligands_max.add(ligand)
                         continue
                     ligands_dict[ligand] += 1
                     if not saved:
                         decoyfile.write(db_mol.mol)
+                        decoys_can_set.add(db_mol.can)
+                        decoys_fp_set.add(db_mol.fp)
                         saved = True
                     ndecoys = get_ndecoys(ligands_dict, maxd)
                     _debug('%s decoys found' % ndecoys)
-                    yield ('ndecoys',  ndecoys, complete_ligand_sets)
                     if ligands_dict[ligand] ==  mind:
                         _debug('Decoy set completed for ' + ligand.title)
                         complete_ligand_sets += 1
-                        yield ('ndecoys',  ndecoys, complete_ligand_sets)
+                    yield ('ndecoys',  ndecoys, complete_ligand_sets)
                     if unique:
                         break
-                if saved:
-                    decoys_can_set.add(db_mol.can)
-                    decoys_fp_set.add(db_mol.fp)
         else:
             _debug("finishing")
             break
