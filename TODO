@@ -1,7 +1,5 @@
 # Core
 
-* QtCore, QThread and Signal/slot powered find_decoys.py
-
 * Take advantadge of multiple cores
 
 * Optionally use CDK, Indigo, RDkit, etc. (provided by cinfony)
@@ -25,7 +23,5 @@
 * Lintian-proof .deb packaging
 
 * MacOSX support?
-
-* RPM packages?
 
 * Linux bundled binary? (using PySideKick.Hatchet and myppy? with PyInstaller)
