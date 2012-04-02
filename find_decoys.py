@@ -304,7 +304,6 @@ def find_decoys(
     used_db_files = set()
 
     ligands_dict = parse_query_files(query_files)
-    active_fp_set = set(active.fp for active in ligands_dict)
 
     nactive_ligands = len(ligands_dict)
 
@@ -356,44 +355,50 @@ def find_decoys(
             _debug( 'All decoy sets complete')
             break
         if not mind or ndecoys < total_min :
+            ligands_decoy = set()
+            for ligand in ligands_dict:
+                if isdecoy(db_mol,ligand,HBA_t,HBD_t,ClogP_t,MW_t,RB_t ):
+                    ligands_decoy.add(ligand)
+            if not ligands_decoy:
+                continue
             too_similar = False
-            if tanimoto_d < Decimal(1):
-                for decoyfp in decoys_fp_set:
-                    decoy_T = Decimal(str(decoyfp | db_mol.fp))
-                    if  decoy_T > tanimoto_d:
-                        too_similar = True
-                        break
+            for active in ligands_dict:
+                active_T = active.fp | db_mol.fp
+                if  active_T > tanimoto_t:
+                    too_similar = True
+                    break
             if not too_similar:
-                for active_fp in active_fp_set:
-                    active_T = Decimal(str(active_fp | db_mol.fp))
-                    if  active_T > tanimoto_t:
-                        too_similar = True
-                        break
+                if db_mol.can in decoys_can_set:
+                    continue
+                if tanimoto_d < 1:
+                    for decoyfp in decoys_fp_set:
+                        decoy_T = decoyfp | db_mol.fp
+                        if  decoy_T > tanimoto_d:
+                            too_similar = True
+                            break
                 if too_similar:
                     continue
                 ligands_max = 0
-                if db_mol.can not in decoys_can_set:
-                    for ligand in ligands_dict:
-                        if maxd and ligands_dict[ligand] >= maxd:
-                            ligands_max +=1
-                            continue
-                        if isdecoy(db_mol,ligand,HBA_t,HBD_t,ClogP_t,MW_t,RB_t ):
-                            ligands_dict[ligand] += 1
-                            if not saved:
-                                decoyfile.write(db_mol.mol)
-                                saved = True
-                            ndecoys = get_ndecoys(ligands_dict, maxd)
-                            _debug('%s decoys found' % ndecoys)
-                            yield ('ndecoys',  ndecoys, complete_ligand_sets)
-                            if ligands_dict[ligand] ==  mind:
-                                _debug('Decoy set completed for ' + ligand.title)
-                                complete_ligand_sets += 1
-                                yield ('ndecoys',  ndecoys, complete_ligand_sets)
-                            if unique:
-                                break
-                    if saved:
-                        decoys_can_set.add(db_mol.can)
-                        decoys_fp_set.add(db_mol.fp)
+                for ligand in ligands_decoy:
+                    if maxd and ligands_dict[ligand] >= maxd:
+                        ligands_max +=1
+                        continue
+                    ligands_dict[ligand] += 1
+                    if not saved:
+                        decoyfile.write(db_mol.mol)
+                        saved = True
+                    ndecoys = get_ndecoys(ligands_dict, maxd)
+                    _debug('%s decoys found' % ndecoys)
+                    yield ('ndecoys',  ndecoys, complete_ligand_sets)
+                    if ligands_dict[ligand] ==  mind:
+                        _debug('Decoy set completed for ' + ligand.title)
+                        complete_ligand_sets += 1
+                        yield ('ndecoys',  ndecoys, complete_ligand_sets)
+                    if unique:
+                        break
+                if saved:
+                    decoys_can_set.add(db_mol.can)
+                    decoys_fp_set.add(db_mol.fp)
         else:
             _debug("finishing")
             break
