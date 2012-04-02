@@ -77,6 +77,9 @@ class ComparableMol():
     def __init__(self, mol):
         self.mol = mol
         self.fp = mol.calcfp("MACCS")
+        self.can = mol.write(REP)
+        if REP in ('smi', 'can'):
+            self.can = self.can.split('\t')[0]
 
     def calcdesc(self):
         """
@@ -325,11 +328,8 @@ def find_decoys(
         yield ('file', 0, 'known decoy files...')
         for decoy in parse_decoy_files(decoy_files):
             decoyfile.write(decoy.mol)
-            can = decoy.mol.write(REP)
-            if REP in ('smi', 'can'):
-                can = can.split('\t')[0]
             for ligand in ligands_dict:
-                if can not in decoys_can_set and isdecoy(decoy,ligand,HBA_t,HBD_t,ClogP_t,MW_t,RB_t ):
+                if decoy.can not in decoys_can_set and isdecoy(decoy,ligand,HBA_t,HBD_t,ClogP_t,MW_t,RB_t ):
                     ligands_dict[ligand] +=1
                     if mind and ligands_dict[ligand] == mind:
                         complete_ligand_sets += 1
@@ -337,7 +337,7 @@ def find_decoys(
                         yield ('ndecoys',  ndecoys,  complete_ligand_sets)
                     if unique:
                         break
-            decoys_can_set.add(can)
+            decoys_can_set.add(decoy.can)
             decoys_fp_set.add(decoy.fp)
 
     yield ('ndecoys', ndecoys,  complete_ligand_sets)
@@ -369,11 +369,8 @@ def find_decoys(
                         break
                 if too_similar:
                     continue
-                can = db_mol.mol.write(REP)
-                if REP in ('smi', 'can'):
-                    can = can.split('\t')[0]
                 ligands_max = 0
-                if can not in decoys_can_set:
+                if db_mol.can not in decoys_can_set:
                     db_mol.calcdesc()
                     for ligand in ligands_dict:
                         if maxd and ligands_dict[ligand] >= maxd:
@@ -388,13 +385,13 @@ def find_decoys(
                             _debug('%s decoys found' % ndecoys)
                             yield ('ndecoys',  ndecoys, complete_ligand_sets)
                             if ligands_dict[ligand] ==  mind:
-                                _debug('Decoy set completed for ', ligand.title)
+                                _debug('Decoy set completed for ' + ligand.title)
                                 complete_ligand_sets += 1
                                 yield ('ndecoys',  ndecoys, complete_ligand_sets)
                             if unique:
                                 break
                     if saved:
-                        decoys_can_set.add(can)
+                        decoys_can_set.add(db_mol.can)
                         decoys_fp_set.add(db_mol.fp)
         else:
             _debug("finishing")
