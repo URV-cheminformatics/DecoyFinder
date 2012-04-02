@@ -328,18 +328,28 @@ def find_decoys(
     if decoy_files:
         yield ('file', 0, 'known decoy files...')
         for decoy in parse_decoy_files(decoy_files):
-            decoyfile.write(decoy.mol)
+            ligands_decoy = set()
             for ligand in ligands_dict:
-                if decoy.can not in decoys_can_set and isdecoy(decoy,ligand,HBA_t,HBD_t,ClogP_t,MW_t,RB_t ):
-                    ligands_dict[ligand] +=1
-                    if mind and ligands_dict[ligand] == mind:
-                        complete_ligand_sets += 1
-                        ndecoys = get_ndecoys(ligands_dict, maxd)
-                        yield ('ndecoys',  ndecoys,  complete_ligand_sets)
-                    if unique:
-                        break
-            decoys_can_set.add(decoy.can)
-            decoys_fp_set.add(decoy.fp)
+                if ligand not in ligands_max:
+                    if isdecoy(decoy,ligand,HBA_t,HBD_t,ClogP_t,MW_t,RB_t ):
+                        ligands_decoy.add(ligand)
+            if not ligands_decoy:
+                continue
+            if decoy.can not in decoys_can_set:
+                decoyfile.write(decoy.mol)
+                decoys_can_set.add(decoy.can)
+                decoys_fp_set.add(decoy.fp)
+            for ligand in ligands_decoy:
+                ligands_dict[ligand] +=1
+                if maxd and ligands_dict[ligand] >= maxd:
+                    ligands_max.add(ligand)
+                    continue
+                if mind and ligands_dict[ligand] == mind:
+                    complete_ligand_sets += 1
+                    ndecoys = get_ndecoys(ligands_dict, maxd)
+                    yield ('ndecoys',  ndecoys,  complete_ligand_sets)
+                if unique:
+                    break
 
     yield ('ndecoys', ndecoys,  complete_ligand_sets)
 
