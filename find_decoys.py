@@ -27,6 +27,11 @@ for format in pybel.informats:
     for compression in ('gz', 'tar',  'bz',  'bz2',  'tar.gz',  'tar.bz',  'tar.bz2'):
         informats += "*.%s.%s " % (format,  compression)
 
+DEBUG = 1
+if DEBUG:
+    def _debug(s): print(s)
+else:
+    def _debug(s): pass
 
 #Some default values:
 
@@ -89,9 +94,9 @@ def get_zinc_slice(slicename = 'all', subset = '10', cachedir = tempfile.gettemp
     """
     if slicename in ('all', 'single', 'usual', 'metals'):
         script = "http://zinc12.docking.org/db/bysubset/%s/%s.sdf.csh" % (subset,slicename)
-        print 'Downloading files in %s' % script
+        _debug( 'Downloading files in %s' % script)
         handler = urllib2.urlopen(script)
-        print("Reading ZINC data...")
+        _debug("Reading ZINC data...")
         scriptcontent = handler.read().split('\n')
         handler.close()
         filelist = []
@@ -119,15 +124,15 @@ def get_zinc_slice(slicename = 'all', subset = '10', cachedir = tempfile.gettemp
                     localsize = os.path.getsize(outfilename)
                     download_needed = localsize != filesize
                     if download_needed:
-                        print("Local file outdated or incomplete")
+                        _debug("Local file outdated or incomplete")
 
             if download_needed:
-                print('Downloading %s' % parenturl + file)
+                _debug('Downloading %s' % parenturl + file)
                 outfile = open(outfilename, "wb")
                 outfile.write(dbhandler.read())
                 outfile.close()
             else:
-                print("Loading cached file: %s" % outfilename)
+                _debug("Loading cached file: %s" % outfilename)
             dbhandler.close()
             yield str(outfilename)
 
@@ -135,8 +140,8 @@ def get_zinc_slice(slicename = 'all', subset = '10', cachedir = tempfile.gettemp
                 try:
                     os.remove(outfilename)
                 except Exception,  e:
-                    print("Unable to remove %s" % (outfilename))
-                    print(unicode(e))
+                    _debug("Unable to remove %s" % (outfilename))
+                    _debug(unicode(e))
     else:
         raise Exception,  u"Unknown slice"
 
@@ -152,7 +157,7 @@ def get_fileformat(file):
     if ext in pybel.informats.keys():
         return ext
     else:
-       print("%s: unknown format"  % file)
+       _debug("%s: unknown format"  % file)
        raise ValueError
 
 def parse_db_files(filelist):
@@ -169,7 +174,7 @@ def parse_db_files(filelist):
                 cmol= ComparableMol(mol)
                 yield cmol, filecount, dbfile
             except Exception, e:
-                print e
+                _debug(e)
         filecount += 1
 
 def parse_query_files(filelist):
@@ -186,7 +191,7 @@ def parse_query_files(filelist):
                 cmol.calcdesc()
                 query_dict[cmol] = 0
             except e,  Exception:
-                print e
+                _debug(e)
     return query_dict
 
 def parse_decoy_files(decoyfilelist):
@@ -203,7 +208,7 @@ def parse_decoy_files(decoyfilelist):
                 cmol.calcdesc()
                 decoy_set.add(cmol)
             except e,  Exception:
-                print e
+                _debug(e)
     return decoy_set
 
 def isdecoy(
@@ -271,7 +276,7 @@ def find_decoys(
     tanimoto_t = Decimal(str(tanimoto_t))
     tanimoto_d = Decimal(str(tanimoto_d))
     ClogP_t = Decimal(str(ClogP_t))
-    print("Looking for decoys!")
+    _debug("Looking for decoys!")
 
     db_entry_gen = parse_db_files(db_files)
 
@@ -324,11 +329,11 @@ def find_decoys(
         used_db_files.add(db_file)
         yield ('file',  filecount, db_file)
         if maxd and ligands_max >= nactive_ligands:
-            print 'Maximum reached'
+            _debug( 'Maximum reached')
             minreached = True
             break
         if complete_ligand_sets >= nactive_ligands:
-            print 'All decoy sets complete'
+            _debug( 'All decoy sets complete')
             break
         if not mind or ndecoys < total_min :
             too_similar = False
@@ -360,10 +365,10 @@ def find_decoys(
                                 decoyfile.write(db_mol.mol)
                                 saved = True
                             ndecoys = get_ndecoys(ligands_dict, maxd)
-                            print('%s decoys found' % ndecoys)
+                            _debug('%s decoys found' % ndecoys)
                             yield ('ndecoys',  ndecoys, complete_ligand_sets)
                             if ligands_dict[ligand] ==  mind:
-                                print('Decoy set completed for ', ligand.title)
+                                _debug('Decoy set completed for ', ligand.title)
                                 complete_ligand_sets += 1
                                 yield ('ndecoys',  ndecoys, complete_ligand_sets)
                             if unique:
@@ -372,22 +377,22 @@ def find_decoys(
                         decoys_can_set.add(can)
                         decoys_fp_set.add(db_mol.fp)
         else:
-            print("finishing")
+            _debug("finishing")
             break
         if os.path.exists(stopfile):
             os.remove(stopfile)
-            print('stopping by user request')
+            _debug('stopping by user request')
             break
     else:
-        print 'No more input molecules'
+        _debug( 'No more input molecules')
 
     if mind:
-        print('Completed %s of %s decoy sets' % (complete_ligand_sets, nactive_ligands ))
+        _debug('Completed %s of %s decoy sets' % (complete_ligand_sets, nactive_ligands ))
         minreached = complete_ligand_sets >= nactive_ligands
     if minreached:
-        print("Found all wanted decoys")
+        _debug("Found all wanted decoys")
     else:
-        print("Not all wanted decoys found")
+        _debug("Not all wanted decoys found")
     #Generate logfile
     log = '"%s %s log file generated on %s"\n' % (metadata.NAME, metadata.VERSION, datetime.datetime.now())
     log += "\n"
