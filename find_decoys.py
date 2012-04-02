@@ -21,6 +21,13 @@ import metadata
 from decimal import Decimal
 #Decimal() can represent floating point data with higher precission than built-in float
 
+_internalformats = {'can', 'smi', 'inchi', 'inchikey'}
+intreprs = [format for format in _internalformats if format in pybel.outformats]
+if 'inchikey' in intreprs:
+    REP = 'inchikey'
+else:
+    REP = 'can'
+
 informats = ''
 for format in pybel.informats:
     informats += "*.%s " %format
@@ -253,8 +260,8 @@ def checkoutputfile(outputfile):
     return outputfile
 
 def find_decoys(
-                query_files
-                ,db_files
+                query_files = []
+                ,db_files = []
                 ,outputfile = 'found_decoys'
                 ,HBA_t = 0
                 ,HBD_t = 0
@@ -268,10 +275,19 @@ def find_decoys(
                 ,decoy_files = []
                 ,stopfile = ''
                 ,unique = False
+                ,internal = 'can'
                 ):
     """
     This is the star of the show
     """
+    internal = internal.lower().strip()
+    if internal in intreprs:
+        global REP
+        REP = internal
+    else:
+        _debug('Unrecognized format:%s' % internal)
+        _debug('Using default:%s' % REP)
+    _debug('Using %s for internal indexation' % REP)
     outputfile = checkoutputfile(outputfile)
     tanimoto_t = Decimal(str(tanimoto_t))
     tanimoto_d = Decimal(str(tanimoto_d))
@@ -309,7 +325,9 @@ def find_decoys(
         yield ('file', 0, 'known decoy files...')
         for decoy in parse_decoy_files(decoy_files):
             decoyfile.write(decoy.mol)
-            can = decoy.mol.write('can').split('\t')[0]
+            can = decoy.mol.write(REP)
+            if REP in ('smi', 'can'):
+                can = can.split('\t')[0]
             for ligand in ligands_dict:
                 if can not in decoys_can_set and isdecoy(decoy,ligand,HBA_t,HBD_t,ClogP_t,MW_t,RB_t ):
                     ligands_dict[ligand] +=1
@@ -351,7 +369,9 @@ def find_decoys(
                         break
                 if too_similar:
                     continue
-                can = db_mol.mol.write('can').split('\t')[0]
+                can = db_mol.mol.write(REP)
+                if REP in ('smi', 'can'):
+                    can = can.split('\t')[0]
                 ligands_max = 0
                 if can not in decoys_can_set:
                     db_mol.calcdesc()
