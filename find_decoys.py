@@ -166,7 +166,8 @@ def parse_db_files(filelist):
         mols = pybel.readfile(get_fileformat(dbfile), dbfile)
         for mol in mols:
             try:
-                yield ComparableMol(mol), filecount, dbfile
+                cmol= ComparableMol(mol)
+                yield cmol, filecount, dbfile
             except Exception, e:
                 print e
         filecount += 1
