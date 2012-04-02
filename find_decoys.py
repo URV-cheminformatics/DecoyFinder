@@ -22,7 +22,7 @@ from decimal import Decimal
 #Decimal() can represent floating point data with higher precission than built-in float
 
 informats = ''
-for format in pybel.informats.iterkeys():
+for format in pybel.informats:
     informats += "*.%s " %format
     for compression in ('gz', 'tar',  'bz',  'bz2',  'tar.gz',  'tar.bz',  'tar.bz2'):
         informats += "*.%s.%s " % (format,  compression)
@@ -350,7 +350,7 @@ def find_decoys(
                 ligands_max = 0
                 if can not in decoys_can_set:
                     db_mol.calcdesc()
-                    for ligand in ligands_dict.iterkeys():
+                    for ligand in ligands_dict:
                         if maxd and ligands_dict[ligand] >= maxd:
                             ligands_max +=1
                             continue
