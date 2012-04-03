@@ -16,7 +16,11 @@
 #    GNU General Public License for more details.
 #
 
-import pybel, os, urllib2, tempfile, random,  sys,  gzip,  datetime
+import os, urllib2, tempfile, random,  sys,  gzip,  datetime, sqlite3, zlib, itertools
+try:
+    from cinfony import pybel
+except ImportError:
+    import pybel
 import metadata
 from decimal import Decimal
 #Decimal() can represent floating point data with higher precission than built-in float
@@ -84,12 +88,14 @@ class ComparableMol(object):
     def calc_clogp(self): return Decimal(str(self.mol.calcdesc(['logP'])['logP']))
     def calc_mw(self): return self.mol.molwt
     def calc_rot(self): return self.mol.OBMol.NumRotors()
-    def calc_fp(self): return self.mol.calcfp("MACCS")
+    def calc_fp(self): return ComFp(fp = self.mol.calcfp("MACCS"))
     def calc_title(self): return self.mol.title
     def calc_can(self):
         can = self.mol.write(REP)
         if REP in ('smi', 'can'):
             can = can.split('\t')[0]
+        elif REP == 'inchikey':
+            can = can[:25]
         return can
 
     def __getattr__(self, attr):
@@ -102,6 +108,49 @@ class ComparableMol(object):
         For debug purposes
         """
         return "Title: %s; HBA: %s; HBD: %s; CLogP: %s; MW:%s \n" % (self.title, self.hba, self.hbd, self.clogp, self.mw)
+
+class DbMol(ComparableMol):
+    """
+    Molecule from a database, with precalculated descriptors
+    """
+    def __init__(self, row):
+        self.inchikey, maccsbits, self.rot, self.mw, self.clogp, self.hba, self.hbd, self.mdlmol = row
+        self.bitset = set(eval(maccsbits))
+        if REP == 'inchikey':
+            self.can = self.inchikey
+
+    def calc_fp(self): return ComFp(bitset = self.bitset)
+
+    def calc_mol(self):
+        #Check wether it's compressed
+        if self.mdlmol[-4:-1] == 'END':
+            return self.mdlmol
+        return pybel.readstring('mol', str(zlib.decompress(self.mdlmol)))
+
+class ComFp(object):
+    """
+    Comparable fingerprint from a set of bits
+    """
+    def __init__(self, bitset = None, fp = None):
+        self.fp = fp
+        if bitset:
+            self.bits = bitset
+        elif fp:
+            self.bits = set(fp.bits)
+
+    def __or__(self, other):
+        """
+        This is borrowed from cinfony's webel.py
+        Returns the Tanimoto score between two sets of bits
+        """
+        if self.fp and other.fp:
+            return self.fp | other.fp
+        else:
+            return len(self.bits&other.bits) / float(len(self.bits|other.bits))
+
+    def __str__(self):
+        return ", ".join([str(x) for x in self.bits])
+
 
 def get_zinc_slice(slicename = 'all', subset = '10', cachedir = tempfile.gettempdir(),  keepcache = False):
     """
@@ -174,6 +223,27 @@ def get_fileformat(file):
     else:
        _debug("%s: unknown format"  % file)
        raise ValueError
+
+def query_db(conn, table='Molecules'):
+    """
+    Parses files from a SQL database with dbapi 2.0
+    """
+    cursor= conn.cursor()
+    if REP in ('can', 'smi'):
+        f = 'smiles'
+    else:
+        f = REP
+    cursor.execute("""SELECT `%s`,`maccs`, `rotatable_bonds`, `weight`, `logp`, `hba`, `hbd`, `mol` FROM %s;""" % (f, table))
+    rowcount = 0
+    for row in cursor:
+        rowcount +=1
+        try:
+            mol = DbMol(row)
+            yield mol, rowcount, 'database'
+        except Exception, e:
+            print e
+    else:
+        cursor.close()
 
 def parse_db_files(filelist):
     """
@@ -268,19 +338,20 @@ def find_decoys(
                 query_files = []
                 ,db_files = []
                 ,outputfile = 'found_decoys'
-                ,HBA_t = 0
-                ,HBD_t = 0
-                ,ClogP_t = Decimal(1)
-                ,tanimoto_t = Decimal('0.9')
-                ,tanimoto_d = Decimal('0.9')
-                ,MW_t = 40
-                ,RB_t = 0
-                ,mind = 36
-                ,maxd = 36
+                ,HBA_t = HBA_t
+                ,HBD_t = HBD_t
+                ,ClogP_t = ClogP_t
+                ,tanimoto_t = tanimoto_t
+                ,tanimoto_d = tanimoto_d
+                ,MW_t = MW_t
+                ,RB_t = RB_t
+                ,mind = mind
+                ,maxd = maxd
                 ,decoy_files = []
                 ,stopfile = ''
                 ,unique = False
                 ,internal = REP
+                ,conn = None
                 ):
     """
     This is the star of the show
@@ -300,6 +371,12 @@ def find_decoys(
     _debug("Looking for decoys!")
 
     db_entry_gen = parse_db_files(db_files)
+
+    if conn:
+        try:
+            db_entry_gen = itertools.chain(query_db(conn), db_entry_gen)
+        except Exception, e:
+            _debug(e)
 
     used_db_files = set()
 
