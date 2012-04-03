@@ -362,9 +362,9 @@ def isdecoy(
     """
     Check if db_mol can be considered a decoy of ligand
     """
-    if ligand.rot - RB_t <= db_mol.rot <= ligand.rot + RB_t:
+    if ligand.hbd - HBD_t <= db_mol.hbd <= ligand.hbd + HBD_t:
         if ligand.mw - MW_t <= db_mol.mw <= ligand.mw + MW_t:
-            if ligand.hbd - HBD_t <= db_mol.hbd <= ligand.hbd + HBD_t:
+            if ligand.rot - RB_t <= db_mol.rot <= ligand.rot + RB_t:
                 if  ligand.hba - HBA_t <= db_mol.hba <= ligand.hba + HBA_t :
                     if ligand.clogp - ClogP_t <= db_mol.clogp <= ligand.clogp + ClogP_t :
                         return True
