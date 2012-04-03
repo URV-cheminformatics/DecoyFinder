@@ -16,27 +16,39 @@
 #    GNU General Public License for more details.
 #
 
-import os, urllib2, tempfile, random,  sys,  gzip,  datetime, sqlite3, zlib, itertools
-try:
-    from cinfony import pybel
-except ImportError:
-    import pybel
+import os, urllib2, tempfile, random,  sys,  gzip, datetime, itertools, zlib
+
+#m is a dict containign all backend modules
+m = {}
+if sys.platform[:4] == "java":
+    from cinfony import cdk
+    m['cdk'] = cdk
+    backend = 'cdk'
+else:
+    try:
+        from cinfony import pybel
+        m['pybel'] = pybel
+    except ImportError:
+        import pybel
+        m['pybel'] = pybel
+    backend = 'pybel'
 import metadata
 from decimal import Decimal
 #Decimal() can represent floating point data with higher precission than built-in float
 
-_internalformats = {'can', 'smi', 'inchi', 'inchikey'}
-intreprs = [format for format in _internalformats if format in pybel.outformats]
+_internalformats = ('can', 'smi', 'inchi', 'inchikey')
+intreprs = [format for format in _internalformats if format in m[backend].outformats]
 if 'inchikey' in intreprs:
     REP = 'inchikey'
 else:
     REP = 'can'
 
 informats = ''
-for format in pybel.informats:
+for format in m[backend].informats:
     informats += "*.%s " %format
-    for compression in ('gz', 'tar',  'bz',  'bz2',  'tar.gz',  'tar.bz',  'tar.bz2'):
-        informats += "*.%s.%s " % (format,  compression)
+    if backend == 'pybel':
+        for compression in ('gz', 'tar',  'bz',  'bz2',  'tar.gz',  'tar.bz',  'tar.bz2'):
+            informats += "*.%s.%s " % (format,  compression)
 
 DEBUG = 1
 if DEBUG:
@@ -75,6 +87,21 @@ ZINC_subsets = {
     ,"Stan":"94"
     }
 
+calc_functs = {
+         'pybel':{
+            'calc_hba': lambda mol: mol.calcdesc(['HBA2'])['HBA2']
+            ,'calc_hbd': lambda mol: mol.calcdesc(['HBD'])['HBD']
+            ,'calc_clogp': lambda mol: Decimal(str(mol.calcdesc(['logP'])['logP']))
+            ,'calc_rot': lambda mol: mol.OBMol.NumRotors()
+            }
+        ,'cdk':{
+            'calc_hba': lambda mol: mol.calcdesc(['hBondacceptors'])['hBondacceptors']
+            ,'calc_hbd': lambda mol: mol.calcdesc(['hBondDonors'])['hBondDonors']
+            ,'calc_clogp': lambda mol: Decimal(str(mol.calcdesc(['xlogP'])['xlogP']))
+            ,'calc_rot': lambda mol: mol.calcdesc(['rotatableBondsCount'])['rotatableBondsCount']
+        }
+    }
+
 class ComparableMol(object):
     """
     """
@@ -83,15 +110,20 @@ class ComparableMol(object):
 
     #Calculate all interesting descriptors. Called only when needed
 
-    def calc_hba(self): return Decimal(str(self.mol.calcdesc(['HBA2'])['HBA2']))
-    def calc_hbd(self): return Decimal(str(self.mol.calcdesc(['HBD'])['HBD']))
-    def calc_clogp(self): return Decimal(str(self.mol.calcdesc(['logP'])['logP']))
+    def calc_hba(self): return calc_functs[backend]['calc_hba'](self.mol)
+    def calc_hbd(self): return calc_functs[backend]['calc_hbd'](self.mol)
+    def calc_clogp(self): return calc_functs[backend]['calc_clogp'](self.mol)
+    def calc_rot(self): return calc_functs[backend]['calc_rot'](self.mol)
+
     def calc_mw(self): return self.mol.molwt
-    def calc_rot(self): return self.mol.OBMol.NumRotors()
     def calc_fp(self): return ComFp(fp = self.mol.calcfp("MACCS"))
     def calc_title(self): return self.mol.title
     def calc_can(self):
-        can = self.mol.write(REP)
+        try:
+            can = self.mol.write(REP)
+        except Exception, e:
+            _debug(e)
+            return None
         if REP in ('smi', 'can'):
             can = can.split('\t')[0]
         elif REP == 'inchikey':
@@ -125,7 +157,7 @@ class DbMol(ComparableMol):
         #Check wether it's compressed
         if self.mdlmol[-4:-1] == 'END':
             return self.mdlmol
-        return pybel.readstring('mol', str(zlib.decompress(self.mdlmol)))
+        return m[backend].readstring('mol', str(zlib.decompress(self.mdlmol)))
 
 class ComFp(object):
     """
@@ -137,6 +169,8 @@ class ComFp(object):
             self.bits = bitset
         elif fp:
             self.bits = set(fp.bits)
+        if backend == 'cdk':
+            self.bits =set([bit+1 for bit in self.bits])
 
     def __or__(self, other):
         """
@@ -218,7 +252,7 @@ def get_fileformat(file):
     while ext in ('gz', 'tar',  'bz',  'bz2'):
         index -= 1
         ext = file.split(".")[index].lower()
-    if ext in pybel.informats.keys():
+    if ext in m[backend].informats.keys():
         return ext
     else:
        _debug("%s: unknown format"  % file)
@@ -253,7 +287,7 @@ def parse_db_files(filelist):
     if type(filelist) == list:
         random.shuffle(filelist)
     for dbfile in filelist:
-        mols = pybel.readfile(get_fileformat(dbfile), dbfile)
+        mols = m[backend].readfile(get_fileformat(dbfile), dbfile)
         for mol in mols:
             try:
                 cmol= ComparableMol(mol)
@@ -269,7 +303,7 @@ def parse_query_files(filelist):
     query_dict = {}
     for file in filelist:
         file = str(file)
-        mols = pybel.readfile(get_fileformat(file), file)
+        mols = m[backend].readfile(get_fileformat(file), file)
         for mol in mols:
             try:
                 cmol = ComparableMol(mol)
@@ -285,7 +319,7 @@ def parse_decoy_files(decoyfilelist):
     decoy_set = set()
     for decoyfile in decoyfilelist:
         decoyfile = str(decoyfile)
-        mols = pybel.readfile(get_fileformat(decoyfile), decoyfile)
+        mols = m[backend].readfile(get_fileformat(decoyfile), decoyfile)
         for mol in mols:
             try:
                 cmol = ComparableMol(mol)
@@ -322,7 +356,7 @@ def checkoutputfile(outputfile):
     Return a safe output filename
     """
     fileexists = 0
-    if os.path.splitext(outputfile)[1].lower()[1:] not in pybel.outformats:
+    if os.path.splitext(outputfile)[1].lower()[1:] not in m[backend].outformats:
         outputfile += "_decoys.sdf"
     while os.path.isfile(outputfile):
         fileexists += 1
@@ -399,7 +433,7 @@ def find_decoys(
 
     outputfile = checkoutputfile(outputfile)
     format = get_fileformat(outputfile)
-    decoyfile = pybel.Outputfile(format, str(outputfile))
+    decoyfile = m[backend].Outputfile(format, str(outputfile))
     decoys_fp_set = set()
 
     if decoy_files:
@@ -502,7 +536,7 @@ def find_decoys(
     else:
         _debug("Not all wanted decoys found")
     #Generate logfile
-    log = '"%s %s log file generated on %s"\n' % (metadata.NAME, metadata.VERSION, datetime.datetime.now())
+    log = u'"%s %s log file generated on %s"\n' % (metadata.NAME, metadata.VERSION, datetime.datetime.now())
     log += "\n"
     log += '"Output file:","%s"\n' % outputfile
     log += "\n"
@@ -522,12 +556,12 @@ def find_decoys(
     log += '"LogP range","%s"\n' % str(ClogP_t)
     log += '"Molecular weight range","%s"\n' % str(MW_t)
     log += '"Rotational bonds range","%s"\n' % str(RB_t)
-    log += '"Minimum nº of decoys per active ligand","%s"\n' % str(mind)
-    log += '"Maximum nº of decoys per active ligand","%s"\n' % str(maxd)
+    log += '"Minimum number of decoys per active ligand","%s"\n' % str(mind)
+    log += '"Maximum number of decoys per active ligand","%s"\n' % str(maxd)
     log += "\n"
-    log += '"Active ligand","HBA","HBD","logP","MW","RB","nº of Decoys found"\n'
+    log += '"Active ligand","HBA","HBD","logP","MW","RB","number of Decoys found"\n'
     for active in ligands_dict:
-        log += '"%s","%s","%s","%s","%s","%s","%s"\n' % (active.title,  active.hba,  active.hbd,  active.clogp,  active.mw,  active.rot,  ligands_dict[active])
+        log += '"%s","%s","%s","%s","%s","%s","%s"\n' % tuple([str(f) for f in (active.title,  active.hba,  active.hbd,  active.clogp,  active.mw,  active.rot,  ligands_dict[active])])
     log += "\n"
 
     logfile = open('%s_log.csv' % outputfile,  'wb')
