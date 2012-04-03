@@ -17,24 +17,40 @@
 #
 
 import os, urllib2, tempfile, random,  sys,  gzip, datetime, itertools, zlib
+#Decimal() can represent floating point data with higher precission than built-in float
+from decimal import Decimal
 
 #m is a dict containign all backend modules
 m = {}
-if sys.platform[:4] == "java":
+try:
     from cinfony import cdk
     m['cdk'] = cdk
     backend = 'cdk'
-else:
+except:
+    backend = None
+try:
+    from cinfony import pybel
+    m['pybel'] = pybel
+    backend = 'pybel'
+except ImportError:
     try:
-        from cinfony import pybel
-        m['pybel'] = pybel
-    except ImportError:
         import pybel
         m['pybel'] = pybel
-    backend = 'pybel'
+        backend = 'pybel'
+    except ImportError:
+        backend = None
+try:
+    from cinfony import rdk
+    m['rdk'] = rdk
+    backend = 'rdk'
+except ImportError:
+    backend = None
+
+if not backend and not m:
+    exit('No supported chemoinformatics toolkit found')
+
 import metadata
-from decimal import Decimal
-#Decimal() can represent floating point data with higher precission than built-in float
+
 
 _internalformats = ('can', 'smi', 'inchi', 'inchikey')
 intreprs = [format for format in _internalformats if format in m[backend].outformats]
@@ -99,6 +115,12 @@ calc_functs = {
             ,'calc_hbd': lambda mol: mol.calcdesc(['hBondDonors'])['hBondDonors']
             ,'calc_clogp': lambda mol: Decimal(str(mol.calcdesc(['xlogP'])['xlogP']))
             ,'calc_rot': lambda mol: mol.calcdesc(['rotatableBondsCount'])['rotatableBondsCount']
+        }
+        ,'rdk':{
+            'calc_hba': lambda mol: mol.calcdesc(['NumHAcceptors'])['NumHAcceptors']
+            ,'calc_hbd': lambda mol: mol.calcdesc(['NumHDonors'])['NumHDonors']
+            ,'calc_clogp': lambda mol: Decimal(str(mol.calcdesc(['MolLogP'])['MolLogP']))
+            ,'calc_rot': lambda mol: mol.calcdesc(['NumRotatableBonds'])['NumRotatableBonds']
         }
     }
 
