@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file '/home/adria/Documents/decoys/MainWindow.ui'
+# Form implementation generated from reading ui file '/home/ssorgatem/uni/PEI/decoys/MainWindow.ui'
 #
-# Created: Fri Mar 30 11:31:23 2012
-#      by: pyside-uic 0.2.11 running on PySide 1.0.6
+# Created: Wed Apr  4 13:46:22 2012
+#      by: pyside-uic 0.2.13 running on PySide 1.1.0
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -501,8 +501,8 @@ class Ui_MainWindow(object):
 "If set to 0, the search will not stop until the above maximum number of decoys has been found for all active ligands (if the maximum is set to other than 0) or all decoy sources have been completely parsed.", None, QtGui.QApplication.UnicodeUTF8))
         self.decoyLimitLabel.setText(QtGui.QApplication.translate("MainWindow", "Minimum decoys per active ligand:", None, QtGui.QApplication.UnicodeUTF8))
         self.decoyMinSpinBox.setToolTip(QtGui.QApplication.translate("MainWindow", "Limit how many decoys to find for each ligand. If the limit is 0, there is no limit.", None, QtGui.QApplication.UnicodeUTF8))
-        self.uniqueCheckBox.setToolTip(QtGui.QApplication.translate("MainWindow", "This will make Decoyfinder try to find diferent decoys for each active ligand, i.e each decoy will count as a decoy only for one active ligand", None, QtGui.QApplication.UnicodeUTF8))
-        self.uniqueCheckBox.setWhatsThis(QtGui.QApplication.translate("MainWindow", "This will make Decoyfinder try to find diferent decoys for each active ligand, i.e each decoy will count as a decoy only for one active ligand", None, QtGui.QApplication.UnicodeUTF8))
+        self.uniqueCheckBox.setToolTip(QtGui.QApplication.translate("MainWindow", "This will make Decoyfinder try to find different decoys for each active ligand, i.e active ligands will not have decoys in common", None, QtGui.QApplication.UnicodeUTF8))
+        self.uniqueCheckBox.setWhatsThis(QtGui.QApplication.translate("MainWindow", "This will make Decoyfinder try to find different decoys for each active ligand, i.e active ligands will not have decoys in common", None, QtGui.QApplication.UnicodeUTF8))
         self.uniqueCheckBox.setText(QtGui.QApplication.translate("MainWindow", "Avoid decoy overlap between active ligands", None, QtGui.QApplication.UnicodeUTF8))
         self.cacheButton.setToolTip(QtGui.QApplication.translate("MainWindow", "This is the directory where temporary ZINC files will be downloaded.\n"
 "They will be kept here if the \'Use cache\' option is enabled, otherwise they will be removed after they have been parsed.\n"
