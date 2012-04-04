@@ -22,12 +22,13 @@ from decimal import Decimal
 
 #m is a dict containign all backend modules
 m = {}
+backend = None
 try:
     from cinfony import cdk
     m['cdk'] = cdk
     backend = 'cdk'
 except:
-    backend = None
+    pass
 try:
     from cinfony import pybel
     m['pybel'] = pybel
@@ -38,19 +39,18 @@ except ImportError:
         m['pybel'] = pybel
         backend = 'pybel'
     except ImportError:
-        backend = None
+        pass
 try:
     from cinfony import rdk
     m['rdk'] = rdk
     backend = 'rdk'
 except ImportError:
-    backend = None
+    pass
 
 if not backend and not m:
     exit('No supported chemoinformatics toolkit found')
 
 import metadata
-
 
 _internalformats = ('can', 'smi', 'inchi', 'inchikey')
 intreprs = [format for format in _internalformats if format in m[backend].outformats]
