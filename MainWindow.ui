@@ -908,10 +908,10 @@ If set to 0, the search will not stop until the above maximum number of decoys h
           <item>
            <widget class="QCheckBox" name="uniqueCheckBox">
             <property name="toolTip">
-             <string>This will make Decoyfinder try to find diferent decoys for each active ligand, i.e each decoy will count as a decoy only for one active ligand</string>
+             <string>This will make Decoyfinder try to find different decoys for each active ligand, i.e active ligands will not have decoys in common</string>
             </property>
             <property name="whatsThis">
-             <string>This will make Decoyfinder try to find diferent decoys for each active ligand, i.e each decoy will count as a decoy only for one active ligand</string>
+             <string>This will make Decoyfinder try to find different decoys for each active ligand, i.e active ligands will not have decoys in common</string>
             </property>
             <property name="text">
              <string>Avoid decoy overlap between active ligands</string>

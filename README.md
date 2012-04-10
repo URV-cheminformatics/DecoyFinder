@@ -1,6 +1,6 @@
 # What is DecoyFinder?
 
-DecoyFinder is a tool that helps finding decoy molecules for a given target, provided a set of active molecules. DecoyFinder will search for molecules physicaly similar yet chemically different from the active ligands. The levels of similarity and diference can be adjusted by the user.
+DecoyFinder is a tool that helps finding decoy molecules for a given target, provided a set of active molecules. DecoyFinder will search for molecules physically similar yet chemically different from the active ligands. The levels of similarity and diference can be adjusted by the user.
 
 # How to use DecoyFinder
 This a guide of DecoyFinder's main features and how to use it. If you miss some information here (be it more examples, documenting a feature X, documenting what does exactly that button/option do, etc.) you can take a look at the built-in tooltip explanations in DecoyFinder, just hover your pointer over the option or button you want information about and wait for it to appear. If after that you still have any questions or any suggestions regarding DecoyFinder or this document, feel free to email them to [_adrian dot cereto at urv dot cat_](mailto:adrian.cereto@urv.cat)
