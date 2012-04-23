@@ -20,9 +20,20 @@ import os, urllib2, tempfile, random,  sys,  gzip, datetime, itertools, zlib
 #Decimal() can represent floating point data with higher precission than built-in float
 from decimal import Decimal
 
+DEBUG = 1
+if DEBUG:
+    def _debug(s): print(s)
+else:
+    def _debug(s): pass
+
 #m is a dict containign all backend modules
 m = {}
 backend = None
+try:
+    from cinfony import indy
+    m['indy'] = indy
+except:
+    pass
 try:
     from cinfony import cdk
     m['cdk'] = cdk
@@ -72,18 +83,27 @@ for desc in _descs:
 #The following would calculate the fingerprint using pybel
 #backenddict['fp'] = 'pybel'
 
-FPTYPE = 'maccs'
+FPTYPE = 'MACCS'
 
 def set_fp_backend():
-    if FPTYPE.upper() not in [fp.upper() for fp in m[backend].fps]:
-        if 'rdk' in m and FPTYPE in m['rdk'].fps:
+    if FPTYPE not in [fp.upper() for fp in m[backend].fps]:
+        if 'rdk' in m and FPTYPE.lower() in m['rdk'].fps:
             backenddict['fp']='rdk'
+            _debug('Fingerprint %s will be calculated using RDkit' % (FPTYPE))
         elif 'pybel' in m and FPTYPE in [fp.upper() for fp in m['pybel'].fps]:
             backenddict['fp']='pybel'
-        elif 'cdk' in m and FPTYPE in m['cdk'].fps:
+            _debug('Fingerprint %s will be calculated using OpenBabel' % (FPTYPE))
+        elif 'indy' in m and FPTYPE.lower() in m['indy'].fps:
+            backenddict['fp']='indy'
+            _debug('Fingerprint %s will be calculated using Indigo' % (FPTYPE))
+        elif 'cdk' in m and FPTYPE.lower() in m['cdk'].fps:
             backenddict['fp']='cdk'
+            _debug('Fingerprint %s will be calculated using the CDK' % (FPTYPE))
+        else:
+            raise ValueError('%s is not a recognized fingerprint type' % FPTYPE)
     else:
         backenddict['fp']=backend
+        _debug('Fingerprint %s will be calculated using the default backend: %s' % (FPTYPE, backend))
 
 set_fp_backend()
 
@@ -118,12 +138,6 @@ for format in format_backends:
     if format_backends[format] == 'pybel':
         for compression in ('gz', 'tar',  'bz',  'bz2',  'tar.gz',  'tar.bz',  'tar.bz2'):
             informats += "*.%s.%s " % (format,  compression)
-
-DEBUG = 1
-if DEBUG:
-    def _debug(s): print(s)
-else:
-    def _debug(s): pass
 
 _debug('%s is the default backend' % backend)
 
