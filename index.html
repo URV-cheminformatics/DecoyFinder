@@ -4,10 +4,16 @@
 
 
 
+
+
   
-  <meta charset="utf-8"><title>DecoyFinder</title>
+  
+  <meta charset="utf-8">
+  <title>DecoyFinder</title>
+
   
 
+  
   
   
   <style type="text/css">
@@ -69,7 +75,9 @@ hr {
   font-style: italic;
 }
 
-</style></head><body><link rel="shortcut icon" href="favicon.ico">
+  </style>
+  <link rel="shortcut icon" href="favicon.ico">
+</head><body>
 
 
 
@@ -86,7 +94,7 @@ bond acceptors, hydrogen bond donors, logP value and molecular weight,
 but are chemically different, which is defined by a maximum Tanimoto
 value threshold between active ligand and decoy molecule MACCS
 fingerprints. Optionally, a maximum Tanimoto value threshold can be set
-between decoys in order assure chemical diversity in the decoy set.</p>
+between decoys in order to assure chemical diversity in the decoy set.</p>
 <h2><span style="font-weight: bold;">Index</span></h2>
 <ul>
   <li><a href="index.html#Authors"><span style="font-weight: bold;">Authors</span></a><br>
@@ -118,16 +126,19 @@ Tarragona, Catalonia, Spain.<br>
 <h2><a name="Downloads_"></a><span style="font-weight: bold;">Downloads</span><br>
 </h2>
 <ul>
-  <li><a href="https://github.com/downloads/URVnutrigenomica-CTNS/DecoyFinder/DecoyFinder-1.0_installer.exe"><span style="font-weight: bold;">Windows 32-bit installer<br>
+  <li><a href="https://github.com/downloads/URVnutrigenomica-CTNS/DecoyFinder/DecoyFinder-1.1_installer.exe"><span style="font-weight: bold;">Windows 32-bit installer<br>
 </span></a></li>
-  <li><a href="https://github.com/downloads/URVnutrigenomica-CTNS/DecoyFinder/decoyfinder-1.0_all.deb"><span style="font-weight: bold;">Ubuntu
+  <li><a href="https://github.com/downloads/URVnutrigenomica-CTNS/DecoyFinder/decoyfinder-1.1_all.deb"><span style="font-weight: bold;">Ubuntu
 +11.10 and Debian testing</span></a></li>
-  <li><span style="font-weight: bold;"><a href="https://github.com/downloads/URVnutrigenomica-CTNS/DecoyFinder/decoyfinder-pyqt-1.0_all.deb">Ubuntu +10.10 (PyQt4 version)</a><br>
-    </span></li>
+  <li><span style="font-weight: bold;"><a href="https://github.com/downloads/URVnutrigenomica-CTNS/DecoyFinder/decoyfinder-pyqt-1.1_all.deb">Ubuntu +10.10 (PyQt4 version)</a></span></li>
+  <li><a href="https://github.com/downloads/URVnutrigenomica-CTNS/DecoyFinder/DecoyFinder-1.1-1.noarch.rpm"><span style="font-weight: bold;">Fedora 16 and derivatives</span></a></li>
+  <li><span style="font-weight: bold;"><a href="https://github.com/downloads/URVnutrigenomica-CTNS/DecoyFinder/DecoyFinder-pyqt-1.1-1.noarch.rpm">Fedora 16 and derivatives (PyQt4 version)</a><br>
+</span></li>
+
   <li><span style="font-weight: bold;">Others:</span></li>
   <ul>
-    <li><a href="https://github.com/downloads/URVnutrigenomica-CTNS/DecoyFinder/DecoyFinder-1.0.tar.bz2"><span style="font-weight: bold;">Source (PySide version)</span></a></li>
-    <li><span style="font-weight: bold;"><a href="https://github.com/downloads/URVnutrigenomica-CTNS/DecoyFinder/DecoyFinder-pyqt-1.0.tar.bz2">Source (PyQt4 version)</a><br>
+    <li><a href="https://github.com/downloads/URVnutrigenomica-CTNS/DecoyFinder/DecoyFinder-1.1.tar.bz2"><span style="font-weight: bold;">Source (PySide version)</span></a></li>
+    <li><span style="font-weight: bold;"><a href="https://github.com/downloads/URVnutrigenomica-CTNS/DecoyFinder/DecoyFinder-pyqt-1.1.tar.bz2">Source (PyQt4 version)</a><br>
       </span></li>
   </ul>
 </ul>
@@ -145,16 +156,26 @@ installation. Just ignore the warning. This will be fixed in future
 releases.<br>
 </li>
   <li><span style="font-weight: bold;">Users of older Ubuntu releases</span>
-shold manually (or using <a href="http://packages.ubuntu.com/search?keywords=openbabel+&amp;searchon=names&amp;suite=all&amp;section=all" target="_blank">a .deb package for a newer Ubuntu release</a>) install
-OpenBabel =&gt;2.3.0 and install the PyQt4 version of DecoyFinder </li>
+should manually (or using <a href="http://packages.ubuntu.com/search?keywords=openbabel+&amp;searchon=names&amp;suite=all&amp;section=all" target="_blank">a .deb package for a newer Ubuntu release</a>) install
+OpenBabel =&gt;2.3.0 and install the PyQt4 version of DecoyFinder</li>
+  <li><span style="font-weight: bold;">Fedora 16 and derivatives</span> <span style="font-weight: bold;">users:</span> just install the provided RPM package with yum or your favourite package manager.<br>
+  </li>
+
 </ul>
 <p><br>
-If you are running an OS for wich there are no DecoyFinder packages
-available, you must make sure you have all the dependencies are
-correctly installed and then it should work from the generic (source)
-package, just executing the following from a command line:</p>
+If you are running an OS for which there are no DecoyFinder packages
+available, you must make sure you have all the dependencies correctly
+installed and then it should work from the generic (source)
+package, just executing the following from a command line:
+
+</p>
 <pre style="margin-left: 71px; width: 476px;">$ python PATH/TO/DECOYFINDER/decoy_finder.py</pre>
-<h2 style="margin-left: 0px; width: 870px;"><a name="Dependencies"></a>Dependencies</h2>
+
+<p>Alternatively, you may consider running the Windows version under <a href="http://www.winehq.org/">wine</a> or any of its derivatives (like <a href="http://www.codeweavers.com/">CrossOver</a> or <a href="http://www.bordeauxgroup.com/">Bordeaux</a>)if that is an easier setup for your platform<br>
+</p>
+<h2 style="margin-left: 0px; width: 870px;"><a name="Dependencies"></a></h2>
+<h2 style="margin-left: 0px; width: 870px;">Dependencies</h2>
+
 <ul>
   <li><a href="http://www.python.org/getit/" target="_blank">Python</a>
 &gt;= 2.5,&nbsp; &lt; 3</li>
@@ -165,20 +186,22 @@ of <a href="http://code.google.com/p/cinfony/" target="_blank">cinfony</a>)</li>
   <li><a href="http://www.pyside.org/downloads/" target="_blank">PySide</a>
 &gt;= 1.0 (or <a href="http://www.riverbankcomputing.co.uk/software/pyqt/download">PyQt4</a>
 &gt;= 4.6 for PyQt4 version)</li>
-  <li>Qt &gt;= 4.6 (sometimes included with PySide or PyQt, depending
-on your platform)</li>
+  <li>Qt &gt;= 4.5 (sometimes included with PySide or PyQt, depending
+on your platform; it might work with older versions of Qt)</li>
 </ul> 
 <h2><a name="Documentation"></a>Documentation</h2>
 
 Documentation is available <a href="https://github.com/URVnutrigenomica-CTNS/DecoyFinder/wiki" target="_blank">here</a>
 <h2><a name="License"></a>License</h2>
-<p>GPLv3: GNU General Public License version 3, wich can be read <a href="LICENCE.html" target="_blank">here</a></p><h2><a name="Contact"></a>Contact</h2>
+<p>AGPLv3: GNU Affero General Public License version 3, wich can be read <a href="LICENCE.html" target="_blank">here</a></p><h2><a name="Contact"></a>Contact</h2>
 <p>Adrià Cereto-Massagué (<a href="mailto:adrian.cereto@urv.cat">adrian.cereto
 at urv .cat</a>)</p><div style="width: 873px;" class="footer"><span style="font-weight: bold;"><a href="http://www.urv.cat"><img style="border: 0px solid ; width: 465px; height: 101px;" alt="www.urv.cat" src="URV.png"></a><a href="http://www.ctns.cat"><img style="border: 0px solid ; width: 200px; height: 79px;" alt="www.ctns.cat" src="logo_ctns.jpg"></a><br>
+<span style="text-decoration: underline;"><a href="http://www.acc10.cat/ACC1O/cat/innovacio-tecnologica/tecnio/"><img style="border: 0px solid ; width: 200px; height: 88px;" alt="" src="tecnio.gif"></a><a href="http://www.ceics.eu/index.html"><img style="border: 0px solid ; width: 200px; height: 111px;" alt="" src="CEICS_3%20idiomas_2.gif"></a></span><a href="http://www.acc10.cat/ACC1O/cat/index.jsp"><img style="border: 0px solid ; width: 200px; height: 85px;" alt="" src="ACC1O_en.gif"></a><br>
 <br>
 </span>get the source code on GitHub : <a href="https://github.com/URVnutrigenomica-CTNS/DecoyFinder">DecoyFinder</a>
 </div>
 </div>
+
 
 <script type="\&quot;text/javascript\&quot;">
 var gaJsHost = ((\"https:\" == document.location.protocol) ? \"https://ssl.\" : \"http://www.\");
