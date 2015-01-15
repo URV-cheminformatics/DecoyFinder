@@ -2,7 +2,7 @@
 #
 #       MainWindow.py is part of Decoy Finder
 #
-#       Copyright 2011-2012 Adrià Cereto Massagué <adrian.cereto@urv.cat>
+#       Copyright 2011-2014 Adrià Cereto Massagué <adrian.cereto@urv.cat>
 #
 #       This program is free software; you can redistribute it and/or modify
 #       it under the terms of the GNU General Public License as published by
@@ -102,8 +102,8 @@ class DecoyFinderThread(QThread):
                             self.progress.emit(info[1])
                             self.info.emit(self.trUtf8("%s of %s decoy sets completed") % (info[2],  self.nactive_ligands))
                 elif info[0] == 'result':
-                    outputfile = info[2][0]
-                    minreached =  info[2][1]
+                    outputfile = info[2]
+                    minreached =  info[3]
                     result = ( info[1],outputfile, minreached)
                 elif info[0] == 'total_min':
                     self.total_min = info[1]
