@@ -3,7 +3,7 @@
 #
 #       find_decoys.py is part of Decoy Finder
 #
-#       Copyright 2011-2012 Adrià Cereto Massagué <adrian.cereto@urv.cat>
+#       Copyright 2011-2014 Adrià Cereto Massagué <adrian.cereto@urv.cat>
 #
 #       This program is free software; you can redistribute it and/or modify
 #       it under the terms of the GNU General Public License as published by
@@ -20,15 +20,29 @@
 #       Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 #       MA 02110-1301, USA.
 
-import pybel, os, urllib2, tempfile, random,  sys,  gzip,  datetime
+import os, urllib2, tempfile, random,  sys,  gzip,  datetime
+from cStringIO import StringIO
+from cinfony import rdk
+try:
+    from cinfony import pybel
+except ImportError:
+    print "Pybel is not available"
+    pybel = False
 from decimal import Decimal
 #Decimal() can represent floating point data with higher precission than built-in float
 
 informats = ''
-for format in pybel.informats.iterkeys():
+informats_set = set()
+for format in rdk.informats.iterkeys():
+    informats_set.add(format)
     informats += "*.%s " %format
-    for compression in ('gz', 'tar',  'bz',  'bz2',  'tar.gz',  'tar.bz',  'tar.bz2'):
-        informats += "*.%s.%s " % (format,  compression)
+if pybel:
+    for format in pybel.informats.iterkeys():
+        informats_set.add(format)
+        for compression in ('gz', 'tar',  'bz',  'bz2',  'tar.gz',  'tar.bz',  'tar.bz2'):
+            informats_set.add(format)
+for format in informats_set:
+    informats += "*.%s.%s " % (format,  compression)
 
 
 #Some default values:
@@ -40,10 +54,6 @@ tanimoto_t = Decimal('0.9')
 tanimoto_d = Decimal('0.9')
 MW_t = 40
 RB_t = 0#1
-
-#SMARTS patterns for HBD and HBA:
-HBA = pybel.Smarts("[#7,#8]")
-HBD = pybel.Smarts("[#7,#8;!H0]")
 
 #Dict of ZINC subsets
 ZINC_subsets = {
@@ -70,17 +80,17 @@ class ComparableMol():
     def __init__(self, mol):
         self.mol = mol
         self.fp = mol.calcfp("MACCS")
+        self.title = mol.title
+        self.mw = mol.molwt
 
     def calcdesc(self):
         """
         Calculate all interesting descriptors. Should be  called only when needed
         """
-        self.hba = len(HBA.findall(self.mol))
-        self.hbd = len(HBD.findall(self.mol))
-        self.clogp = Decimal(str(self.mol.calcdesc(['logP'])['logP']))
-        self.mw = self.mol.molwt
-        self.rot = self.mol.OBMol.NumRotors()
-        self.title = self.mol.title
+        self.hba = Decimal(str(self.mol.calcdesc(['NumHAcceptors'])['NumHAcceptors']))
+        self.hbd = Decimal(str(self.mol.calcdesc(['NumHDonors'])['NumHDonors']))
+        self.clogp = Decimal(str(self.mol.calcdesc(['MolLogP'])['MolLogP']))
+        self.rot = self.mol.calcdesc(["NumRotatableBonds"])["NumRotatableBonds"]
 
     def __str__(self):
         """
@@ -116,49 +126,74 @@ def get_zinc_slice(slicename = 'all', subset = '10', cachedir = tempfile.gettemp
             outfilename = os.path.join(cachedir, file)
             download_needed = True
             if keepcache:
-                filesize = dbhandler.info().get('Content-Length')
-                if filesize:
-                    filesize = int(filesize)
+#                filesize = dbhandler.info().get('Content-Length')
+#                if filesize:
+#                    filesize = int(filesize)
 
-                if os.path.isfile(outfilename):
-                    localsize = os.path.getsize(outfilename)
-                    download_needed = localsize != filesize
-                    if download_needed:
-                        print("Local file outdated or incomplete")
+                if not os.path.isfile(outfilename[:-3]):
+                    download_needed = True
+                    print("Local file outdated or incomplete")
+                else:
+                    download_needed = False
 
             if download_needed:
                 print('Downloading %s' % parenturl + file)
-                outfile = open(outfilename, "wb")
-                outfile.write(dbhandler.read())
+                buf = StringIO(dbhandler.read())
+                dbhandler.close()
+                outfile = open(outfilename[:-3], "wb")
+                f = gzip.GzipFile(fileobj=buf)
+                outfile.write(f.read())
+                f.close()
                 outfile.close()
             else:
-                print("Loading cached file: %s" % outfilename)
-            dbhandler.close()
-            yield str(outfilename)
+                print("Loading cached file: %s" % outfilename[:-3])
+            yield str(outfilename[:-3])
 
             if not keepcache:
                 try:
-                    os.remove(outfilename)
+                    os.remove(outfilename[:-3])
                 except Exception,  e:
-                    print("Unable to remove %s" % (outfilename))
+                    print("Unable to remove %s" % (outfilename[:-3]))
                     print(unicode(e))
     else:
         raise Exception,  u"Unknown slice"
 
-def get_fileformat(file):
+def get_fileformat(file,  rdkout = 0):
     """
     Guess the file format from its extension
     """
     index = -1
     ext = file.split(".")[index].lower()
+    print file
+    print ext
+    if ext in rdk.informats.keys() and ext != "mol2":
+        return ext, 0
+    elif rdkout:
+       print("%s: unknown format"  % file)
+       raise ValueError
     while ext in ('gz', 'tar',  'bz',  'bz2'):
         index -= 1
         ext = file.split(".")[index].lower()
-    if ext in pybel.informats.keys():
-        return ext
+    if pybel and ext in pybel.informats.keys():
+        return ext, 1
     else:
        print("%s: unknown format"  % file)
        raise ValueError
+
+def readfile(filename):
+    fileformat,  usepybel = get_fileformat(filename)
+    if not usepybel:
+        return rdk.readfile(fileformat, filename)
+    else:
+        return Ob2RDK(fileformat, filename)
+
+def Ob2RDK(fileformat, filename):
+    for mol in pybel.readfile(fileformat, filename):
+        try:
+            rdkmol = rdk.Molecule(mol)
+            yield rdkmol
+        except IOError:
+            pass
 
 def parse_db_files(filelist):
     """
@@ -168,7 +203,7 @@ def parse_db_files(filelist):
     if type(filelist) == list:
         random.shuffle(filelist)
     for dbfile in filelist:
-        mols = pybel.readfile(get_fileformat(dbfile), dbfile)
+        mols = readfile(dbfile)
         for mol in mols:
             yield ComparableMol(mol), filecount, dbfile
         filecount += 1
@@ -180,7 +215,7 @@ def parse_query_files(filelist):
     query_dict = {}
     for file in filelist:
         file = str(file)
-        mols = pybel.readfile(get_fileformat(file), file)
+        mols = readfile(file)
         for mol in mols:
             cmol = ComparableMol(mol)
             cmol.calcdesc()
@@ -194,7 +229,7 @@ def parse_decoy_files(decoyfilelist):
     decoy_set = set()
     for decoyfile in decoyfilelist:
         decoyfile = str(decoyfile)
-        mols = pybel.readfile(get_fileformat(decoyfile), decoyfile)
+        mols = readfile(decoyfile)
         for mol in mols:
             cmol = ComparableMol(mol)
             cmol.calcdesc()
@@ -228,7 +263,7 @@ def checkoutputfile(outputfile):
     Return a safe output filename
     """
     fileexists = 0
-    if os.path.splitext(outputfile)[1].lower()[1:] not in pybel.outformats:
+    if os.path.splitext(outputfile)[1].lower()[1:] not in rdk.outformats:
         outputfile += "_decoys.sdf"
     while os.path.isfile(outputfile):
         fileexists += 1
@@ -289,8 +324,8 @@ def find_decoys(
     ligands_max = 0
 
     outputfile = checkoutputfile(outputfile)
-    format = get_fileformat(outputfile)
-    decoyfile = pybel.Outputfile(format, str(outputfile))
+    format, usepybel = get_fileformat(outputfile, rdkout=True)
+    decoyfile = rdk.Outputfile(format, str(outputfile))
     decoys_fp_set = set()
 
     if decoy_files:
@@ -396,9 +431,8 @@ def find_decoys(
         log += '"%s","%s","%s","%s","%s","%s","%s"\n' % (active.title,  active.hba,  active.hbd,  active.clogp,  active.mw,  active.rot,  ligands_dict[active])
     log += "\n"
 
-    logfile = open('%s_log.csv' % outputfile,  'wb')
-    logfile.write(log)
-    logfile.close()
+    with open('%s_log.csv' % outputfile,  'wb') as logfile:
+        logfile.write(log)
 
     decoyfile.close()
 
