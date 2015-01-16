@@ -20,7 +20,8 @@
 #       Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 #       MA 02110-1301, USA.
 
-import os, urllib2, tempfile, random,  sys,  gzip,  datetime
+import os, urllib2, tempfile, random,  sys,  gzip,  datetime, time, itertools
+import numpy as np
 from cStringIO import StringIO
 from cinfony import rdk
 try:
@@ -29,6 +30,7 @@ except ImportError:
     print "Pybel is not available"
     pybel = False
 from decimal import Decimal
+import metadata
 #Decimal() can represent floating point data with higher precission than built-in float
 
 informats = ''
@@ -79,18 +81,43 @@ class ComparableMol():
     """
     def __init__(self, mol):
         self.mol = mol
-        self.fp = mol.calcfp("MACCS")
+        self._fp = None
         self.title = mol.title
         self.mw = mol.molwt
+        self._hba = None
+        self._hbd = None
+        self._clogp = None
+        self._rot = None
 
-    def calcdesc(self):
-        """
-        Calculate all interesting descriptors. Should be  called only when needed
-        """
-        self.hba = Decimal(str(self.mol.calcdesc(['NumHAcceptors'])['NumHAcceptors']))
-        self.hbd = Decimal(str(self.mol.calcdesc(['NumHDonors'])['NumHDonors']))
-        self.clogp = Decimal(str(self.mol.calcdesc(['MolLogP'])['MolLogP']))
-        self.rot = self.mol.calcdesc(["NumRotatableBonds"])["NumRotatableBonds"]
+    @property
+    def fp(self):
+        if self._fp is  None:
+            self._fp = self.mol.calcfp("MACCS")
+        return self._fp
+
+    @property
+    def hba(self):
+        if self._hba is  None:
+            self._hba = Decimal(str(self.mol.calcdesc(['NumHAcceptors'])['NumHAcceptors']))
+        return self._hba
+
+    @property
+    def hbd(self):
+        if self._hbd is  None:
+            self._hbd = Decimal(str(self.mol.calcdesc(['NumHDonors'])['NumHDonors']))
+        return self._hbd
+
+    @property
+    def clogp(self):
+        if self._clogp is  None:
+            self._clogp = Decimal(str(self.mol.calcdesc(['MolLogP'])['MolLogP']))
+        return self._clogp
+
+    @property
+    def rot(self):
+        if self._rot is  None:
+            self._rot = self.mol.calcdesc(["NumRotatableBonds"])["NumRotatableBonds"]
+        return self._rot
 
     def __str__(self):
         """
@@ -218,7 +245,6 @@ def parse_query_files(filelist):
         mols = readfile(file)
         for mol in mols:
             cmol = ComparableMol(mol)
-            cmol.calcdesc()
             query_dict[cmol] = 0
     return query_dict
 
@@ -232,7 +258,6 @@ def parse_decoy_files(decoyfilelist):
         mols = readfile(decoyfile)
         for mol in mols:
             cmol = ComparableMol(mol)
-            cmol.calcdesc()
             decoy_set.add(cmol)
     return decoy_set
 
@@ -257,6 +282,8 @@ def isdecoy(
         return True
     return False
 
+def is_mw_decoy(db_mol, ligand, ligand_std, maxStds):
+    return ligand.mw - maxStds * ligand_std <= db_mol.mw <= ligand.mw + maxStds * ligand_std
 
 def checkoutputfile(outputfile):
     """
@@ -290,22 +317,31 @@ def find_decoys(
                 ,max = 36
                 ,decoy_files = []
                 ,stopfile = ''
+                ,maxStds = 1.0
+                ,method = 1
                 ):
     """
     This is the star of the show
     """
+    start_time = time.time()
     outputfile = checkoutputfile(outputfile)
     tanimoto_t = Decimal(str(tanimoto_t))
     tanimoto_d = Decimal(str(tanimoto_d))
     ClogP_t = Decimal(str(ClogP_t))
     print("Looking for decoys!")
 
+    db_files = itertools.chain(decoy_files, db_files)
+
     db_entry_gen = parse_db_files(db_files)
 
     used_db_files = set()
 
     ligands_dict = parse_query_files(query_files)
-    active_fp_set = set(active.fp for active in ligands_dict)
+
+    if method == 0:
+        active_fp_set = set(active.fp for active in ligands_dict)
+    if method == 1:
+        ligand_std = np.std([active.mw for active in ligands_dict])
 
     nactive_ligands = len(ligands_dict)
 
@@ -319,29 +355,14 @@ def find_decoys(
         min = None
 
     decoys_can_set = set()
-    kdecoys_can_set = set()
     ndecoys = 0
     ligands_max = 0
 
     outputfile = checkoutputfile(outputfile)
     format, usepybel = get_fileformat(outputfile, rdkout=True)
     decoyfile = rdk.Outputfile(format, str(outputfile))
-    decoys_fp_set = set()
-
-    if decoy_files:
-        yield ('file', 0, 'known decoy files...')
-        for decoy in parse_decoy_files(decoy_files):
-            can = decoy.mol.write('can')
-            for ligand in ligands_dict.keys():
-                if can not in kdecoys_can_set and isdecoy(decoy,ligand,HBA_t,HBD_t,ClogP_t,MW_t,RB_t ):
-                    ligands_dict[ligand] +=1
-                    decoys_fp_set.add(decoy.fp)
-                    decoyfile.write(decoy.mol)
-                    if min and ligands_dict[ligand] == min:
-                        complete_ligand_sets += 1
-                        ndecoys = len(kdecoys_can_set)
-                        yield ('ndecoys',  ndecoys,  complete_ligand_sets)
-            kdecoys_can_set.add(can)
+    if method == 0:
+        decoys_fp_set = set()
 
     yield ('ndecoys', ndecoys,  complete_ligand_sets)
 
@@ -350,43 +371,49 @@ def find_decoys(
         yield ('file',  filecount, db_file)
         if max and ligands_max >= nactive_ligands:
             break
-        if not min or ndecoys < total_min or complete_ligand_sets < nactive_ligands:
-            too_similar = False
-            if tanimoto_d < Decimal(1):
-                for decoyfp in decoys_fp_set:
-                    decoy_T = Decimal(str(decoyfp | db_mol.fp))
-                    if  decoy_T > tanimoto_d:
-                        too_similar = True
-                        break
-            if not too_similar:
-                for active_fp in active_fp_set:
-                    active_T = Decimal(str(active_fp | db_mol.fp))
-                    if  active_T > tanimoto_t:
-                        too_similar = True
-                        break
-                if too_similar:
-                    continue
-                db_mol.calcdesc()
-                ligands_max = 0
-                for ligand in ligands_dict.iterkeys():
-                    if max and ligands_dict[ligand] >= max:
-                        ligands_max +=1
+        if (not min or ndecoys < total_min) or complete_ligand_sets < nactive_ligands:
+            if method == 0:
+                too_similar = False
+                if tanimoto_d < Decimal(1):
+                    for decoyfp in decoys_fp_set:
+                        decoy_T = Decimal(str(decoyfp | db_mol.fp))
+                        if  decoy_T > tanimoto_d:
+                            too_similar = True
+                            break
+                if not too_similar:
+                    for active_fp in active_fp_set:
+                        active_T = Decimal(str(active_fp | db_mol.fp))
+                        if  active_T > tanimoto_t:
+                            too_similar = True
+                            break
+                    if too_similar:
                         continue
-                    if isdecoy(db_mol,ligand,HBA_t,HBD_t,ClogP_t,MW_t,RB_t ):
-                        can = db_mol.mol.write('can')
-                        if can not in kdecoys_can_set:
-                            ligands_dict[ligand] += 1
-                            if can not in decoys_can_set:
-                                decoys_fp_set.add(db_mol.fp)
-                                decoyfile.write(db_mol.mol)
-                                decoys_can_set.add(can)
-                                ndecoys = len(decoys_can_set | kdecoys_can_set)
-                                print('%s decoys found' % ndecoys)
-                                yield ('ndecoys',  ndecoys, complete_ligand_sets)
-                            if ligands_dict[ligand] ==  min:
-                                print('Decoy set completed for ', ligand.title)
-                                complete_ligand_sets += 1
-                                yield ('ndecoys',  ndecoys, complete_ligand_sets)
+            ligands_max = 0
+            for ligand in ligands_dict.iterkeys():
+                if max and ligands_dict[ligand] >= max:
+                    ligands_max +=1
+                    continue
+                if method == 0:
+                    is_a_decoy = isdecoy(db_mol,ligand,HBA_t,HBD_t,ClogP_t,MW_t,RB_t )
+                if method == 1:
+                    is_a_decoy = is_mw_decoy(db_mol, ligand, ligand_std, maxStds)
+                if is_a_decoy:
+                    can = db_mol.mol.write('can')
+                    if can not in decoys_can_set:
+                        if method == 0:
+                            decoys_fp_set.add(db_mol.fp)
+                        decoyfile.write(db_mol.mol)
+                        decoys_can_set.add(can)
+                        ndecoys = len(decoys_can_set )
+                        ligands_dict[ligand] += 1
+                        print('%s decoys found' % ndecoys)
+                        yield ('ndecoys',  ndecoys, complete_ligand_sets)
+                    if ligands_dict[ligand] ==  min:
+                        print('Decoy set completed for ', ligand.title)
+                        complete_ligand_sets += 1
+                        yield ('ndecoys',  ndecoys, complete_ligand_sets)
+                    if max:
+                        break
         else:
             print("finishing")
             break
@@ -398,12 +425,12 @@ def find_decoys(
     if min:
         print('Completed %s of %s decoy sets' % (complete_ligand_sets, nactive_ligands ))
         minreached = complete_ligand_sets >= nactive_ligands
-    if minreached and total_min <= len(decoys_can_set | kdecoys_can_set):
+    if minreached and total_min <= len(decoys_can_set):
         print("Found all wanted decoys")
     else:
         print("Not all wanted decoys found")
     #Generate logfile
-    log = '"DecoyFinder 1.1 log file generated on %s\n"' % datetime.datetime.now()
+    log = '"%s %s log file generated on %s\n"' % (metadata.NAME,  metadata.VERSION,  datetime.datetime.now())
     log += "\n"
     log += '"Output file:","%s"\n' % outputfile
     log += "\n"
@@ -416,17 +443,21 @@ def find_decoys(
         log += '"%s"\n' % str(file)
     log += "\n"
     log += '"Search settings:"\n'
-    log += '"Active ligand vs decoy tanimoto threshold","%s"\n' % str(tanimoto_t)
-    log += '"Decoy vs decoy tanimoto threshold","%s"\n' % str(tanimoto_d)
-    log += '"Hydrogen bond acceptors range","%s"\n' % str(HBA_t)
-    log += '"Hydrogen bond donors range","%s"\n' % str(HBD_t)
-    log += '"LogP range","%s"\n' % str(ClogP_t)
-    log += '"Molecular weight range","%s"\n' % str(MW_t)
-    log += '"Rotational bonds range","%s"\n' % str(RB_t)
+    if method == 0:
+        log += '"Active ligand vs decoy tanimoto threshold","%s"\n' % str(tanimoto_t)
+        log += '"Decoy vs decoy tanimoto threshold","%s"\n' % str(tanimoto_d)
+        log += '"Hydrogen bond acceptors range","%s"\n' % str(HBA_t)
+        log += '"Hydrogen bond donors range","%s"\n' % str(HBD_t)
+        log += '"LogP range","%s"\n' % str(ClogP_t)
+        log += '"Molecular weight range","%s"\n' % str(MW_t)
+        log += '"Rotational bonds range","%s"\n' % str(RB_t)
+    if method == 1:
+        log += '"Maximum molecular weight standard deviations","%s"\n' % str(maxStds)
+        log += '"Active molecular weight standard deviation ","%s"\n' % str(ligand_std)
     log += '"Minimum nº of decoys per active ligand","%s"\n' % str(min)
     log += '"Maximum nº of decoys per active ligand","%s"\n' % str(max)
     log += "\n"
-    log += '"Avtive ligand","HBA","HBD","logP","MW","RB","nº of Decoys found"\n'
+    log += '"Active ligand","HBA","HBD","logP","MW","RB","nº of Decoys found"\n'
     for active in ligands_dict:
         log += '"%s","%s","%s","%s","%s","%s","%s"\n' % (active.title,  active.hba,  active.hbd,  active.clogp,  active.mw,  active.rot,  ligands_dict[active])
     log += "\n"
@@ -435,9 +466,11 @@ def find_decoys(
         logfile.write(log)
 
     decoyfile.close()
-
-    if not decoys_fp_set:
-        os.remove(outputfile)
+    if method == 0:
+        if not decoys_fp_set:
+            os.remove(outputfile)
+    end_time = time.time()
+    print end_time - start_time
     #Last, special yield:
     yield ('result',  ligands_dict,  outputfile, minreached)
 
