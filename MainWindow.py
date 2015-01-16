@@ -159,34 +159,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 print("No icon theme set, using default: Tango")
                 import icons_rc
                 QIcon.setThemeName('iconset')
-            addIcon = QIcon.fromTheme('list-add', QIcon())
-            clearIcon = QIcon.fromTheme('edit-clear', QIcon())
-            outIcon = QIcon.fromTheme('document-save-as', QIcon())
-            finddIcon = QIcon.fromTheme('media-playback-start', QIcon())
-            stopIcon = QIcon.fromTheme('process-stop', QIcon())
-            cachedirIcon = QIcon.fromTheme('folder-open', QIcon())
-            defaultsIcon = QIcon.fromTheme('view-refresh', QIcon())
-            helpIcon = QIcon.fromTheme('internet-web-browser', QIcon())
-            aboutIcon = QIcon.fromTheme('dialog-information', QIcon())
-
-            self.addQueryButton.setIcon(addIcon)
-            self.addDecoysButton.setIcon(addIcon)
-            self.addDButton.setIcon(addIcon)
-
-            self.clearActives.setIcon(clearIcon)
-            self.clearDecoys.setIcon(clearIcon)
-            self.clearDB.setIcon(clearIcon)
-            self.clearButton.setIcon(clearIcon)
-
-            self.outDirButton.setIcon(outIcon)
-            self.findDecoysButton.setIcon(finddIcon)
-            self.stopButton.setIcon(stopIcon)
-
-            self.cacheButton.setIcon(cachedirIcon)
-            self.defaultsButton.setIcon(defaultsIcon)
-
-            self.actionAbout.setIcon(aboutIcon)
-            self.actionHelp.setIcon(helpIcon)
         else:
             print 'Your version of Qt is way too old. Consider upgrading it to at least 4.6!'
             print 'Icons will not be displayed because of that'
