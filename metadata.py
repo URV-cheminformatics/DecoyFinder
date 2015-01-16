@@ -2,7 +2,7 @@
 #
 #       This file is part of Decoy Finder
 #
-#       Copyright 2012 Adrià Cereto Massagué <adrian.cereto@urv.cat>
+#       Copyright 2012-2014 Adrià Cereto Massagué <adrian.cereto@urv.cat>
 #
 #       This program is free software; you can redistribute it and/or modify
 #       it under the terms of the GNU General Public License as published by
@@ -21,6 +21,6 @@
 
 ORGNAME = u'Universitat Rovira i Virgili - Grup de Recerca en Nutrigenòmica'
 NAME = 'DecoyFinder'
-VERSION = '1.1'
+VERSION = '2.0'
 URL = 'urvnutrigenomica-ctns.github.com/DecoyFinder/'
 PYQT = True
