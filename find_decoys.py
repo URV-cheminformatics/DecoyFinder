@@ -337,7 +337,7 @@ def find_decoys(
     used_db_files = set()
 
     ligands_dict = parse_query_files(query_files)
-
+    ligand_std = 0
     if method == 0:
         active_fp_set = set(active.fp for active in ligands_dict)
     if method == 1:
