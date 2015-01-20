@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE Project SYSTEM "Project-4.6.dtd">
 <!-- eric4 project file for project df -->
-<!-- Saved: 2011-07-24, 22:14:53 -->
-<!-- Copyright (C) 2011 Adrià Cereto-Massagué, adrian.cereto@gmail.com -->
+<!-- Saved: 2015-01-20, 09:47:55 -->
+<!-- Copyright (C) 2015 Adrià Cereto-Massagué, adrian.cereto@gmail.com -->
 <Project version="4.6">
   <Language>ca</Language>
   <ProgLanguage mixed="0">Python</ProgLanguage>
-  <ProjectType>PySide</ProjectType>
+  <ProjectType>Qt4</ProjectType>
   <Description></Description>
   <Version>0.1</Version>
   <Author>Adrià Cereto-Massagué</Author>
