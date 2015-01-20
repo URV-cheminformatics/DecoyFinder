@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file '/home/adria/ownCloud/DecoyFinder/MainWindow.ui'
 #
-# Created: Fri Jan 16 11:59:36 2015
+# Created: Tue Jan 20 09:47:59 2015
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -589,7 +589,7 @@ class Ui_MainWindow(object):
 "If set to 0, the search will not stop until the above maximum number of decoys has been found for all active ligands (if the maximum is set to other than 0) or all decoy sources have been completely parsed.", None))
         self.decoyLimitLabel.setText(_translate("MainWindow", "Minimum decoys per active ligand:", None))
         self.decoyMinSpinBox.setToolTip(_translate("MainWindow", "Limit how many decoys to find for each ligand. If the limit is 0, there is no limit.", None))
-        self.label_4.setText(_translate("MainWindow", "Maximum standard deviations away from mean", None))
+        self.label_4.setText(_translate("MainWindow", "Maximum standard deviations away from active", None))
         self.cacheButton.setToolTip(_translate("MainWindow", "This is the directory where temporary ZINC files will be downloaded.\n"
 "They will be kept here if the \'Use cache\' option is enabled, otherwise they will be removed after they have been parsed.\n"
 "\n"

@@ -34,11 +34,13 @@
        <bool>true</bool>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="tabWidgetPage1">
        <attribute name="icon">
-        <iconset theme="system-search"/>
+        <iconset theme="system-search">
+         <normaloff/>
+        </iconset>
        </attribute>
        <attribute name="title">
         <string>Find</string>
@@ -128,7 +130,9 @@
                  <string>Add</string>
                 </property>
                 <property name="icon">
-                 <iconset theme="list-add"/>
+                 <iconset theme="list-add">
+                  <normaloff/>
+                 </iconset>
                 </property>
                </widget>
               </item>
@@ -157,7 +161,9 @@
                  <string>Clear</string>
                 </property>
                 <property name="icon">
-                 <iconset theme="edit-clear"/>
+                 <iconset theme="edit-clear">
+                  <normaloff/>
+                 </iconset>
                 </property>
                </widget>
               </item>
@@ -257,7 +263,9 @@
                   <string>Add</string>
                  </property>
                  <property name="icon">
-                  <iconset theme="list-add"/>
+                  <iconset theme="list-add">
+                   <normaloff/>
+                  </iconset>
                  </property>
                 </widget>
                </item>
@@ -286,7 +294,9 @@
                   <string>Clear</string>
                  </property>
                  <property name="icon">
-                  <iconset theme="edit-clear"/>
+                  <iconset theme="edit-clear">
+                   <normaloff/>
+                  </iconset>
                  </property>
                 </widget>
                </item>
@@ -486,7 +496,9 @@ p, li { white-space: pre-wrap; }
                  <string>Add</string>
                 </property>
                 <property name="icon">
-                 <iconset theme="list-add"/>
+                 <iconset theme="list-add">
+                  <normaloff/>
+                 </iconset>
                 </property>
                </widget>
               </item>
@@ -512,7 +524,9 @@ p, li { white-space: pre-wrap; }
                  <string>Clear</string>
                 </property>
                 <property name="icon">
-                 <iconset theme="edit-clear"/>
+                 <iconset theme="edit-clear">
+                  <normaloff/>
+                 </iconset>
                 </property>
                </widget>
               </item>
@@ -542,7 +556,9 @@ p, li { white-space: pre-wrap; }
              <string>Output file</string>
             </property>
             <property name="icon">
-             <iconset theme="document-save-as"/>
+             <iconset theme="document-save-as">
+              <normaloff/>
+             </iconset>
             </property>
            </widget>
           </item>
@@ -555,7 +571,9 @@ p, li { white-space: pre-wrap; }
       </widget>
       <widget class="QWidget" name="tab">
        <attribute name="icon">
-        <iconset theme="text-x-generic"/>
+        <iconset theme="text-x-generic">
+         <normaloff/>
+        </iconset>
        </attribute>
        <attribute name="title">
         <string>Run Statistics</string>
@@ -661,7 +679,9 @@ p, li { white-space: pre-wrap; }
       </widget>
       <widget class="QWidget" name="tabWidgetPage2">
        <attribute name="icon">
-        <iconset theme="document-properties"/>
+        <iconset theme="document-properties">
+         <normaloff/>
+        </iconset>
        </attribute>
        <attribute name="title">
         <string>Options</string>
@@ -678,14 +698,14 @@ p, li { white-space: pre-wrap; }
              <item>
               <widget class="QRadioButton" name="MwBasedRB">
                <property name="text">
-                <string>Molecular weight based decoys</string>
+                <string>Molecular weight based decoys (fast)</string>
                </property>
               </widget>
              </item>
              <item>
               <widget class="QRadioButton" name="descriptorBasedRB">
                <property name="text">
-                <string>Molecular descriptor based decoys</string>
+                <string>Molecular descriptor based decoys (slow)</string>
                </property>
                <property name="checked">
                 <bool>true</bool>
@@ -933,7 +953,7 @@ If set to 0, the search will not stop until the above maximum number of decoys h
              <item row="7" column="0">
               <widget class="QLabel" name="label_4">
                <property name="text">
-                <string>Maximum standard deviations away from mean</string>
+                <string>Maximum standard deviations away from active</string>
                </property>
               </widget>
              </item>
@@ -962,7 +982,9 @@ If the 'Use cache' option is enabled, it is recommended to place the cache direc
              <string>Cache directory</string>
             </property>
             <property name="icon">
-             <iconset theme="folder-open"/>
+             <iconset theme="folder-open">
+              <normaloff/>
+             </iconset>
             </property>
            </widget>
           </item>
@@ -1005,7 +1027,9 @@ If the 'Use cache' option is enabled, it is recommended to place the cache direc
              <string>Load Defaults</string>
             </property>
             <property name="icon">
-             <iconset theme="view-refresh"/>
+             <iconset theme="view-refresh">
+              <normaloff/>
+             </iconset>
             </property>
            </widget>
           </item>
@@ -1042,7 +1066,9 @@ If the 'Use cache' option is enabled, it is recommended to place the cache direc
          <string>Clear all</string>
         </property>
         <property name="icon">
-         <iconset theme="edit-clear"/>
+         <iconset theme="edit-clear">
+          <normaloff/>
+         </iconset>
         </property>
        </widget>
       </item>
@@ -1074,7 +1100,9 @@ If the 'Use cache' option is enabled, it is recommended to place the cache direc
          <string>Stop</string>
         </property>
         <property name="icon">
-         <iconset theme="process-stop"/>
+         <iconset theme="process-stop">
+          <normaloff/>
+         </iconset>
         </property>
        </widget>
       </item>
@@ -1103,7 +1131,9 @@ If the 'Use cache' option is enabled, it is recommended to place the cache direc
          <string>Find decoys</string>
         </property>
         <property name="icon">
-         <iconset theme="system-search"/>
+         <iconset theme="system-search">
+          <normaloff/>
+         </iconset>
         </property>
        </widget>
       </item>
@@ -1138,7 +1168,9 @@ If the 'Use cache' option is enabled, it is recommended to place the cache direc
   </widget>
   <action name="actionHelp">
    <property name="icon">
-    <iconset theme="internet-web-browser"/>
+    <iconset theme="internet-web-browser">
+     <normaloff/>
+    </iconset>
    </property>
    <property name="text">
     <string>DecoyFinder Website</string>
@@ -1149,7 +1181,9 @@ If the 'Use cache' option is enabled, it is recommended to place the cache direc
   </action>
   <action name="actionAbout">
    <property name="icon">
-    <iconset theme="dialog-information"/>
+    <iconset theme="dialog-information">
+     <normaloff/>
+    </iconset>
    </property>
    <property name="text">
     <string>About DecoyFinder</string>
