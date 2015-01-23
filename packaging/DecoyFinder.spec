@@ -4,25 +4,36 @@ import os, shutil, platform
 # Process the includes and excludes first
 
 NAME=r"DecoyFinder"
+NAME2 = NAME + "_" + "_".join([platform.system().lower(), platform.architecture()[0]])
 if os.name == 'nt':
     NAME += '.exe'
 else:
-    NAME +="_" + "_".join([platform.system().lower(), platform.architecture()[0]])
+    NAME = NAME2
 
 cwd = os.path.abspath(os.getcwd())
 
-datadir = os.environ['BABEL_DATADIR']
+try:
+    datadir = os.environ['BABEL_DATADIR']
+except KeyError:
+    datadir = "/usr/share/openbabel/2.3.2/"
+
+try:
+    libdir = os.environ['BABEL_LIBDIR']
+except KeyError:
+    if os.name == "nt":
+        for p in os.environ["PATH"].split(os.pathsep):
+            if os.path.isfile(os.path.join(p, "obabel.exe")):
+                libdir = p
+    else:
+        libdir = "/usr/lib/openbabel/2.3.2/"
 
 data_files = []
 
 if os.name == 'nt':
-    obdir = os.path.abspath(os.path.join(datadir , '..'))
-    data_files = [(file,os.path.join(obdir, file),'DATA') for file in os.listdir(obdir) if os.path.splitext(file)[1].lower() == '.obf']
-else:
-    obdir = os.environ['BABEL_LIBDIR'] #'/opt/openbabel-2.3.1/lib/openbabel/2.3.1'
+    data_files = [(file,os.path.join(libdir, file),'DATA') for file in os.listdir(libdir) if os.path.splitext(file)[1].lower() == '.obf']
 
 for file in os.listdir(datadir):
-    data_files.append((file, os.path.join(os.environ['BABEL_DATADIR'], file),
+    data_files.append((file, os.path.join(datadir, file),
              'DATA'))
 
 data_files.append(('qt.conf', os.path.join(cwd, 'qt.conf'),
@@ -33,25 +44,19 @@ data_files.append(('RELEASE_NOTES.txt', os.path.join(cwd, '..',  'RELEASE_NOTES.
              'DATA'))
 
 includes = []
-excludes = ['_gtkagg', '_tkagg', 'bsddb', 'curses', 'email', 'pywin.debugger',
+excludes = ['_gtkagg', '_tkagg', 'bsddb', 'curses', 'pywin.debugger',
             'pywin.debugger.dbgcon', 'pywin.dialogs', 'tcl',
-            'Tkconstants', 'Tkinter']
-packages = []
+            'Tkconstants', 'Tkinter', "PySide"]
 dll_excludes = []
 dll_includes = []
-if os.name == 'nt':
-    dll_includes = [('QtCore4.dll', 'C:\\Python27\\Lib\\site-packages\\PySide\\QtCore4.dll',
-                    'BINARY'), ('QtGui4.dll', 'C:\\Python27\\Lib\\site-packages\\PySide\\QtGui4.dll',
-                    'BINARY')]
 
-
-for file in os.listdir(obdir):
+for file in os.listdir(libdir):
     if os.path.splitext(file)[1].lower() in ('.dll', '.so'):
         if 'csharp' in file.lower() or 'dotnet'in file.lower() or 'java' in file.lower():
-            dll_excludes.append((file, os.path.join(obdir, file),
+            dll_excludes.append((file, os.path.join(libdir, file),
                 'BINARY'))
         else:
-            dll_includes.append((file, os.path.join(obdir, file),
+            dll_includes.append((file, os.path.join(libdir, file),
                 'BINARY'))
 # Set up the more obscure PyInstaller runtime options
 
@@ -67,26 +72,17 @@ options = [('O', '', 'OPTION')]
 
 # The setup for PyInstaller is different from py2exe. Here I am going to
 # use some common spec file declarations
-if os.name == 'nt':
-    homepath = os.path.join('Z:/home', os.environ['USER'])
-else:
-    homepath = os.environ['HOME']
 
-pidir = os.path.join(homepath ,'winbin', 'pyinstaller-1.5.1')
-
-print os.path.abspath(os.path.join(pidir, 'support','_mountzlib.py'))
-
-analysis = Analysis([os.path.abspath(os.path.join(pidir, 'support','_mountzlib.py')),
-           os.path.abspath(os.path.join(pidir, 'support','useUnicode.py')),
-           os.path.abspath(os.path.join(cwd,'..','decoy_finder.py'))],
+analysis = Analysis([os.path.abspath(os.path.join(cwd,'..','decoy_finder.py'))],
                     pathex=[],
                     hookspath=[],
-                    excludes=excludes)
+                    excludes=excludes,
+                    runtime_hooks=["rthooks.py"])
 
 pyz = PYZ(analysis.pure, level=9)
 
 executable = EXE( pyz,
-                 analysis.scripts + includes + packages + options,
+                 analysis.scripts + includes  + options,
                  analysis.binaries - dll_excludes + dll_includes + data_files,
                  name=NAME,
                  debug=False,
@@ -94,16 +90,31 @@ executable = EXE( pyz,
                  strip= os.name != 'nt',
                  upx=True,
                  icon=os.path.abspath(os.path.join(cwd, '../icon.ico')),
+                 #manifest="manifest",
+                 version=None)
+executable_dir = EXE( pyz,
+                 analysis.scripts + includes  + options,
+                 name=NAME,
+                 exclude_binaries=True,
+                 debug=False,
+                 console=False,
+                 strip= os.name != 'nt',
+                 upx=True,
+                 icon=os.path.abspath(os.path.join(cwd, '../icon.ico')),
+                 #manifest="manifest",
                  version=None)
 
+coll = COLLECT(executable_dir,
+               analysis.binaries - dll_excludes + dll_includes + data_files,
+               analysis.zipfiles,
+               analysis.datas,
+               strip=None,
+               upx=True,
+               name=NAME2 + "_dir")
 # This is a place where any post-compile code may go.
 # You can add as much code as you want, which can be used, for example,
 # to clean up your folders or to do some particular post-compilation
 # actions.
-
-vcredist = os.path.join(obdir, 'vcredist_x86.exe')
-if os.path.isfile(vcredist):
-    shutil.copy(vcredist,  cwd)
 
 # And we are done. That's a setup script :-D
 

@@ -64,7 +64,7 @@ ShowInstDetails show
 Section "DecoyFinder" SEC01
   SetOutPath "$INSTDIR"
   SetOverwrite on
-  File "DecoyFinder.exe"
+  File "dist\DecoyFinder.exe"
   File "..\README.txt"
   File "..\LICENCE.txt"
   File "..\RELEASE_NOTES.txt"

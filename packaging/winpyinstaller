@@ -1,0 +1,4 @@
+WINEPREFIX="$PWD/winedist"
+PYI="$WINEPREFIX/drive_c/Python27/Scripts/pyinstaller.exe"
+export WINEPREFIX
+wine $PYI $@

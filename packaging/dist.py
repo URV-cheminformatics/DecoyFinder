@@ -2,7 +2,7 @@
 #
 #       This file is part of Decoy Finder
 #
-#       Copyright 2012 Adrià Cereto Massagué <adrian.cereto@urv.cat>
+#       Copyright 2012-2014 Adrià Cereto Massagué <adrian.cereto@urv.cat>
 #
 #       This program is free software; you can redistribute it and/or modify
 #       it under the terms of the GNU General Public License as published by
@@ -24,10 +24,10 @@ from glob import glob
 sys.path.append('..')
 import metadata
 exit
-if metadata.PYQT:
-    metadata.NAME += '-pyqt'
+if not metadata.PYQT:
+    metadata.NAME += '-pyside'
 
-PI = os.path.join(os.path.expanduser('~'), 'winbin', 'pyinstaller-1.5.1', 'pyinstaller.py')
+PI = 'pyinstaller'
 
 author = "Adrià Cereto Massagué"
 author_email = "adrian.cereto@urv.cat"
@@ -91,7 +91,7 @@ def generate_deb_control():
     control += 'Maintainer: %s\n' % (author + ' <%s>' % author_email)
     control += 'Architecture: all\n'
     control += 'Homepage: http://%s\n' % metadata.URL
-    control += 'Depends: python-qt4 , python-openbabel (>= 2.3.0)\n'
+    control += 'Depends: python-qt4 , python-openbabel, python-rdk, python-cinfony\n'
     control += 'Description:%s\n' % description
     control += ' %s\n' % long_description
     control += '\n'
@@ -164,11 +164,12 @@ def make_deb(srcdir):
 
 def make_win32(srcdir):
     print 'Building Windows binary...'
-    args = [PI, '-w', '-X', '-C', 'config-win32.dat', '-F', 'DecoyFinder.spec']
+    args = [PI, 'DecoyFinder.spec']
     if os.name == 'nt':
-        args = [sys.executable] + args
+        pass
     else:
-        args = ['wine', 'c:/Python27/python'] + args
+        os.environ["WINEPREFIX"] = os.path.abspath("winedist")
+        args = ['wine', ] + args
     subprocess.call(args)
     print 'Done. Building Windows installer...'
     nsi_data = """!define PRODUCT_NAME "%s"
@@ -252,7 +253,7 @@ def make_rpm(srcdir):
     spec_template +="BuildArch: noarch\n"
     spec_template +="ExclusiveArch: noarch\n"
     spec_template +="Buildroot: %s\n" % buildroot
-    spec_template +="Requires: python-openbabel >= 2.3 , PyQt4\n"
+    spec_template +="Requires: python-openbabel, python-rdkit, python-rdkit, PyQt4\n"
     spec_template +="%define _rpmfilename %%{NAME}-%%{VERSION}-%%{RELEASE}.%%{ARCH}.rpm\n"
     spec_template +="%define _unpackaged_files_terminate_build 0\n"
     spec_template +="%description\n"
@@ -267,7 +268,7 @@ def make_rpm(srcdir):
 %dir "/opt/"
 %dir "/opt/DecoyFinder-pyqt/"
 /opt/DecoyFinder-pyqt/*
-"""
+""".replace("-pyqt", "-pyside" if not metadata.PYQT else "")
     sf = open(specfile, 'wb')
     sf.write(spec_template)
     sf.write(files_spec)
@@ -296,5 +297,5 @@ if __name__ == '__main__':
     make_archive(srcdir)
     if os.name != 'nt':
         make_deb(srcdir)
-        make_rpm(srcdir)
-    #make_win32(srcdir)
+        #make_rpm(srcdir)
+    make_win32(srcdir)
