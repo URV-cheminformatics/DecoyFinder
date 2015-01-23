@@ -155,18 +155,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         for subset in ZINC_subsets:
             self.zsubComboBox.addItem(subset)
         self.zsubComboBox.setCurrentIndex(self.zsubComboBox.findText('everything'))
-        ###Load icons, if Qt is new enough###
-        if 'themeName' in dir(QIcon):
-            print("Icon theme support enabled")
-            if not QIcon.themeName():
-                print("No icon theme set, using default: Tango")
-                import icons_rc
-                QIcon.setThemeName('iconset')
-        else:
-            print 'Your version of Qt is way too old. Consider upgrading it to at least 4.6!'
-            print 'Icons will not be displayed because of that'
-        ############
-
         self.toolBar.addAction(self.actionAbout)
         self.toolBar.addAction(self.actionHelp)
 
