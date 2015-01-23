@@ -180,7 +180,8 @@ def get_zinc_slice(slicename = 'all', subset = '10', cachedir = tempfile.gettemp
                 dbhandler.close()
                 outfile = open(outfilename[:-3], "wb")
                 f = gzip.GzipFile(fileobj=buf)
-                outfile.write(f.read())
+                for line in f.readlines():
+                    outfile.write(line)
                 f.close()
                 outfile.close()
             else:
