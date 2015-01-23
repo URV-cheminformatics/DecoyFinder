@@ -43,8 +43,6 @@ if pybel:
         informats_set.add(format)
         for compression in ('gz', 'tar',  'bz',  'bz2',  'tar.gz',  'tar.bz',  'tar.bz2'):
             informats_set.add(format)
-for format in informats_set:
-    informats += "*.%s.%s " % (format,  compression)
 
 
 #Some default values:
@@ -232,7 +230,10 @@ def parse_db_files(filelist):
     for dbfile in filelist:
         mols = readfile(dbfile)
         for mol in mols:
-            yield ComparableMol(mol), filecount, dbfile
+            try:
+                yield ComparableMol(mol), filecount, dbfile
+            except:
+                continue
         filecount += 1
 
 def parse_query_files(filelist):
@@ -244,7 +245,10 @@ def parse_query_files(filelist):
         file = str(file)
         mols = readfile(file)
         for mol in mols:
-            cmol = ComparableMol(mol)
+            try:
+                cmol = ComparableMol(mol)
+            except:
+                continue
             query_dict[cmol] = 0
     return query_dict
 
@@ -257,7 +261,10 @@ def parse_decoy_files(decoyfilelist):
         decoyfile = str(decoyfile)
         mols = readfile(decoyfile)
         for mol in mols:
-            cmol = ComparableMol(mol)
+            try:
+                cmol = ComparableMol(mol)
+            except:
+                continue
             decoy_set.add(cmol)
     return decoy_set
 
