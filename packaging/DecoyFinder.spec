@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #-*- coding:utf-8 -*-
-import os, shutil, platform
+import os, shutil, platform, glob
 # Process the includes and excludes first
 
 NAME=r"DecoyFinder"
@@ -15,7 +15,7 @@ cwd = os.path.abspath(os.getcwd())
 try:
     datadir = os.environ['BABEL_DATADIR']
 except KeyError:
-    datadir = "/usr/share/openbabel/2.3.2/"
+    datadir = glob.glob("/usr/share/openbabel/2.3*/")[-1]
 
 try:
     libdir = os.environ['BABEL_LIBDIR']
@@ -25,7 +25,7 @@ except KeyError:
             if os.path.isfile(os.path.join(p, "obabel.exe")):
                 libdir = p
     else:
-        libdir = "/usr/lib/openbabel/2.3.2/"
+        libdir = glob.glob("/usr/lib/openbabel/2.3*/")[-1]
 
 data_files = []
 

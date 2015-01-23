@@ -1,7 +1,7 @@
 #!/bin/sh
 # installation directory
 OLDDIR=$PWD
-DECOYFINDERDIR=/opt/DecoyFinder-pyqt
+DECOYFINDERDIR=/opt/DecoyFinder
 cd $DECOYFINDERDIR
 python decoy_finder.py &
 cd $PWD

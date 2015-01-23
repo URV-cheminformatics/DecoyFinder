@@ -91,7 +91,7 @@ def generate_deb_control():
     control += 'Maintainer: %s\n' % (author + ' <%s>' % author_email)
     control += 'Architecture: all\n'
     control += 'Homepage: http://%s\n' % metadata.URL
-    control += 'Depends: python-qt4 , python-openbabel, python-rdk, python-cinfony\n'
+    control += 'Depends: python-qt4 , python-openbabel, python-rdkit, python-cinfony, python-numpy\n'
     control += 'Description:%s\n' % description
     control += ' %s\n' % long_description
     control += '\n'
@@ -164,7 +164,7 @@ def make_deb(srcdir):
 
 def make_win32(srcdir):
     print 'Building Windows binary...'
-    args = [PI, 'DecoyFinder.spec']
+    args = [PI, "-y", 'DecoyFinder.spec']
     if os.name == 'nt':
         pass
     else:
@@ -253,7 +253,7 @@ def make_rpm(srcdir):
     spec_template +="BuildArch: noarch\n"
     spec_template +="ExclusiveArch: noarch\n"
     spec_template +="Buildroot: %s\n" % buildroot
-    spec_template +="Requires: python-openbabel, python-rdkit, python-rdkit, PyQt4\n"
+    spec_template +="Requires: python-openbabel, python-rdkit, python-numpy, PyQt4\n"
     spec_template +="%define _rpmfilename %%{NAME}-%%{VERSION}-%%{RELEASE}.%%{ARCH}.rpm\n"
     spec_template +="%define _unpackaged_files_terminate_build 0\n"
     spec_template +="%description\n"
