@@ -29,6 +29,16 @@ try:
 except ImportError:
     print "Pybel is not available"
     pybel = False
+if "can" not in rdk.outformats:
+    if not pybel:
+        e = "Unable to generate canonical smiles. Please upgrade cinfony, the RDKit or install OpenBabel python bindings"
+        print e
+        raise e
+    else:
+        obcan = True
+else:
+    obcan = False
+
 from decimal import Decimal
 import metadata
 #Decimal() can represent floating point data with higher precission than built-in float
@@ -86,6 +96,9 @@ class ComparableMol():
         self._hbd = None
         self._clogp = None
         self._rot = None
+        if obcan:
+            self.obmol = pybel.Molecule(mol)
+            self.mol.write = self.obmol.write
 
     @property
     def fp(self):
