@@ -157,6 +157,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.zsubComboBox.setCurrentIndex(self.zsubComboBox.findText('everything'))
         ###Load icons, if Qt is new enough###
         if 'themeName' in dir(QIcon):
+            print("Icon theme support enabled")
             if not QIcon.themeName():
                 print("No icon theme set, using default: Tango")
                 import icons_rc
@@ -170,7 +171,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.toolBar.addAction(self.actionHelp)
 
         ######Display current settings########
-        self.MwBasedRB.setOn(self.settings.value('MwBasedRB', True) != "false")
+        self.MwBasedRB.setChecked(self.settings.value('MwBasedRB', True) != "false")
         self.stdMaxSpinBox.setValue(float(self.settings.value('maxStds', 1)))
         self.hbaBox.setValue(int(self.settings.value('HBA_t', 0)))
         self.hbdBox.setValue(int(self.settings.value('HBD_t', 0)))
@@ -580,7 +581,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
 
     @Slot("")
-    def on_actionAbout_activated(self):
+    def on_actionAbout_triggered(self):
         """
         Slot documentation goes here.
         """
@@ -593,7 +594,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         aboutdiag.exec_()
 
     @Slot("")
-    def on_actionHelp_activated(self):
+    def on_actionHelp_triggered(self):
         """
         Slot documentation goes here.
         """
