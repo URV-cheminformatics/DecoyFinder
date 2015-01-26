@@ -1,10 +1,10 @@
 #!/usr/bin/env xdg-open
 [Desktop Entry]
-Name=DecoyFinder (PyQt4 version)
+Name=DecoyFinder
 Comment=Find decoy molecules for a set of active ligands
-Exec=decoyfinder-pyqt
+Exec=decoyfinder
 Terminal=false
 Type=Application
-Icon=/opt/DecoyFinder-pyqt/icon.png
+Icon=/opt/DecoyFinder/icon.png
 Categories=Education;Science
 StartupNotify=true
