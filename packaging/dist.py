@@ -168,7 +168,7 @@ def make_win32(srcdir):
     if os.name == 'nt':
         pass
     else:
-        os.environ["WINEPREFIX"] = os.path.abspath("winedist")
+        #os.environ["WINEPREFIX"] = os.path.abspath("winedist")
         args = ['wine', ] + args
     subprocess.call(args)
     print 'Done. Building Windows installer...'
