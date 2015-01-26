@@ -6,10 +6,11 @@
 
 
 
+
   
   
-  <meta charset="utf-8">
-  <title>DecoyFinder</title>
+  <meta charset="utf-8"><title>DecoyFinder</title>
+  
 
   
 
@@ -76,8 +77,7 @@ hr {
 }
 
   </style>
-  <link rel="shortcut icon" href="favicon.ico">
-</head><body>
+  <link rel="shortcut icon" href="favicon.ico"></head><body>
 
 
 
@@ -88,13 +88,16 @@ active ligand sets </div>
 <p><br>
 </p>
 <p>DecoyFinder is a graphical tool which helps finding sets of decoy
-molecules for a given group of active ligands. It does so by finding
+molecules for a given group of active ligands. It can do so by either
+finding molecules with a molecular weight similar to the actives (fast
+method) or by finding
 molecules which have a similar number of rotational bonds, hydrogen
 bond acceptors, hydrogen bond donors, logP value and molecular weight,
 but are chemically different, which is defined by a maximum Tanimoto
 value threshold between active ligand and decoy molecule MACCS
-fingerprints. Optionally, a maximum Tanimoto value threshold can be set
-between decoys in order to assure chemical diversity in the decoy set.</p>
+fingerprints (slow method). Optionally, with this method a maximum
+Tanimoto value threshold can be set
+between decoys in order assure chemical diversity in the decoy set.</p>
 <h2><span style="font-weight: bold;">Index</span></h2>
 <ul>
   <li><a href="index.html#Authors"><span style="font-weight: bold;">Authors</span></a><br>
@@ -136,41 +139,30 @@ application for building target-specific decoy sets. Bioinformatics,
 <h2><a name="Downloads_"></a><span style="font-weight: bold;">Downloads</span><br>
 </h2>
 <ul>
-  <li><a href="https://github.com/downloads/URVnutrigenomica-CTNS/DecoyFinder/DecoyFinder-1.1_installer.exe"><span style="font-weight: bold;">Windows 32-bit installer<br>
+  <li><a href="https://130.206.36.133/owncloud/public.php?service=files&amp;t=0b0cb4b35bf9d82e2ea557a4a44c8ef6&amp;download"><span style="font-weight: bold;">Windows 32-bit installer<br>
 </span></a></li>
-  <li><a href="https://github.com/downloads/URVnutrigenomica-CTNS/DecoyFinder/decoyfinder-1.1_all.deb"><span style="font-weight: bold;">Ubuntu
-+11.10 and Debian testing</span></a></li>
-  <li><span style="font-weight: bold;"><a href="https://github.com/downloads/URVnutrigenomica-CTNS/DecoyFinder/decoyfinder-pyqt-1.1_all.deb">Ubuntu +10.10 (PyQt4 version)</a></span></li>
-  <li><a href="https://github.com/downloads/URVnutrigenomica-CTNS/DecoyFinder/DecoyFinder-1.1-1.noarch.rpm"><span style="font-weight: bold;">Fedora 16 and derivatives</span></a></li>
-  <li><span style="font-weight: bold;"><a href="https://github.com/downloads/URVnutrigenomica-CTNS/DecoyFinder/DecoyFinder-pyqt-1.1-1.noarch.rpm">Fedora 16 and derivatives (PyQt4 version)</a><br>
-</span></li>
-
+  <li><a href="https://130.206.36.133/owncloud/public.php?service=files&amp;t=aec93fb4c1714f1d46e181bef67e5347&amp;download"><span style="font-weight: bold;">Ubuntu
++12.04 LTS and Debian<br>
+</span></a></li>
+  <li><span style="font-weight: bold;"><a href="https://130.206.36.133/owncloud/public.php?service=files&amp;t=2859910bc9dc7bcf07f5bbc5d9655608&amp;download">Static 32-bit Linux standalone</a><br>
+    </span></li>
   <li><span style="font-weight: bold;">Others:</span></li>
   <ul>
-    <li><a href="https://github.com/downloads/URVnutrigenomica-CTNS/DecoyFinder/DecoyFinder-1.1.tar.bz2"><span style="font-weight: bold;">Source (PySide version)</span></a></li>
-    <li><span style="font-weight: bold;"><a href="https://github.com/downloads/URVnutrigenomica-CTNS/DecoyFinder/DecoyFinder-pyqt-1.1.tar.bz2">Source (PyQt4 version)</a><br>
-      </span></li>
+<li><a href="https://130.206.36.133/owncloud/public.php?service=files&amp;t=99ef634fe6fa993ea3a6737e16d3566e&amp;download"><span style="font-weight: bold;">Source</span></a></li>
   </ul>
 </ul>
 <h2><a name="Install"></a>Install</h2>
 <ul>
   <li><span style="font-weight: bold;">Windows users:</span> just use
 the installer, all needed files are provided.</li>
-  <li><span style="font-weight: bold;">Ubuntu 11.10 and Debian testing
-users:</span>
+  <li><span style="font-weight: bold;">Ubuntu 12.04 LTS and Debian users:</span>
 simply install the provided .deb package, all
 dependencies will be automatically installed by the package manager. If
 you open the .deb package using the software center, it may complain
 about the package being of bad quality and advice against its
 installation. Just ignore the warning. This will be fixed in future
-releases.<br>
-</li>
-  <li><span style="font-weight: bold;">Users of older Ubuntu releases</span>
-should manually (or using <a href="http://packages.ubuntu.com/search?keywords=openbabel+&amp;searchon=names&amp;suite=all&amp;section=all" target="_blank">a .deb package for a newer Ubuntu release</a>) install
-OpenBabel =&gt;2.3.0 and install the PyQt4 version of DecoyFinder</li>
-  <li><span style="font-weight: bold;">Fedora 16 and derivatives</span> <span style="font-weight: bold;">users:</span> just install the provided RPM package with yum or your favourite package manager.<br>
-  </li>
-
+releases.</li>
+  <li><span style="font-weight: bold;">Other Linux users:</span> the 32-bit static standalone executable should work on any system with GLIBC &gt;= 2.15</li>
 </ul>
 <p><br>
 If you are running an OS for which there are no DecoyFinder packages
@@ -181,23 +173,20 @@ package, just executing the following from a command line:
 </p>
 <pre style="margin-left: 71px; width: 476px;">$ python PATH/TO/DECOYFINDER/decoy_finder.py</pre>
 
-<p>Alternatively, you may consider running the Windows version under <a href="http://www.winehq.org/">wine</a> or any of its derivatives (like <a href="http://www.codeweavers.com/">CrossOver</a> or <a href="http://www.bordeauxgroup.com/">Bordeaux</a>)if that is an easier setup for your platform<br>
-</p>
+
 <h2 style="margin-left: 0px; width: 870px;"><a name="Dependencies"></a></h2>
 <h2 style="margin-left: 0px; width: 870px;">Dependencies</h2>
 
 <ul>
   <li><a href="http://www.python.org/getit/" target="_blank">Python</a>
 &gt;= 2.5,&nbsp; &lt; 3</li>
-  <li><a href="http://openbabel.org/wiki/Category:Installation">OpenBabel</a>
-&gt;= 2.3.0 with python bindings</li>
-  <li>pybel (usually included with OpenBabel python bindings; also part
-of <a href="http://code.google.com/p/cinfony/" target="_blank">cinfony</a>)</li>
-  <li><a href="http://www.pyside.org/downloads/" target="_blank">PySide</a>
-&gt;= 1.0 (or <a href="http://www.riverbankcomputing.co.uk/software/pyqt/download">PyQt4</a>
-&gt;= 4.6 for PyQt4 version)</li>
-  <li>Qt &gt;= 4.5 (sometimes included with PySide or PyQt, depending
-on your platform; it might work with older versions of Qt)</li>
+  <li><a href="http://www.rdkit.org/">RDKit</a><br>
+  </li>
+  <li><a href="http://openbabel.org/wiki/Category:Installation">OpenBabel</a> (optional; for extra supported file formats)<br>
+  </li>
+  <li><a href="http://code.google.com/p/cinfony/" target="_blank">Cinfony</a></li>
+  <li><a href="http://www.riverbankcomputing.co.uk/software/pyqt/download">PyQt4</a>
+&gt;= 4.6 </li>
 </ul> 
 <h2><a name="Documentation"></a>Documentation</h2>
 
