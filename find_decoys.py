@@ -16,7 +16,7 @@
 #    GNU General Public License for more details.
 #
 
-import os, urllib2, tempfile, random,  sys,  gzip, datetime, itertools, zlib
+import os, urllib.request, urllib.error, urllib.parse, tempfile, random,  sys,  gzip, datetime, itertools, zlib
 #Decimal() can represent floating point data with higher precission than built-in float
 from decimal import Decimal
 
@@ -29,35 +29,35 @@ else:
 #m is a dict containign all backend modules
 m = {}
 backend = None
-try:
-    from cinfony import indy
-    m['indy'] = indy
-except:
-    pass
-try:
-    from cinfony import cdk
-    m['cdk'] = cdk
-    backend = 'cdk'
-except:
-    pass
+#try:
+#    from cinfony import indy
+#    m['indy'] = indy
+#except:
+#    pass
+#try:
+#    from cinfony import cdk
+#    m['cdk'] = cdk
+#    backend = 'cdk'
+#except:
+#    pass
 try:
     from cinfony import pybel
     m['pybel'] = pybel
     backend = 'pybel'
 except ImportError:
     try:
-        import pybel
+        from openbabel import pybel
         m['pybel'] = pybel
         backend = 'pybel'
     except ImportError:
         pass
-try:
-    from cinfony import rdk
-    m['rdk'] = rdk
-    backend = 'rdk'
-except ImportError:
-    pass
-
+#try:
+#    from cinfony import rdk
+#    m['rdk'] = rdk
+#    backend = 'rdk'
+#except ImportError:
+#    pass
+#
 if not backend and not m:
     exit('No supported chemoinformatics toolkit found')
 
@@ -213,7 +213,7 @@ class ComparableMol(object):
     def calc_can(self, mol, b):
         try:
             can = mol.write(REP)
-        except Exception, e:
+        except Exception as e:
             _debug(e)
             return None
         if REP in ('smi', 'can') and b == 'pybel':
@@ -302,7 +302,7 @@ def get_zinc_slice(slicename = 'all', subset = '10', cachedir = tempfile.gettemp
     if slicename in ('all', 'single', 'usual', 'metals'):
         script = "http://zinc12.docking.org/db/bysubset/%s/%s.sdf.csh" % (subset,slicename)
         _debug( 'Downloading files in %s' % script)
-        handler = urllib2.urlopen(script)
+        handler = urllib.request.urlopen(script)
         _debug("Reading ZINC data...")
         scriptcontent = handler.read().split('\n')
         handler.close()
@@ -319,7 +319,7 @@ def get_zinc_slice(slicename = 'all', subset = '10', cachedir = tempfile.gettemp
         yield len(filelist)
         random.shuffle(filelist)
         for file in filelist:
-            dbhandler = urllib2.urlopen(parenturl + file)
+            dbhandler = urllib.request.urlopen(parenturl + file)
             outfilename = os.path.join(cachedir, file)
             download_needed = True
             if keepcache:
@@ -346,11 +346,11 @@ def get_zinc_slice(slicename = 'all', subset = '10', cachedir = tempfile.gettemp
             if not keepcache:
                 try:
                     os.remove(outfilename)
-                except Exception,  e:
+                except Exception as  e:
                     _debug("Unable to remove %s" % (outfilename))
-                    _debug(unicode(e))
+                    _debug(str(e))
     else:
-        raise Exception,  u"Unknown slice"
+        raise Exception("Unknown slice")
 
 def get_fileformat(filename):
     """
@@ -391,8 +391,8 @@ def query_db(conn, table='Molecules'):
         try:
             mol = DbMol(row)
             yield mol, rowcount, 'database'
-        except Exception, e:
-            print e
+        except Exception as e:
+            print(e)
     else:
         cursor.close()
 
@@ -411,7 +411,7 @@ def parse_db_files(filelist):
                 try:
                     cmol= ComparableMol(mol, b)
                     yield cmol, filecount, dbfile
-                except Exception, e:
+                except Exception as e:
                     _debug(e)
         filecount += 1
 
@@ -429,7 +429,7 @@ def parse_query_files(filelist):
                 try:
                     cmol = ComparableMol(mol, b)
                     query_dict[cmol] = 0
-                except Exception, e:
+                except Exception as e:
                     _debug(e)
     return query_dict
 
@@ -447,7 +447,7 @@ def parse_decoy_files(decoyfilelist):
                 try:
                     cmol = ComparableMol(mol, b)
                     decoy_set.add(cmol)
-                except Exception, e:
+                except Exception as e:
                     _debug(e)
     return decoy_set
 
@@ -472,7 +472,7 @@ def isdecoy(
     return False
 
 def get_ndecoys(ligands_dict, maxd):
-    return sum((x for x in ligands_dict.itervalues() if not maxd or maxd >= x))
+    return sum((x for x in ligands_dict.values() if not maxd or maxd >= x))
 
 def checkoutputfile(outputfile):
     """
@@ -550,7 +550,7 @@ def find_decoys(
     if conn:
         try:
             db_entry_gen = itertools.chain(query_db(conn), db_entry_gen)
-        except Exception, e:
+        except Exception as e:
             _debug(e)
 
     used_db_files = set()
@@ -661,7 +661,7 @@ def find_decoys(
                         yield ('ndecoys',  ndecoys, complete_ligand_sets)
                         if unique:
                             break
-            except Exception, e:
+            except Exception as e:
                 _debug(e)
         else:
             _debug("finishing")
@@ -681,7 +681,7 @@ def find_decoys(
     else:
         _debug("Not all wanted decoys found")
     #Generate logfile
-    log = u'"%s %s log file generated on %s"\n' % (metadata.NAME, metadata.VERSION, datetime.datetime.now())
+    log = '"%s %s log file generated on %s"\n' % (metadata.NAME, metadata.VERSION, datetime.datetime.now())
     log += "\n"
     log += '"Output file:","%s"\n' % outputfile
     log += "\n"
